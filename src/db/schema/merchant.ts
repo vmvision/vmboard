@@ -26,8 +26,11 @@ export const merchant = pgTable("merchant", {
   cookieJar: jsonb("cookie_jar"),
   comment: text("comment"),
 
-  createdAt: timestamp("created_at", { withTimezone: true }).notNull(),
-  updatedAt: timestamp("updated_at", { withTimezone: true }).notNull(),
+  createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
+  updatedAt: timestamp("updated_at", { withTimezone: true })
+    .notNull()
+    .defaultNow()
+    .$onUpdate(() => new Date()),
 });
 
 export type Merchant = typeof merchant.$inferSelect;

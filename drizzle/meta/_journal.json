@@ -15,6 +15,13 @@
       "when": 1740289428113,
       "tag": "0001_clear_champions",
       "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "7",
+      "when": 1740304153340,
+      "tag": "0002_opposite_deadpool",
+      "breakpoints": true
     }
   ]
 }

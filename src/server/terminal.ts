@@ -3,7 +3,9 @@ import { vm as vmTable } from "@/db/schema/vm";
 import { eq } from "drizzle-orm";
 import { Client } from "ssh2";
 import { WebSocketServer } from "ws";
-import { db } from "@/db";
+import db from "@/db";
+import { auth } from "@/lib/auth";
+import { sshKeysTable } from "@/db/schema/ssh-key";
 
 export const setupTerminalWebSocketServer = (
   server: http.Server<typeof http.IncomingMessage, typeof http.ServerResponse>,
@@ -33,13 +35,23 @@ export const setupTerminalWebSocketServer = (
       req.url ?? "/",
       `http://${req.headers.host ?? "localhost"}`,
     );
+
+    const session = await auth.api.getSession({
+      headers: new Headers(req.headers as Record<string, string>),
+    });
+
+    if (!session) {
+      ws.send("[ERROR] Unauthorized");
+      ws.close();
+      return;
+    }
+
     const vmId = url.searchParams.get("vmId");
     // Get terminal size parameters
     const cols = Number.parseInt(url.searchParams.get("cols") ?? "80");
     const rows = Number.parseInt(url.searchParams.get("rows") ?? "30");
 
-    // const { user, session } = await validateWebSocketRequest(req);
-    if (!user || !session || !vmId) {
+    if (!vmId) {
       ws.send("[ERROR] Invalid request");
       ws.close();
       return;
@@ -60,6 +72,14 @@ export const setupTerminalWebSocketServer = (
       ws.close();
       return;
     }
+
+    const sshKey = vm.sshInfo.sshKeyId
+      ? await db.query.sshKeysTable.findFirst({
+          where: eq(sshKeysTable.id, vm.sshInfo.sshKeyId),
+        })
+      : null;
+
+    const privateKey = sshKey?.privateKey ?? vm.sshInfo.privateKey;
 
     const conn = new Client();
     // const bufferSize = 1024 * 1024; // 1MB buffer
@@ -182,6 +202,7 @@ export const setupTerminalWebSocketServer = (
         keepaliveInterval: 10000,
         readyTimeout: 30000,
         ...vm.sshInfo,
+        privateKey,
       });
   });
 };

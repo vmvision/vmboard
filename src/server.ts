@@ -16,7 +16,6 @@ void app.prepare().then(async () => {
       handle(req, res);
     });
 
-    /* No watch mode, please restart for now */
     (await import("./server/terminal")).setupTerminalWebSocketServer(server);
     server.on("listening", () => {
       console.log(

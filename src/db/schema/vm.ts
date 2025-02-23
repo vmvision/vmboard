@@ -13,6 +13,10 @@ import { merchant, type Merchant } from "./merchant";
 import type { VMMetadata } from "vmapi";
 import type { ConnectConfig } from "ssh2";
 
+export interface SSHInfo extends ConnectConfig {
+  sshKeyId?: number;
+}
+
 export const vm = pgTable("vm", {
   id: serial("id").primaryKey(),
   userId: text("user_id")
@@ -34,7 +38,7 @@ export const vm = pgTable("vm", {
     enum: ["running", "stopped", "expired", "error"],
   }).notNull(),
   ipAddress: inet("ip_address"),
-  sshInfo: jsonb("ssh_info").$type<ConnectConfig>(),
+  sshInfo: jsonb("ssh_info").$type<SSHInfo>(),
   metadata: jsonb("metadata").$type<VMMetadata>(),
 
   createdAt: timestamp("created_at", { withTimezone: true })
@@ -42,6 +46,7 @@ export const vm = pgTable("vm", {
     .defaultNow(),
   updatedAt: timestamp("updated_at", { withTimezone: true })
     .notNull()
+    .defaultNow()
     .$onUpdate(() => new Date()),
 });
 
