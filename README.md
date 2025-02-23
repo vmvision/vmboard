@@ -5,6 +5,11 @@
 
 ![hits](https://hits.aprilnea.com/hits?url=https://github.com/AprilNEA/VMBoard)
 
+## Credits
+
+- [vmapi](https://github.com/AprilNEA/vmapi)
+- [shadcn-table](https://github.com/sadmann7/shadcn-table)
+
 ## License
 ```
 Copyright (C) 2025 by AprilNEA <github@sku.moe>

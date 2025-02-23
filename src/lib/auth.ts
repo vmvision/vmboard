@@ -1,4 +1,4 @@
-import { db } from "@/db";
+import db from "@/db";
 import { betterAuth } from "better-auth";
 import { drizzleAdapter } from "better-auth/adapters/drizzle";
 import { twoFactor, admin, username } from "better-auth/plugins";

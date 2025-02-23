@@ -1,6 +1,6 @@
 import "server-only";
 
-import { db } from "@/db";
+import db from "@/db";
 import { vm as vmTable, type VM } from "@/db/schema/vm";
 import { merchant as merchantTable } from "@/db/schema/merchant";
 import {

@@ -1,6 +1,6 @@
 "use server";
 
-import { db } from "@/db/index";
+import db from "@/db/index";
 import { type VM, vm as vmTable } from "@/db/schema/vm";
 import { takeFirstOrThrow } from "@/db/utils";
 import { asc, eq, inArray, not } from "drizzle-orm";
