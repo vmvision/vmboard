@@ -82,7 +82,9 @@ export default function RootLayout({ children }: React.PropsWithChildren) {
         >
           <div className="relative flex min-h-screen flex-col">
             <SiteHeader />
-            <main className="flex-1">{children}</main>
+            <main className="h-[calc(100vh-3.5rem-1px)] w-screen">
+              {children}
+            </main>
           </div>
           <TailwindIndicator />
         </ThemeProvider>

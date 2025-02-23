@@ -12,7 +12,7 @@ export const setupTerminalWebSocketServer = (
 ) => {
   const wssTerm = new WebSocketServer({
     noServer: true,
-    path: "/api/terminal",
+    path: "/wss/terminal",
   });
 
   server.on("upgrade", (req, socket, head) => {
@@ -23,7 +23,7 @@ export const setupTerminalWebSocketServer = (
     if (pathname === "/_next/webpack-hmr") {
       return;
     }
-    if (pathname === "/api/terminal") {
+    if (pathname === "/wss/terminal") {
       wssTerm.handleUpgrade(req, socket, head, function done(ws) {
         wssTerm.emit("connection", ws, req);
       });
@@ -93,32 +93,31 @@ export const setupTerminalWebSocketServer = (
       }
     }, 30000);
 
+    ws.send("正在尝试连接服务器...\r");
+
     conn
       .once("ready", () => {
         conn.shell(
           {
             term: "xterm-256color",
-            // cols: 80,
-            // rows: 30,
-            // height: 30,
-            // width: 80,
             cols: cols,
             rows: rows,
-            width: cols * 7, // 估算字符宽度
-            height: rows * 14, // 估算字符高度
+            width: cols * 7, // Estimating character width
+            height: rows * 14, // Estimate character height
           },
           (err, stream) => {
-            // if (err) throw err;
             if (err) {
               ws.send(`[ERROR] Shell error: ${err.message}`);
               ws.close();
               return;
             }
+            const clearScreenCommand = "\x1b[2J";
+            ws.send(clearScreenCommand);
 
             stream.setEncoding("utf8");
 
             stream
-              .on("close", (code: number, signal: string) => {
+              .on("close", (code: number) => {
                 clearInterval(pingInterval);
                 ws.send(`\nConnection closed (${code})\n`);
                 conn.end();
@@ -146,34 +145,49 @@ export const setupTerminalWebSocketServer = (
                   command = message;
                 }
                 try {
-                  const data = JSON.parse(message.toString());
+                  const data = JSON.parse(message.toString()) as {
+                    type?: string;
+                    rows?: number;
+                    cols?: number;
+                    data?: string;
+                  };
                   if (data.type === "resize") {
-                    stream.setWindow(
-                      data.rows,
-                      data.cols,
-                      data.cols * 7,
-                      data.rows * 14,
-                    );
+                    if (
+                      typeof data.rows === "number" &&
+                      typeof data.cols === "number"
+                    ) {
+                      stream.setWindow(
+                        data.rows,
+                        data.cols,
+                        data.cols * 7,
+                        data.rows * 14,
+                      );
+                    }
                   } else {
-                    stream.write(data.data || data);
+                    stream.write(
+                      typeof data.data === "string"
+                        ? data.data
+                        : message.toString(),
+                    );
                   }
                 } catch (error) {
                   // If JSON parsing fails, treat as plain command
                   if (error instanceof SyntaxError) {
-                    stream.write(message.toString());
+                    stream.write(command.toString());
                   } else {
                     throw error; // Re-throw other errors
                   }
                 }
               } catch (error) {
-                // @ts-ignore
-                const errorMessage = error?.message as unknown as string;
+                const errorMessage =
+                  error instanceof Error ? error.message : "Unknown error";
                 ws.send(`[ERROR] ${errorMessage}`);
               }
             });
 
             ws.on("close", () => {
               clearInterval(pingInterval);
+              console.log("close");
               stream.end();
               conn.end();
             });
@@ -186,6 +200,7 @@ export const setupTerminalWebSocketServer = (
         );
       })
       .on("error", (err) => {
+        console.log("error", err);
         clearInterval(pingInterval);
         if (err.level === "client-authentication") {
           ws.send(
@@ -198,10 +213,13 @@ export const setupTerminalWebSocketServer = (
         ws.close();
       })
       .connect({
-        timeout: 30000,
+        timeout: 3000,
         keepaliveInterval: 10000,
-        readyTimeout: 30000,
+        readyTimeout: 3000,
         ...vm.sshInfo,
+        host: vm.sshInfo.host || vm.ipAddress || undefined,
+        port: vm.sshInfo.port || 22,
+        username: vm.sshInfo.username || "root",
         privateKey,
       });
   });

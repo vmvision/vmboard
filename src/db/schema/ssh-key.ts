@@ -9,7 +9,7 @@ export const sshKeysTable = pgTable("ssh-key", {
       onDelete: "cascade",
       onUpdate: "cascade",
     }),
-    
+
   name: text("name").notNull(),
   description: text("description"),
 

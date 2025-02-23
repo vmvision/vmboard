@@ -17,6 +17,7 @@ void app.prepare().then(async () => {
     });
 
     (await import("./server/terminal")).setupTerminalWebSocketServer(server);
+    
     server.on("listening", () => {
       console.log(
         `[VMBoard] v${packageJson.version} running on http://localhost:${PORT}`,
