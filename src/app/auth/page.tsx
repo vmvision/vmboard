@@ -34,29 +34,29 @@ export default function AuthPage() {
   });
 
   const onSubmit = async (values: IAuth) => {
-    const { data, error } = await authClient.signUp.email(
-      {
-        email: values.email,
-        password: values.password,
-        name: values.email,
-      },
-      {
-        onRequest: (ctx) => {
-          //show loading
-        },
-        onSuccess: (ctx) => {
-          toast.success("注册成功");
-        },
-        onError: (ctx) => {
-          // display the error message
-          toast.error(ctx.error.message);
-        },
-      },
-    );
-    // const { data, error } = await authClient.signIn.email({
-    // 	email: values.email,
-    // 	password: values.password,
-    // });
+    // const { data, error } = await authClient.signUp.email(
+    //   {
+    //     email: values.email,
+    //     password: values.password,
+    //     name: values.email,
+    //   },
+    //   {
+    //     onRequest: (ctx) => {
+    //       //show loading
+    //     },
+    //     onSuccess: (ctx) => {
+    //       toast.success("注册成功");
+    //     },
+    //     onError: (ctx) => {
+    //       // display the error message
+    //       toast.error(ctx.error.message);
+    //     },
+    //   },
+    // );
+    const { data, error } = await authClient.signIn.email({
+    	email: values.email,
+    	password: values.password,
+    });
     if (data) {
       toast.success("登录成功");
       router.push("/dash");
