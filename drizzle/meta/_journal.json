@@ -1,0 +1,20 @@
+{
+  "version": "7",
+  "dialect": "postgresql",
+  "entries": [
+    {
+      "idx": 0,
+      "version": "7",
+      "when": 1740286963407,
+      "tag": "0000_oval_zaran",
+      "breakpoints": true
+    },
+    {
+      "idx": 1,
+      "version": "7",
+      "when": 1740289428113,
+      "tag": "0001_clear_champions",
+      "breakpoints": true
+    }
+  ]
+}
