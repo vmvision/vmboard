@@ -3,6 +3,8 @@
 
 # VMBoard
 
+![hits](https://hits.aprilnea.com/hits?url=https://github.com/AprilNEA/VMBoard)
+
 ## License
 ```
 Copyright (C) 2025 by AprilNEA <github@sku.moe>
