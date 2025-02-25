@@ -42,7 +42,7 @@ export const metadata: Metadata = {
     creator: "@AprilNEA",
   },
   icons: {
-    icon: "/icon.png",
+    icon: "/icon.svg",
   },
   manifest: `${siteConfig.url}/site.webmanifest`,
 };
@@ -74,9 +74,7 @@ export default function RootLayout({ children }: React.PropsWithChildren) {
         >
           <div className="relative flex min-h-screen flex-col">
             <SiteHeader />
-            <main className="h-[calc(100vh-3.5rem-1px)] w-screen">
-              {children}
-            </main>
+            {children}
           </div>
           <TailwindIndicator />
         </ThemeProvider>

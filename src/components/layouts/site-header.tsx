@@ -1,24 +1,25 @@
-import { LayoutGrid } from "lucide-react";
 import Link from "next/link";
 
 import { Icons } from "@/components/icons";
 import { ModeToggle } from "@/components/layouts/mode-toggle";
 import { Button } from "@/components/ui/button";
 import { siteConfig } from "@/config/site";
+import Logo from "../icons/logo";
+import Profile from "./profile";
 
 export function SiteHeader() {
   return (
     <header className="sticky top-0 z-50 w-full border-border/40 border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
       <div className="container flex h-14 items-center">
         <Link href="/" className="mr-2 flex items-center md:mr-6 md:space-x-2">
-          <LayoutGrid className="size-4" aria-hidden="true" />
+          <Logo className="size-5" aria-hidden="true" />
           <span className="hidden font-bold md:inline-block">
             {siteConfig.name}
           </span>
         </Link>
         <nav className="flex w-full items-center gap-6 text-sm">
           <Link
-            href="https://www.sadmn.com/blog/shadcn-table"
+            href="https://vmboard.app"
             target="_blank"
             rel="noopener noreferrer"
             className="text-foreground/60 transition-colors hover:text-foreground"
@@ -34,10 +35,11 @@ export function SiteHeader() {
               target="_blank"
               rel="noopener noreferrer"
             >
-              <Icons.gitHub className="size-4" aria-hidden="true" />
+              <Icons.gitHub className="size-5" aria-hidden="true" />
             </Link>
           </Button>
           <ModeToggle />
+          <Profile />
         </nav>
       </div>
     </header>

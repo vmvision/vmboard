@@ -33,34 +33,41 @@ export default function AuthPage() {
     },
   });
 
-  const onSubmit = async (values: IAuth) => {
-    // const { data, error } = await authClient.signUp.email(
-    //   {
-    //     email: values.email,
-    //     password: values.password,
-    //     name: values.email,
-    //   },
-    //   {
-    //     onRequest: (ctx) => {
-    //       //show loading
-    //     },
-    //     onSuccess: (ctx) => {
-    //       toast.success("注册成功");
-    //     },
-    //     onError: (ctx) => {
-    //       // display the error message
-    //       toast.error(ctx.error.message);
-    //     },
-    //   },
-    // );
-    const { data, error } = await authClient.signIn.email({
-    	email: values.email,
-    	password: values.password,
-    });
-    if (data) {
-      toast.success("登录成功");
-      router.push("/dash");
-    }
+  const onSubmit = async (type: "signIn" | "signUp", values: IAuth) => {
+    type === "signIn"
+      ? await authClient.signIn.email(
+          {
+            email: values.email,
+            password: values.password,
+          },
+          {
+            onSuccess: () => {
+              toast.success("登陆成功");
+              router.push("/dash");
+            },
+            onError: (ctx) => {
+              toast.error("登陆失败");
+              console.error(ctx);
+            },
+          },
+        )
+      : await authClient.signUp.email(
+          {
+            email: values.email,
+            password: values.password,
+            name: values.email,
+          },
+          {
+            onSuccess: () => {
+              toast.success("注册成功");
+              router.push("/dash");
+            },
+            onError: (ctx) => {
+              toast.error("注册失败");
+              console.error(ctx);
+            },
+          },
+        );
   };
 
   const handlePasskeySignIn = async () => {
@@ -82,7 +89,10 @@ export default function AuthPage() {
       </CardHeader>
       <CardContent>
         <Form {...form}>
-          <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
+          <form
+            onSubmit={form.handleSubmit((values) => onSubmit("signIn", values))}
+            className="space-y-4"
+          >
             <FormField
               control={form.control}
               name="email"
