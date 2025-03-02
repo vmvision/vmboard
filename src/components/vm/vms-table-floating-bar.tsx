@@ -6,6 +6,7 @@ import {
   CheckCircle2,
   Download,
   Loader,
+  SquareTerminalIcon,
   Trash2,
   X,
 } from "lucide-react";
@@ -45,7 +46,7 @@ export function VMsTableFloatingBar({ table }: VMsTableFloatingBarProps) {
 
   const [isPending, startTransition] = React.useTransition();
   const [action, setAction] = React.useState<
-    "update-status" | "update-priority" | "export" | "delete"
+    "update-status" | "update-priority" | "terminal" | "export" | "delete"
   >();
 
   // Clear selection on Escape key press
@@ -67,7 +68,7 @@ export function VMsTableFloatingBar({ table }: VMsTableFloatingBarProps) {
           <div className="mx-auto flex w-fit items-center gap-2 rounded-md border bg-background p-2 text-foreground shadow">
             <div className="flex h-7 items-center rounded-md border border-dashed pr-1 pl-2.5">
               <span className="whitespace-nowrap text-xs">
-                {rows.length} selected
+                {rows.length} 选中
               </span>
               <Separator orientation="vertical" className="mr-1 ml-2" />
               <Tooltip>
@@ -82,7 +83,7 @@ export function VMsTableFloatingBar({ table }: VMsTableFloatingBarProps) {
                   </Button>
                 </TooltipTrigger>
                 <TooltipContent className="flex items-center border bg-accent px-2 py-1 font-semibold text-foreground dark:bg-zinc-900">
-                  <p className="mr-2">Clear selection</p>
+                  <p className="mr-2">清空选中</p>
                   <Kbd abbrTitle="Escape" variant="outline">
                     Esc
                   </Kbd>
@@ -181,6 +182,42 @@ export function VMsTableFloatingBar({ table }: VMsTableFloatingBarProps) {
                 </TooltipTrigger>
                 <TooltipContent className="border bg-accent font-semibold text-foreground dark:bg-zinc-900">
                   <p>Export tasks</p>
+                </TooltipContent>
+              </Tooltip>
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <Button
+                    variant="secondary"
+                    size="icon"
+                    className="size-7 border"
+                    onClick={() => {
+                      setAction("terminal");
+                      startTransition(() => {
+                        for (const row of rows) {
+                          window.open(
+                            `/dash/terminal?vmId=${row.original.id}`,
+                            "_blank",
+                          );
+                        }
+                      });
+                    }}
+                    disabled={isPending}
+                  >
+                    {isPending && action === "terminal" ? (
+                      <Loader
+                        className="size-3.5 animate-spin"
+                        aria-hidden="true"
+                      />
+                    ) : (
+                      <SquareTerminalIcon
+                        className="size-3.5"
+                        aria-hidden="true"
+                      />
+                    )}
+                  </Button>
+                </TooltipTrigger>
+                <TooltipContent className="border bg-accent font-semibold text-foreground dark:bg-zinc-900">
+                  <p>使用终端连接服务器</p>
                 </TooltipContent>
               </Tooltip>
               <Tooltip>
