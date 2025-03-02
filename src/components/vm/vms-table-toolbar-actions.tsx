@@ -5,10 +5,10 @@ import type { Table } from "@tanstack/react-table";
 import { Download } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
-import { exportTableToCSV } from "@/lib/export";
+// import { exportTableToCSV } from "@/lib/export";
 
 import { DeleteVMsDialog } from "./delete-vms-dialog";
-
+import { CreateVMSheet } from "./create-vm-sheet";
 
 interface VMsTableToolbarActionsProps {
   table: Table<VM>;
@@ -25,7 +25,7 @@ export function VMsTableToolbarActions({ table }: VMsTableToolbarActionsProps) {
           onSuccess={() => table.toggleAllRowsSelected(false)}
         />
       ) : null}
-      <Button
+      {/* <Button
         variant="outline"
         size="sm"
         onClick={() =>
@@ -37,12 +37,18 @@ export function VMsTableToolbarActions({ table }: VMsTableToolbarActionsProps) {
         className="gap-2"
       >
         <Download className="size-4" aria-hidden="true" />
-        Export
-      </Button>
+        导出
+      </Button> */}
       {/**
        * Other actions can be added here.
        * For example, import, view, etc.
        */}
+      <CreateVMSheet>
+        <Button variant="outline" size="sm" className="gap-2">
+          <Download className="size-4" aria-hidden="true" />
+          导入
+        </Button>
+      </CreateVMSheet>
     </div>
   );
 }

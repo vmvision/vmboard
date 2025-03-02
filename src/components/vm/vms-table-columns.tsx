@@ -1,9 +1,9 @@
 "use client";
 
-import { type VM, vm as vmTable, VMWithMerchant } from "@/db/schema/vm";
+import { type VM, vm as vmTable, type VMWithMerchant } from "@/db/schema/vm";
 import type { DataTableRowAction } from "@/types";
 import type { ColumnDef } from "@tanstack/react-table";
-import { Ellipsis } from "lucide-react";
+import { Ellipsis, TerminalIcon } from "lucide-react";
 import * as React from "react";
 import { toast } from "sonner";
 
@@ -34,7 +34,8 @@ import {
   getPriorityIcon,
   getStatusIcon,
 } from "../../app/_lib/utils";
-import { Merchant } from "@/db/schema";
+import type { Merchant } from "@/db/schema";
+import Link from "next/link";
 
 interface GetColumnsProps {
   setRowAction: React.Dispatch<
@@ -227,6 +228,17 @@ export function getColumns({
               </Button>
             </DropdownMenuTrigger>
             <DropdownMenuContent align="end" className="w-40">
+              <Link
+                target="_blank"
+                href={`/dash/terminal?vmId=${row.original.id}`}
+              >
+                <DropdownMenuItem>
+                  终端
+                  <DropdownMenuShortcut>
+                    <TerminalIcon className="size-4" aria-hidden="true" />
+                  </DropdownMenuShortcut>
+                </DropdownMenuItem>
+              </Link>
               <DropdownMenuItem
                 onSelect={() => setRowAction({ row, type: "update" })}
               >

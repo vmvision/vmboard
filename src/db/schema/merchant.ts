@@ -19,14 +19,18 @@ export const merchant = pgTable("merchant", {
       onDelete: "cascade",
       onUpdate: "cascade",
     }),
-  merchant: varchar("merchant", { length: 30, enum: ["dmit"] }).notNull(),
+  merchant: varchar("merchant", {
+    length: 30,
+  }).notNull(),
 
   username: varchar("username").notNull(),
   password: varchar("password").notNull(),
   cookieJar: jsonb("cookie_jar"),
   comment: text("comment"),
 
-  createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
+  createdAt: timestamp("created_at", { withTimezone: true })
+    .notNull()
+    .defaultNow(),
   updatedAt: timestamp("updated_at", { withTimezone: true })
     .notNull()
     .defaultNow()

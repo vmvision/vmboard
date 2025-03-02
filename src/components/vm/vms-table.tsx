@@ -22,6 +22,7 @@ import { getColumns } from "./vms-table-columns";
 import { VMsTableFloatingBar } from "./vms-table-floating-bar";
 import { VMsTableToolbarActions } from "./vms-table-toolbar-actions";
 import { UpdateVMSheet } from "./update-vm-sheet";
+// import { CreateVMSheet } from "./create-vm-sheet";
 
 interface TasksTableProps {
   promises: Promise<
@@ -58,7 +59,7 @@ export function VMsTable({ promises }: TasksTableProps) {
     {
       id: "nickname",
       label: "昵称",
-      placeholder: "Filter titles...",
+      placeholder: "筛选昵称",
     },
     {
       id: "status",
@@ -90,7 +91,7 @@ export function VMsTable({ promises }: TasksTableProps) {
     },
     {
       id: "status",
-      label: "Status",
+      label: "状态",
       type: "multi-select",
       options: vmTable.status.enumValues.map((status) => ({
         label: toSentenceCase(status),
@@ -101,7 +102,7 @@ export function VMsTable({ promises }: TasksTableProps) {
     },
     {
       id: "createdAt",
-      label: "Created at",
+      label: "创建时间",
       type: "date",
     },
   ];

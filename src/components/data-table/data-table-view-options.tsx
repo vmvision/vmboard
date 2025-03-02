@@ -41,7 +41,7 @@ export function DataTableViewOptions<TData>({
           className="ml-auto hidden h-8 gap-2 focus:outline-none focus:ring-1 focus:ring-ring focus-visible:ring-0 lg:flex"
         >
           <Settings2 className="size-4" />
-          View
+          视图
           <ChevronsUpDown className="ml-auto size-4 shrink-0 opacity-50" />
         </Button>
       </PopoverTrigger>
@@ -51,9 +51,9 @@ export function DataTableViewOptions<TData>({
         onCloseAutoFocus={() => triggerRef.current?.focus()}
       >
         <Command>
-          <CommandInput placeholder="Search columns..." />
+          <CommandInput placeholder="搜索列名..." />
           <CommandList>
-            <CommandEmpty>No columns found.</CommandEmpty>
+            <CommandEmpty>未找到列。</CommandEmpty>
             <CommandGroup>
               {table
                 .getAllColumns()

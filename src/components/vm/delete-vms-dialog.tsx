@@ -71,22 +71,22 @@ export function DeleteVMsDialog({
           <DialogTrigger asChild>
             <Button variant="outline" size="sm">
               <Trash className="mr-2 size-4" aria-hidden="true" />
-              Delete ({vms.length})
+              删除 ({vms.length})
             </Button>
           </DialogTrigger>
         ) : null}
         <DialogContent>
           <DialogHeader>
-            <DialogTitle>Are you absolutely sure?</DialogTitle>
+            <DialogTitle>确定删除吗？</DialogTitle>
             <DialogDescription>
-              This action cannot be undone. This will permanently delete your{" "}
+              此操作无法撤销。这将永久删除您的{" "}
               <span className="font-medium">{vms.length}</span>
-              {vms.length === 1 ? " task" : " tasks"} from our servers.
+              {vms.length === 1 ? " 个任务" : " 个任务"}。
             </DialogDescription>
           </DialogHeader>
           <DialogFooter className="gap-2 sm:space-x-0">
             <DialogClose asChild>
-              <Button variant="outline">Cancel</Button>
+              <Button variant="outline">取消</Button>
             </DialogClose>
             <Button
               aria-label="Delete selected rows"
@@ -100,7 +100,7 @@ export function DeleteVMsDialog({
                   aria-hidden="true"
                 />
               )}
-              Delete
+              删除
             </Button>
           </DialogFooter>
         </DialogContent>
@@ -114,7 +114,7 @@ export function DeleteVMsDialog({
         <DrawerTrigger asChild>
           <Button variant="outline" size="sm">
             <Trash className="mr-2 size-4" aria-hidden="true" />
-            Delete ({vms.length})
+            删除 ({vms.length})
           </Button>
         </DrawerTrigger>
       ) : null}
@@ -122,9 +122,9 @@ export function DeleteVMsDialog({
         <DrawerHeader>
           <DrawerTitle>Are you absolutely sure?</DrawerTitle>
           <DrawerDescription>
-            This action cannot be undone. This will permanently delete your{" "}
+            此操作无法撤销。这将永久删除您的{" "}
             <span className="font-medium">{vms.length}</span>
-            {vms.length === 1 ? " task" : " tasks"} from our servers.
+            {vms.length === 1 ? " 个任务" : " 个任务"}。
           </DrawerDescription>
         </DrawerHeader>
         <DrawerFooter className="gap-2 sm:space-x-0">
@@ -140,7 +140,7 @@ export function DeleteVMsDialog({
             {isDeletePending && (
               <Loader className="mr-2 size-4 animate-spin" aria-hidden="true" />
             )}
-            Delete
+            删除
           </Button>
         </DrawerFooter>
       </DrawerContent>

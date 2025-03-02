@@ -1,4 +1,4 @@
-import { type Task, tasks } from "@/db/schema";
+import { type VM, vm as vmTable } from "@/db/schema";
 import { SelectTrigger } from "@radix-ui/react-select";
 import type { Table } from "@tanstack/react-table";
 import {
@@ -35,7 +35,6 @@ import {
   updateVM,
   updateVMs,
 } from "../../app/_lib/actions";
-import type { VM } from "@/db/schema/vm";
 
 interface VMsTableFloatingBarProps {
   table: Table<VM>;
@@ -93,7 +92,7 @@ export function VMsTableFloatingBar({ table }: VMsTableFloatingBarProps) {
             <Separator orientation="vertical" className="hidden h-5 sm:block" />
             <div className="flex items-center gap-1.5">
               <Select
-                onValueChange={(value: Task["status"]) => {
+                onValueChange={(value: VM["status"]) => {
                   setAction("update-status");
 
                   startTransition(async () => {
@@ -140,70 +139,13 @@ export function VMsTableFloatingBar({ table }: VMsTableFloatingBarProps) {
                 </Tooltip>
                 <SelectContent align="center">
                   <SelectGroup>
-                    {tasks.status.enumValues.map((status) => (
+                    {vmTable.status.enumValues.map((status) => (
                       <SelectItem
                         key={status}
                         value={status}
                         className="capitalize"
                       >
                         {status}
-                      </SelectItem>
-                    ))}
-                  </SelectGroup>
-                </SelectContent>
-              </Select>
-              <Select
-                onValueChange={(value: Task["priority"]) => {
-                  setAction("update-priority");
-
-                  startTransition(async () => {
-                    const { error } = await updateVMs({
-                      ids: rows.map((row) => row.original.id),
-                      status: value,
-                    });
-
-                    if (error) {
-                      toast.error(error);
-                      return;
-                    }
-
-                    toast.success("Tasks updated");
-                  });
-                }}
-              >
-                <Tooltip>
-                  <SelectTrigger asChild>
-                    <TooltipTrigger asChild>
-                      <Button
-                        variant="secondary"
-                        size="icon"
-                        className="size-7 border data-[state=open]:bg-accent data-[state=open]:text-accent-foreground"
-                        disabled={isPending}
-                      >
-                        {isPending && action === "update-priority" ? (
-                          <Loader
-                            className="size-3.5 animate-spin"
-                            aria-hidden="true"
-                          />
-                        ) : (
-                          <ArrowUp className="size-3.5" aria-hidden="true" />
-                        )}
-                      </Button>
-                    </TooltipTrigger>
-                  </SelectTrigger>
-                  <TooltipContent className="border bg-accent font-semibold text-foreground dark:bg-zinc-900">
-                    <p>Update priority</p>
-                  </TooltipContent>
-                </Tooltip>
-                <SelectContent align="center">
-                  <SelectGroup>
-                    {tasks.priority.enumValues.map((priority) => (
-                      <SelectItem
-                        key={priority}
-                        value={priority}
-                        className="capitalize"
-                      >
-                        {priority}
                       </SelectItem>
                     ))}
                   </SelectGroup>
