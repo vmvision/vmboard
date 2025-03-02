@@ -32,13 +32,16 @@ export const searchParamsCache = createSearchParamsCache({
 export const createVMSchema = z.object({
   nickname: z.string(),
   // label: z.enum(tasks.label.enumValues),
+  ipAddress: z.string().optional(),
   status: z.enum(vmTable.status.enumValues),
-  merchantId: z.string(),
+  merchantId: z.number().optional(),
+  metadata: z.any().optional(),
   // priority: z.enum(tasks.priority.enumValues),
 });
 
 export const updateVMSchema = z.object({
   nickname: z.string().optional(),
+
   // label: z.enum(tasks.label.enumValues).optional(),
   status: z.enum(vmTable.status.enumValues).optional(),
   // priority: z.enum(tasks.priority.enumValues).optional(),

@@ -21,7 +21,22 @@ import { filterColumns } from "@/lib/filter-columns";
 import { unstable_cache } from "@/lib/unstable-cache";
 
 import type { GetVMSchema } from "./validations";
-import { metadata } from "../layout";
+import { sshKeysTable } from "@/db/schema";
+
+export async function getVM(vmId: number) {
+  const session = await getSessionOrThrow();
+  return await unstable_cache(
+    async () =>
+      db.query.vm.findFirst({
+        where: and(eq(vmTable.id, vmId), eq(vmTable.userId, session.user.id)),
+      }),
+    [String(vmId)],
+    {
+      revalidate: 60,
+      tags: ["vm"],
+    },
+  )();
+}
 
 export async function getVMs(input: GetVMSchema) {
   await getSessionOrThrow();
@@ -154,6 +169,21 @@ export async function getMerchants() {
     ["merchants"],
     {
       revalidate: 3600,
+    },
+  )();
+}
+
+export async function getSSHKey() {
+  const session = await getSessionOrThrow();
+  return await unstable_cache(
+    async () =>
+      db.query.sshKeysTable.findMany({
+        where: eq(sshKeysTable.userId, session.user.id),
+      }),
+    [session.user.id],
+    {
+      revalidate: 3600,
+      tags: ["ssh-key"],
     },
   )();
 }

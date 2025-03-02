@@ -27,6 +27,7 @@ const app = appFactory.createApp().get(
 
     return c.json({
       name: vm.nickname,
+      sshInfo: vm.sshInfo,
     });
   },
 );

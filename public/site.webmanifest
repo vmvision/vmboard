@@ -3,9 +3,9 @@
   "short_name": "VMBoard",
   "icons": [
     {
-      "src": "/icon.png",
+      "src": "/icon.svg",
       "sizes": "32x32",
-      "type": "image/png"
+      "type": "image/svg+xml"
     }
   ],
   "theme_color": "#ffffff",

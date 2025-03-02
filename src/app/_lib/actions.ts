@@ -1,9 +1,9 @@
 "use server";
 
 import db from "@/db/index";
-import { type VM, vm as vmTable } from "@/db/schema/vm";
+import { SSHInfo, type VM, vm as vmTable } from "@/db/schema/vm";
 import { takeFirstOrThrow } from "@/db/utils";
-import { asc, eq, inArray, not } from "drizzle-orm";
+import { and, asc, eq, inArray, not } from "drizzle-orm";
 import { revalidateTag, unstable_noStore } from "next/cache";
 
 import { getSessionOrThrow } from "@/lib/session";
@@ -193,6 +193,33 @@ export async function deleteVMs(input: { ids: number[] }) {
     revalidateTag("vm-status-counts");
     // revalidateTag("vm-priority-counts");
 
+    return {
+      data: null,
+      error: null,
+    };
+  } catch (err) {
+    return {
+      data: null,
+      error: getErrorMessage(err),
+    };
+  }
+}
+
+export async function setupVMSSHInfo(input: {
+  id: number;
+  sshInfo: SSHInfo;
+}) {
+  unstable_noStore();
+  const session = await getSessionOrThrow();
+  try {
+    await db
+      .update(vmTable)
+      .set({
+        sshInfo: input.sshInfo,
+      })
+      .where(
+        and(eq(vmTable.id, input.id), eq(vmTable.userId, session.user.id)),
+      );
     return {
       data: null,
       error: null,
