@@ -53,7 +53,6 @@ export function UpdateVMSheet({ vm, ...props }: UpdateVMSheetProps) {
     defaultValues: {
       nickname: vm?.nickname ?? "",
       status: vm?.status ?? "running",
-      merchantId: vm?.merchantId ?? "",
     },
   });
 
@@ -110,39 +109,6 @@ export function UpdateVMSheet({ vm, ...props }: UpdateVMSheetProps) {
             />
             <FormField
               control={form.control}
-              name="label"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Label</FormLabel>
-                  <Select
-                    onValueChange={field.onChange}
-                    defaultValue={field.value}
-                  >
-                    <FormControl>
-                      <SelectTrigger className="capitalize">
-                        <SelectValue placeholder="Select a label" />
-                      </SelectTrigger>
-                    </FormControl>
-                    <SelectContent>
-                      <SelectGroup>
-                        {tasks.label.enumValues.map((item) => (
-                          <SelectItem
-                            key={item}
-                            value={item}
-                            className="capitalize"
-                          >
-                            {item}
-                          </SelectItem>
-                        ))}
-                      </SelectGroup>
-                    </SelectContent>
-                  </Select>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-            <FormField
-              control={form.control}
               name="status"
               render={({ field }) => (
                 <FormItem>
@@ -158,7 +124,7 @@ export function UpdateVMSheet({ vm, ...props }: UpdateVMSheetProps) {
                     </FormControl>
                     <SelectContent>
                       <SelectGroup>
-                        {tasks.status.enumValues.map((item) => (
+                        {vmTable.status.enumValues.map((item) => (
                           <SelectItem
                             key={item}
                             value={item}
@@ -177,7 +143,7 @@ export function UpdateVMSheet({ vm, ...props }: UpdateVMSheetProps) {
             <SheetFooter className="gap-2 pt-2 sm:space-x-0">
               <SheetClose asChild>
                 <Button type="button" variant="outline">
-                  Cancel
+                  取消
                 </Button>
               </SheetClose>
               <Button disabled={isUpdatePending}>
@@ -187,7 +153,7 @@ export function UpdateVMSheet({ vm, ...props }: UpdateVMSheetProps) {
                     aria-hidden="true"
                   />
                 )}
-                Save
+                保存
               </Button>
             </SheetFooter>
           </form>

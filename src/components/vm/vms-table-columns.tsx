@@ -3,7 +3,7 @@
 import { type VM, vm as vmTable, type VMWithMerchant } from "@/db/schema/vm";
 import type { DataTableRowAction } from "@/types";
 import type { ColumnDef } from "@tanstack/react-table";
-import { Ellipsis, TerminalIcon } from "lucide-react";
+import { Ellipsis, PenLineIcon, TerminalIcon, TrashIcon } from "lucide-react";
 import * as React from "react";
 import { toast } from "sonner";
 
@@ -233,16 +233,17 @@ export function getColumns({
                 href={`/dash/terminal?vmId=${row.original.id}`}
               >
                 <DropdownMenuItem>
+                  <TerminalIcon className="size-4" aria-hidden="true" />
                   终端
-                  <DropdownMenuShortcut>
-                    <TerminalIcon className="size-4" aria-hidden="true" />
-                  </DropdownMenuShortcut>
+                  <DropdownMenuShortcut>⌘T</DropdownMenuShortcut>
                 </DropdownMenuItem>
               </Link>
               <DropdownMenuItem
                 onSelect={() => setRowAction({ row, type: "update" })}
               >
-                Edit
+                <PenLineIcon className="size-4" aria-hidden="true" />
+                编辑
+                <DropdownMenuShortcut>⌘E</DropdownMenuShortcut>
               </DropdownMenuItem>
               {/*<DropdownMenuSub>
                  <DropdownMenuSubTrigger>Labels</DropdownMenuSubTrigger>
@@ -282,7 +283,8 @@ export function getColumns({
               <DropdownMenuItem
                 onSelect={() => setRowAction({ row, type: "delete" })}
               >
-                Delete
+                <TrashIcon className="size-4" aria-hidden="true" />
+                删除
                 <DropdownMenuShortcut>⌘⌫</DropdownMenuShortcut>
               </DropdownMenuItem>
             </DropdownMenuContent>
