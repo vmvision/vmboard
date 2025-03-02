@@ -3,9 +3,13 @@ import { betterAuth } from "better-auth";
 import { drizzleAdapter } from "better-auth/adapters/drizzle";
 import { twoFactor, admin, username } from "better-auth/plugins";
 import { passkey } from "better-auth/plugins/passkey";
+import { env } from "@/env";
+
+const trustedOrigins = [];
+trustedOrigins.push(env.BASE_URL);
 
 export const auth = betterAuth({
-  trustedOrigins: ["http://10.0.0.21:3000"],
+  trustedOrigins,
   database: drizzleAdapter(db, {
     provider: "pg",
   }),

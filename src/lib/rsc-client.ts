@@ -1,10 +1,10 @@
 import "server-only";
 import { hcWithType } from "@/server/hc";
 import { headers } from "next/headers";
+import { env } from "@/env";
 
-const rscClient = hcWithType("http://localhost:3000/api", {
+const rscClient = hcWithType(new URL("/api", env.BASE_URL).toString(), {
   init: {
-  
     credentials: "include",
   },
   headers: async () => {

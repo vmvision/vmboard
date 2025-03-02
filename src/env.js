@@ -10,6 +10,9 @@ export const env = createEnv({
     NODE_ENV: z
       .enum(["development", "test", "production"])
       .default("development"),
+    // RSC
+    BASE_URL: z.string().url().default("http://localhost:3000"),
+    // API
     DATABASE_URL: z.string().url(),
   },
 
@@ -28,6 +31,7 @@ export const env = createEnv({
    */
   runtimeEnv: {
     DATABASE_URL: process.env.DATABASE_URL,
+    BASE_URL: process.env.BASE_URL,
     NODE_ENV: process.env.NODE_ENV,
     // NEXT_PUBLIC_CLIENTVAR: process.env.NEXT_PUBLIC_CLIENTVAR,
   },
