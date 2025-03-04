@@ -8,7 +8,7 @@ CREATE TABLE "ssh-key" (
 	"created_at" timestamp with time zone DEFAULT now() NOT NULL,
 	"updated_at" timestamp with time zone DEFAULT now() NOT NULL
 );
---> statement-breakpoint
+> statement-breakpoint
 ALTER TABLE "merchant" ALTER COLUMN "created_at" SET DEFAULT now();--> statement-breakpoint
 ALTER TABLE "merchant" ALTER COLUMN "updated_at" SET DEFAULT now();--> statement-breakpoint
 ALTER TABLE "vm" ALTER COLUMN "updated_at" SET DEFAULT now();--> statement-breakpoint

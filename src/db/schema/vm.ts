@@ -6,6 +6,7 @@ import {
   serial,
   text,
   timestamp,
+  uuid,
   varchar,
 } from "drizzle-orm/pg-core";
 import { user } from "./auth";
@@ -38,6 +39,7 @@ export const vm = pgTable("vm", {
     enum: ["running", "stopped", "expired", "error"],
   }).notNull(),
   ipAddress: inet("ip_address"),
+  token: uuid("token").defaultRandom().notNull(),
   sshInfo: jsonb("ssh_info").$type<SSHInfo>(),
   metadata: jsonb("metadata").$type<VMMetadata>(),
 

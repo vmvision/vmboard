@@ -1,4 +1,5 @@
 import http from "node:http";
+
 import next from "next";
 import packageJson from "../package.json";
 
@@ -16,8 +17,9 @@ void app.prepare().then(async () => {
       handle(req, res);
     });
 
+    (await import("./server/monitor")).setupMonitorWebSocketServer(server);
     (await import("./server/terminal")).setupTerminalWebSocketServer(server);
-    
+
     server.on("listening", () => {
       console.log(
         `[VMBoard] v${packageJson.version} running on http://localhost:${PORT}`,
