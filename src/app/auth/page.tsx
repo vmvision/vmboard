@@ -17,6 +17,7 @@ import { useTransitionRouter } from "next-view-transitions";
 import { authClient } from "@/lib/auth-client";
 import { toast } from "sonner";
 import { Separator } from "@/components/ui/separator";
+import { useState } from "react";
 
 interface IAuth {
   email: string;
@@ -25,6 +26,7 @@ interface IAuth {
 
 export default function AuthPage() {
   const router = useTransitionRouter();
+  const [isSignUp, setIsSignUp] = useState(false);
 
   const form = useForm<IAuth>({
     defaultValues: {
@@ -33,25 +35,9 @@ export default function AuthPage() {
     },
   });
 
-  const onSubmit = async (type: "signIn" | "signUp", values: IAuth) => {
-    type === "signIn"
-      ? await authClient.signIn.email(
-          {
-            email: values.email,
-            password: values.password,
-          },
-          {
-            onSuccess: () => {
-              toast.success("登陆成功");
-              router.push("/dash");
-            },
-            onError: (ctx) => {
-              toast.error("登陆失败");
-              console.error(ctx);
-            },
-          },
-        )
-      : await authClient.signUp.email(
+  const onSubmit = async (values: IAuth) => {
+    isSignUp
+      ? await authClient.signUp.email(
           {
             email: values.email,
             password: values.password,
@@ -64,6 +50,22 @@ export default function AuthPage() {
             },
             onError: (ctx) => {
               toast.error("注册失败");
+              console.error(ctx);
+            },
+          },
+        )
+      : await authClient.signIn.email(
+          {
+            email: values.email,
+            password: values.password,
+          },
+          {
+            onSuccess: () => {
+              toast.success("登陆成功");
+              router.push("/dash");
+            },
+            onError: (ctx) => {
+              toast.error("登陆失败");
               console.error(ctx);
             },
           },
@@ -89,10 +91,7 @@ export default function AuthPage() {
       </CardHeader>
       <CardContent>
         <Form {...form}>
-          <form
-            onSubmit={form.handleSubmit((values) => onSubmit("signIn", values))}
-            className="space-y-4"
-          >
+          <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
             <FormField
               control={form.control}
               name="email"
@@ -121,8 +120,12 @@ export default function AuthPage() {
                 </FormItem>
               )}
             />
-            <Button type="submit" className="w-full" data-umami-event="signin">
-              提交
+            <Button
+              type="submit"
+              className="w-full"
+              data-umami-event={isSignUp ? "signup" : "signin"}
+            >
+              {isSignUp ? "注册" : "登录"}
             </Button>
           </form>
         </Form>
@@ -135,6 +138,16 @@ export default function AuthPage() {
             data-umami-event="passkey-signin"
           >
             使用 Passkey 登录
+          </Button>
+        </div>
+        <div className="mt-4 text-center text-sm">
+          {isSignUp ? "已有账号？" : "没有账号？"}
+          <Button
+            variant="link"
+            className="underline underline-offset-4"
+            onClick={() => setIsSignUp((prev) => !prev)}
+          >
+            {isSignUp ? "登录" : "注册"}
           </Button>
         </div>
       </CardContent>
