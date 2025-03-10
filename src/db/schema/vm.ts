@@ -18,6 +18,21 @@ export interface SSHInfo extends ConnectConfig {
   sshKeyId?: number;
 }
 
+export interface MonitorVMInfo {
+  os: string;
+  osVersion: string;
+  arch: string;
+  platform: string;
+  platformVersion: string;
+  kernel: string;
+  hostname: string;
+  cpu: string;
+  memory: string;
+  uptime: string;
+  disk: string;
+  version: string;
+}
+
 export const vm = pgTable("vm", {
   id: serial("id").primaryKey(),
   userId: text("user_id")
@@ -41,6 +56,8 @@ export const vm = pgTable("vm", {
   ipAddress: inet("ip_address"),
   token: uuid("token").defaultRandom().notNull(),
   sshInfo: jsonb("ssh_info").$type<SSHInfo>(),
+  
+  monitorInfo: jsonb("monitor_info").$type<MonitorVMInfo>(),
   metadata: jsonb("metadata").$type<VMMetadata>(),
 
   createdAt: timestamp("created_at", { withTimezone: true })
