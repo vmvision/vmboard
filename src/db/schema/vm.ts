@@ -29,7 +29,7 @@ export interface MonitorVMInfo {
   hostname: string;
   cpu: string[];
   memory: string;
-  disk: string[];
+  disk: string;
   uptime: string;
   version: string;
 }

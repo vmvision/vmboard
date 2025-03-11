@@ -1,16 +1,22 @@
-import { customType } from 'drizzle-orm/pg-core';
-import JSONbig from 'json-bigint';
+import { customType } from "drizzle-orm/pg-core";
+import JSONbig from "json-bigint";
+
+const JSONBigInt = JSONbig({
+  storeAsString: true,
+  protoAction: "preserve",
+  constructorAction: "preserve",
+});
 
 const bigintJsonb = <TData>(name: string) =>
   customType<{ data: TData; driverData: string }>({
     dataType() {
-      return 'jsonb';
+      return "jsonb";
     },
     toDriver(value: TData): string {
-      return JSONbig.stringify(value);
+      return JSONBigInt.stringify(value);
     },
     fromDriver(value: string): TData {
-      return JSONbig.parse(value) as TData;
+      return JSONBigInt.parse(JSON.stringify(value)) as TData;
     },
   })(name);
 

@@ -40,3 +40,6 @@ export const page = pgTable(
     uniqueIndex("page_hostname_idx").on(sql`lower(${t.hostname})`),
   ],
 );
+
+export type Page = typeof page.$inferSelect;
+export type NewPage = typeof page.$inferInsert;

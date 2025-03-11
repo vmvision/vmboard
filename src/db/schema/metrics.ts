@@ -22,9 +22,13 @@ export const metrics = pgTable("metrics", {
 
   memoryUsed: decimal("memory_used").notNull(),
   memoryTotal: decimal("memory_total").notNull(),
+  swapUsed: decimal("swap_used").notNull(),
+  swapTotal: decimal("swap_total").notNull(),
 
   diskUsed: decimal("disk_used").notNull(),
   diskTotal: decimal("disk_total").notNull(),
+  diskRead: decimal("disk_read").notNull(),
+  diskWrite: decimal("disk_write").notNull(),
 
   networkIn: decimal("network_in").notNull(),
   networkOut: decimal("network_out").notNull(),
