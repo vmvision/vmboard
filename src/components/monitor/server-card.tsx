@@ -21,27 +21,23 @@ import { cn, formatBytes, calculatePercentage } from "@/lib/utils";
 import type { ServerWithLiveMetrics } from "@/types/metrics";
 import { useTranslations } from "next-intl";
 import { Link } from "next-view-transitions";
+import { useMetricsData } from "./vm-data-context";
 
 const ServerCard: React.FC<{
-  serverWithMetrics: ServerWithLiveMetrics;
-}> = ({ serverWithMetrics }) => {
+  vmId: number;
+  nickname: string;
+}> = ({ vmId, nickname }) => {
   const t = useTranslations("ServerCard");
-  const { id, vmInfo, metrics } = serverWithMetrics;
-  const online = true;
+  const { getLatestMetrics } = useMetricsData();
+  const metrics = getLatestMetrics(vmId);
+  const online = !!metrics;
 
   const showFlag = env.NEXT_PUBLIC_SHOW_FLAG;
   const showNetTransfer = env.NEXT_PUBLIC_SHOW_NETWORK_TRANSFER;
   const fixedTopServerName = env.NEXT_PUBLIC_FIXED_TOP_SERVER_NAME;
 
-  const memoryUsage = calculatePercentage(
-    metrics.memoryUsed,
-    metrics.memoryTotal,
-    2,
-  );
-  
-  
   return online ? (
-    <Link href={`/server/${id}`} prefetch={true}>
+    <Link href={`/vm/${vmId}`} prefetch={true}>
       <Card
         className={cn(
           "flex cursor-pointer flex-col items-center justify-start gap-3 p-3 hover:border-stone-300 hover:shadow-md md:px-5 dark:hover:border-stone-700",
@@ -58,14 +54,14 @@ const ServerCard: React.FC<{
           style={{ gridTemplateColumns: "auto auto 1fr" }}
         >
           <span className="h-2 w-2 shrink-0 self-center rounded-full bg-green-500" />
-          {/* <div
+          <div
             className={cn(
               "flex items-center justify-center",
               showFlag ? "min-w-[17px]" : "min-w-0",
             )}
           >
-            {showFlag ? <ServerFlag country_code={country_code} /> : null}
-          </div> */}
+            {showFlag ? <ServerFlag country_code="cn" /> : null}
+          </div>
           <div className="relative">
             <p
               className={cn(
@@ -73,7 +69,7 @@ const ServerCard: React.FC<{
                 showFlag ? "text-xs " : "text-sm",
               )}
             >
-              {serverWithMetrics.nickname}
+              {nickname}
             </p>
           </div>
         </section>
@@ -90,18 +86,18 @@ const ServerCard: React.FC<{
                 }
               >
                 <div className="font-semibold text-xs">
-                  {vmInfo.platform.includes("Windows") ? (
+                  {/* {vmInfo.platform.includes("Windows") ? (
                     <MageMicrosoftWindows className="size-[10px]" />
                   ) : (
                     <p className={`fl-${GetFontLogoClass(vmInfo.platform)}`} />
-                  )}
+                  )} */}
                 </div>
                 <div className={"flex w-14 flex-col"}>
                   <p className="text-muted-foreground text-xs">{t("System")}</p>
                   <div className="flex items-center font-semibold text-[10.5px]">
-                    {vmInfo.platform.includes("Windows")
+                    {/* {vmInfo.platform.includes("Windows")
                       ? "Windows"
-                      : GetOsName(vmInfo.platform)}
+                      : GetOsName(vmInfo.platform)} */}
                   </div>
                 </div>
               </div>
@@ -111,46 +107,32 @@ const ServerCard: React.FC<{
               <div className="flex items-center font-semibold text-xs">
                 {Number(metrics.cpuUsage).toFixed(2)}%
               </div>
-              <ServerUsageBar value={metrics.cpuUsage} />
+              <ServerUsageBar value={metrics?.cpuUsage} />
             </div>
             <div className={"flex w-14 flex-col"}>
               <p className="text-muted-foreground text-xs">{t("Mem")}</p>
               <div className="flex items-center font-semibold text-xs">
-                {calculatePercentage(
-                  metrics.memoryUsed,
-                  metrics.memoryTotal,
-                  2,
-                )}
-                %
+                {metrics.memoryUsage}%
               </div>
               <ServerUsageBar value={metrics.memoryUsed} />
             </div>
             <div className={"flex w-14 flex-col"}>
               <p className="text-muted-foreground text-xs">{t("STG")}</p>
               <div className="flex items-center font-semibold text-xs">
-                {calculatePercentage(
-                  metrics.diskUsed,
-                  metrics.diskTotal,
-                  2,
-                )}
-                %
+                {calculatePercentage(metrics.diskUsed, metrics.diskTotal, 2)}%
               </div>
               <ServerUsageBar value={metrics.diskUsed} />
             </div>
             <div className={"flex w-14 flex-col"}>
               <p className="text-muted-foreground text-xs">{t("Upload")}</p>
               <div className="flex items-center font-semibold text-xs">
-                {metrics.netOutTransfer >= 1024
-                  ? `${(metrics.netOutTransfer / 1024).toFixed(2)}G/s`
-                  : `${metrics.netOutTransfer.toFixed(2)}M/s`}
+                {metrics.networkOutSpeed.toFixed(2)}M/s
               </div>
             </div>
             <div className={"flex w-14 flex-col"}>
               <p className="text-muted-foreground text-xs">{t("Download")}</p>
               <div className="flex items-center font-semibold text-xs">
-                {metrics.netInTransfer >= 1024
-                  ? `${(metrics.netInTransfer / 1024).toFixed(2)}G/s`
-                  : `${metrics.netInTransfer.toFixed(2)}M/s`}
+                {metrics.networkInSpeed.toFixed(2)}M/s
               </div>
             </div>
           </section>
@@ -160,15 +142,13 @@ const ServerCard: React.FC<{
                 variant="secondary"
                 className="flex-1 items-center justify-center text-nowrap rounded-[8px] border-muted-50 text-[11px] shadow-md shadow-neutral-200/30 dark:shadow-none"
               >
-                {t("Upload")}:
-                {formatBytes(serverWithMetrics.status.NetOutTransfer)}
+                {t("Upload")}:{formatBytes(metrics.networkOutSpeed)}
               </Badge>
               <Badge
                 variant="outline"
                 className="flex-1 items-center justify-center text-nowrap rounded-[8px] text-[11px] shadow-md shadow-neutral-200/30 dark:shadow-none"
               >
-                {t("Download")}:
-                {formatBytes(serverWithMetrics.status.NetInTransfer)}
+                {t("Download")}:{formatBytes(metrics.networkInSpeed)}
               </Badge>
             </section>
           )}
@@ -176,7 +156,7 @@ const ServerCard: React.FC<{
       </Card>
     </Link>
   ) : (
-    <Link href={`/server/${id}`} prefetch={true}>
+    <Link href={`/server/${vmId}`} prefetch={true}>
       <Card
         className={cn(
           "flex cursor-pointer flex-col items-center justify-start gap-3 p-3 hover:border-stone-300 hover:shadow-md md:px-5 dark:hover:border-stone-700",
@@ -211,7 +191,7 @@ const ServerCard: React.FC<{
                 showFlag ? "text-xs" : "text-sm",
               )}
             >
-              {serverWithMetrics.nickname}
+              {nickname}
             </p>
           </div>
         </section>

@@ -21,21 +21,24 @@ import { Separator } from "@/components/ui/separator";
 import { useTranslations } from "next-intl";
 import type { ServerWithLiveMetrics } from "@/types/metrics";
 import { env } from "@/env";
+import { useMetricsData } from "./vm-data-context";
 
 /**
  * Server CardInline with dynamic style
  */
 const ServerCardInline: React.FC<{
-  serverWithMetrics: ServerWithLiveMetrics;
-}> = ({ serverWithMetrics }) => {
+  vmId: number;
+  nickname: string;
+}> = ({ vmId, nickname }) => {
   const t = useTranslations("Monitor");
-  const { id, metrics, vmInfo } = serverWithMetrics;
-  const online = true;
+  const { getLatestMetrics } = useMetricsData();
+  const metrics = getLatestMetrics(vmId);
+  const online = !!metrics;
 
   const showFlag = env.NEXT_PUBLIC_FORCE_USE_SVG_FLAG;
 
   return online ? (
-    <Link href={`/server/${id}`} prefetch={true}>
+    <Link href={`/vm/${vmId}`} prefetch={true}>
       <Card
         className={cn(
           "flex w-full min-w-[900px] cursor-pointer items-center justify-start gap-3 p-3 hover:border-stone-300 hover:shadow-md md:px-5 lg:flex-row dark:hover:border-stone-700",
@@ -61,14 +64,14 @@ const ServerCardInline: React.FC<{
                 showFlag ? "text-xs " : "text-sm",
               )}
             >
-              {serverWithMetrics.nickname}
+              {nickname}
             </p>
           </div>
         </section>
         <Separator orientation="vertical" className="mx-0 ml-2 h-8" />
         <div className="flex flex-col gap-2">
           <section className={cn("grid flex-1 grid-cols-9 items-center gap-3")}>
-            <div
+            {/* <div
               className={"flex flex-row items-center gap-2 whitespace-nowrap"}
             >
               <div className="font-semibold text-xs">
@@ -92,7 +95,7 @@ const ServerCardInline: React.FC<{
               <div className="flex items-center font-semibold text-xs">
                 {(serverWithMetrics.metrics.uptime / 86400).toFixed(0)} {"Days"}
               </div>
-            </div>
+            </div> */}
             <div className={"flex w-14 flex-col"}>
               <p className="text-muted-foreground text-xs">{t("CPU")}</p>
               <div className="flex items-center font-semibold text-xs">
@@ -154,7 +157,7 @@ const ServerCardInline: React.FC<{
       </Card>
     </Link>
   ) : (
-    <Link href={`/server/${id}`} prefetch={true}>
+    <Link href={`/server/${vmId}`} prefetch={true}>
       <Card
         className={cn(
           "flex min-h-[61px] min-w-[900px] flex-row items-center justify-start gap-3 p-3 hover:border-stone-300 hover:shadow-md md:px-5 dark:hover:border-stone-700",
@@ -180,7 +183,7 @@ const ServerCardInline: React.FC<{
                 showFlag ? "text-xs" : "text-sm",
               )}
             >
-              {serverWithMetrics.nickname}
+              {nickname}
             </p>
           </div>
         </section>

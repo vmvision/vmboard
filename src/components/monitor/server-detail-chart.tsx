@@ -7,152 +7,77 @@
  * Derived from: https://github.com/hamster1963/nezha-dash/raw/ac15be6e71ba9804681b1fe760fa245f94912372/app/(main)/ClientComponents/detail/ServerDetailChartClient.tsx
  * Licensed under the GNU General Public License v3.0 (GPLv3).
  */
-"use client"
+"use client";
 
+import { ServerDetailChartLoading } from "@/components/monitor/server-detail-loading";
+import AnimatedCircularProgressBar from "@/components/ui/animated-circular-progress-bar";
+import { Card, CardContent } from "@/components/ui/card";
+import { type ChartConfig, ChartContainer } from "@/components/ui/chart";
+import { formatBytes, formatRelativeTime } from "@/lib/utils";
+import { useTranslations } from "next-intl";
 import {
-  MAX_HISTORY_LENGTH,
-  type ServerDataWithTimestamp,
-  useServerData,
-} from "@/app/context/server-data-context"
-import type { NezhaAPISafe } from "@/app/types/nezha-api"
-import { ServerDetailChartLoading } from "@/components/monitor/server-detail-loading"
-import AnimatedCircularProgressBar from "@/components/ui/animated-circular-progress-bar"
-import { Card, CardContent } from "@/components/ui/card"
-import { type ChartConfig, ChartContainer } from "@/components/ui/chart"
-import { formatBytes, formatNezhaInfo, formatRelativeTime } from "@/lib/utils"
-import { useTranslations } from "next-intl"
-import { useEffect, useRef, useState } from "react"
-import { Area, AreaChart, CartesianGrid, Line, LineChart, XAxis, YAxis } from "recharts"
+  Area,
+  AreaChart,
+  CartesianGrid,
+  Line,
+  LineChart,
+  XAxis,
+  YAxis,
+} from "recharts";
+import { type DerivedMetrics, useMetricsData } from "./vm-data-context";
 
-type cpuChartData = {
-  timeStamp: string
-  cpu: number
-}
-
-type processChartData = {
-  timeStamp: string
-  process: number
-}
-
-type diskChartData = {
-  timeStamp: string
-  disk: number
-}
-
-type memChartData = {
-  timeStamp: string
-  mem: number
-  swap: number
-}
-
-type networkChartData = {
-  timeStamp: string
-  upload: number
-  download: number
-}
-
-type connectChartData = {
-  timeStamp: string
-  tcp: number
-  udp: number
+interface ServerDetailChartClientProps {
+  vmId: number;
 }
 
 export default function ServerDetailChartClient({
-  server_id,
-}: {
-  server_id: number
-  show: boolean
-}) {
-  const t = useTranslations("ServerDetailChartClient")
+  vmId,
+}: ServerDetailChartClientProps) {
+  const t = useTranslations("ServerDetailChartClient");
+  const { getMetrics } = useMetricsData();
+  const data = getMetrics(vmId);
 
-  const { data: serverList, error, history } = useServerData()
-
-  const data = serverList?.result?.find((item) => item.id === server_id)
-
-  if (error) {
-    return (
-      <>
-        <div className="flex flex-col items-center justify-center">
-          <p className="font-medium text-sm opacity-40">{error.message}</p>
-          <p className="font-medium text-sm opacity-40">{t("chart_fetch_error_message")}</p>
-        </div>
-      </>
-    )
-  }
-  if (!data) return <ServerDetailChartLoading />
+  // if (error) {
+  //   return (
+  //     <>
+  //       <div className="flex flex-col items-center justify-center">
+  //         <p className="font-medium text-sm opacity-40">{error.message}</p>
+  //         <p className="font-medium text-sm opacity-40">
+  //           {t("chart_fetch_error_message")}
+  //         </p>
+  //       </div>
+  //     </>
+  //   );
+  // }
+  if (!data) return <ServerDetailChartLoading />;
 
   return (
-    <section className="grid grid-cols-1 gap-3 md:grid-cols-2 lg:grid-cols-3">
-      <CpuChart data={data} history={history} />
-      <ProcessChart data={data} history={history} />
-      <DiskChart data={data} history={history} />
-      <MemChart data={data} history={history} />
-      <NetworkChart data={data} history={history} />
-      <ConnectChart data={data} history={history} />
+    <section className="grid w-full grid-cols-1 gap-3 md:grid-cols-2 lg:grid-cols-3">
+      <CpuChart data={data} />
+      <ProcessCountChart data={data} />
+      <DiskChart data={data} />
+      <MemoryChart data={data} />
+      <NetworkChart data={data} />
+      <ConnectionsChart data={data} />
     </section>
-  )
+  );
 }
 
-function CpuChart({
-  history,
-  data,
-}: {
-  history: ServerDataWithTimestamp[]
-  data: NezhaAPISafe
-}) {
-  const [cpuChartData, setCpuChartData] = useState([] as cpuChartData[])
-  const hasInitialized = useRef(false)
-  const [historyLoaded, setHistoryLoaded] = useState(false)
+interface ChartProps {
+  data: DerivedMetrics[];
+}
 
-  useEffect(() => {
-    if (!hasInitialized.current && history.length > 0) {
-      const historyData = history
-        .map((msg) => {
-          const server = msg.data?.result?.find((item) => item.id === data.id)
-          if (!server) return null
-          const { cpu } = formatNezhaInfo(server)
-          return {
-            timeStamp: msg.timestamp.toString(),
-            cpu: cpu,
-          }
-        })
-        .filter((item): item is cpuChartData => item !== null)
-        .reverse() // 保持时间顺序
-
-      setCpuChartData(historyData)
-      hasInitialized.current = true
-      setHistoryLoaded(true)
-    } else if (history.length === 0) {
-      setHistoryLoaded(true)
-    }
-  }, [])
-
-  const { cpu } = formatNezhaInfo(data)
-
-  useEffect(() => {
-    if (data && historyLoaded) {
-      const timestamp = Date.now().toString()
-      let newData = [] as cpuChartData[]
-      if (cpuChartData.length === 0) {
-        newData = [
-          { timeStamp: timestamp, cpu: cpu },
-          { timeStamp: timestamp, cpu: cpu },
-        ]
-      } else {
-        newData = [...cpuChartData, { timeStamp: timestamp, cpu: cpu }]
-      }
-      if (newData.length > MAX_HISTORY_LENGTH) {
-        newData.shift()
-      }
-      setCpuChartData(newData)
-    }
-  }, [data, historyLoaded])
+function CpuChart({ data }: ChartProps) {
+  const current = data[data.length - 1] ||
+    data[0] || {
+      cpuUsage: 0,
+    };
 
   const chartConfig = {
-    cpu: {
-      label: "CPU",
+    cpuUsage: {
+      label: "cpuUsage",
     },
-  } satisfies ChartConfig
+  } satisfies ChartConfig;
 
   return (
     <Card>
@@ -161,20 +86,25 @@ function CpuChart({
           <div className="flex items-center justify-between">
             <p className="font-medium text-md">CPU</p>
             <section className="flex items-center gap-2">
-              <p className="w-10 text-end font-medium text-xs">{cpu.toFixed(0)}%</p>
+              <p className="w-10 text-end font-medium text-xs">
+                {Number(current.cpuUsage).toFixed(0)}%
+              </p>
               <AnimatedCircularProgressBar
                 className="size-3 text-[0px]"
                 max={100}
                 min={0}
-                value={cpu}
+                value={Number(current.cpuUsage)}
                 primaryColor="hsl(var(--chart-1))"
               />
             </section>
           </div>
-          <ChartContainer config={chartConfig} className="aspect-auto h-[130px] w-full">
+          <ChartContainer
+            config={chartConfig}
+            className="aspect-auto h-[130px] w-full"
+          >
             <AreaChart
               accessibilityLayer
-              data={cpuChartData}
+              data={data}
               margin={{
                 top: 12,
                 left: 12,
@@ -183,7 +113,7 @@ function CpuChart({
             >
               <CartesianGrid vertical={false} />
               <XAxis
-                dataKey="timeStamp"
+                dataKey="time"
                 tickLine={false}
                 axisLine={false}
                 tickMargin={8}
@@ -201,7 +131,7 @@ function CpuChart({
               />
               <Area
                 isAnimationActive={false}
-                dataKey="cpu"
+                dataKey="cpuUsage"
                 type="step"
                 fill="hsl(var(--chart-1))"
                 fillOpacity={0.3}
@@ -212,70 +142,21 @@ function CpuChart({
         </section>
       </CardContent>
     </Card>
-  )
+  );
 }
 
-function ProcessChart({
-  data,
-  history,
-}: {
-  data: NezhaAPISafe
-  history: ServerDataWithTimestamp[]
-}) {
-  const t = useTranslations("ServerDetailChartClient")
-  const [processChartData, setProcessChartData] = useState([] as processChartData[])
-  const hasInitialized = useRef(false)
-  const [historyLoaded, setHistoryLoaded] = useState(false)
-
-  useEffect(() => {
-    if (!hasInitialized.current && history.length > 0) {
-      const historyData = history
-        .map((msg) => {
-          const server = msg.data?.result?.find((item) => item.id === data.id)
-          if (!server) return null
-          const { process } = formatNezhaInfo(server)
-          return {
-            timeStamp: msg.timestamp.toString(),
-            process: process,
-          }
-        })
-        .filter((item): item is processChartData => item !== null)
-        .reverse()
-
-      setProcessChartData(historyData)
-      hasInitialized.current = true
-      setHistoryLoaded(true)
-    } else if (history.length === 0) {
-      setHistoryLoaded(true)
-    }
-  }, [])
-
-  const { process } = formatNezhaInfo(data)
-
-  useEffect(() => {
-    if (data && historyLoaded) {
-      const timestamp = Date.now().toString()
-      let newData = [] as processChartData[]
-      if (processChartData.length === 0) {
-        newData = [
-          { timeStamp: timestamp, process: process },
-          { timeStamp: timestamp, process: process },
-        ]
-      } else {
-        newData = [...processChartData, { timeStamp: timestamp, process: process }]
-      }
-      if (newData.length > MAX_HISTORY_LENGTH) {
-        newData.shift()
-      }
-      setProcessChartData(newData)
-    }
-  }, [data, historyLoaded])
+function ProcessCountChart({ data }: ChartProps) {
+  const t = useTranslations("ServerDetailChartClient");
+  const current = data[data.length - 1] ||
+    data[0] || {
+      processCount: 0,
+    };
 
   const chartConfig = {
-    process: {
-      label: "Process",
+    processCount: {
+      label: "processCount",
     },
-  } satisfies ChartConfig
+  } satisfies ChartConfig;
 
   return (
     <Card>
@@ -284,13 +165,18 @@ function ProcessChart({
           <div className="flex items-center justify-between">
             <p className="font-medium text-md">{t("Process")}</p>
             <section className="flex items-center gap-2">
-              <p className="w-10 text-end font-medium text-xs">{process}</p>
+              <p className="w-10 text-end font-medium text-xs">
+                {current.processCount}
+              </p>
             </section>
           </div>
-          <ChartContainer config={chartConfig} className="aspect-auto h-[130px] w-full">
+          <ChartContainer
+            config={chartConfig}
+            className="aspect-auto h-[130px] w-full"
+          >
             <AreaChart
               accessibilityLayer
-              data={processChartData}
+              data={data}
               margin={{
                 top: 12,
                 left: 12,
@@ -299,7 +185,7 @@ function ProcessChart({
             >
               <CartesianGrid vertical={false} />
               <XAxis
-                dataKey="timeStamp"
+                dataKey="time"
                 tickLine={false}
                 axisLine={false}
                 tickMargin={8}
@@ -307,10 +193,15 @@ function ProcessChart({
                 interval="preserveStartEnd"
                 tickFormatter={(value) => formatRelativeTime(value)}
               />
-              <YAxis tickLine={false} axisLine={false} mirror={true} tickMargin={-15} />
+              <YAxis
+                tickLine={false}
+                axisLine={false}
+                mirror={true}
+                tickMargin={-15}
+              />
               <Area
                 isAnimationActive={false}
-                dataKey="process"
+                dataKey="processCount"
                 type="step"
                 fill="hsl(var(--chart-2))"
                 fillOpacity={0.3}
@@ -321,74 +212,28 @@ function ProcessChart({
         </section>
       </CardContent>
     </Card>
-  )
+  );
 }
 
-function MemChart({
-  data,
-  history,
-}: {
-  data: NezhaAPISafe
-  history: ServerDataWithTimestamp[]
-}) {
-  const t = useTranslations("ServerDetailChartClient")
-  const [memChartData, setMemChartData] = useState([] as memChartData[])
-  const hasInitialized = useRef(false)
-  const [historyLoaded, setHistoryLoaded] = useState(false)
-
-  useEffect(() => {
-    if (!hasInitialized.current && history.length > 0) {
-      const historyData = history
-        .map((msg) => {
-          const server = msg.data?.result?.find((item) => item.id === data.id)
-          if (!server) return null
-          const { mem, swap } = formatNezhaInfo(server)
-          return {
-            timeStamp: msg.timestamp.toString(),
-            mem: mem,
-            swap: swap,
-          }
-        })
-        .filter((item): item is memChartData => item !== null)
-        .reverse()
-
-      setMemChartData(historyData)
-      hasInitialized.current = true
-      setHistoryLoaded(true)
-    } else if (history.length === 0) {
-      setHistoryLoaded(true)
-    }
-  }, [])
-
-  const { mem, swap } = formatNezhaInfo(data)
-
-  useEffect(() => {
-    if (data && historyLoaded) {
-      const timestamp = Date.now().toString()
-      let newData = [] as memChartData[]
-      if (memChartData.length === 0) {
-        newData = [
-          { timeStamp: timestamp, mem: mem, swap: swap },
-          { timeStamp: timestamp, mem: mem, swap: swap },
-        ]
-      } else {
-        newData = [...memChartData, { timeStamp: timestamp, mem: mem, swap: swap }]
-      }
-      if (newData.length > MAX_HISTORY_LENGTH) {
-        newData.shift()
-      }
-      setMemChartData(newData)
-    }
-  }, [data, historyLoaded])
-
+function MemoryChart({ data }: ChartProps) {
+  const t = useTranslations("ServerDetailChartClient");
+  const current = data[data.length - 1] ||
+    data[0] || {
+      memoryUsed: 0,
+      memoryTotal: 0,
+      swapUsed: 0,
+      swapTotal: 0,
+      memoryUsage: 0,
+      swapUsage: 0,
+    };
   const chartConfig = {
-    mem: {
+    memoryUsage: {
       label: "Mem",
     },
-    swap: {
+    swapUsage: {
       label: "Swap",
     },
-  } satisfies ChartConfig
+  } satisfies ChartConfig;
 
   return (
     <Card>
@@ -403,10 +248,12 @@ function MemChart({
                     className="size-3 text-[0px]"
                     max={100}
                     min={0}
-                    value={mem}
+                    value={current.memoryUsage}
                     primaryColor="hsl(var(--chart-8))"
                   />
-                  <p className="font-medium text-xs">{mem.toFixed(0)}%</p>
+                  <p className="font-medium text-xs">
+                    {current.memoryUsage.toFixed(0)}%
+                  </p>
                 </div>
               </div>
               <div className="flex flex-col">
@@ -416,26 +263,33 @@ function MemChart({
                     className="size-3 text-[0px]"
                     max={100}
                     min={0}
-                    value={swap}
+                    value={current.swapUsage}
                     primaryColor="hsl(var(--chart-10))"
                   />
-                  <p className="font-medium text-xs">{swap.toFixed(0)}%</p>
+                  <p className="font-medium text-xs">
+                    {current.swapUsage.toFixed(0)}%
+                  </p>
                 </div>
               </div>
             </section>
             <section className="flex flex-col items-end gap-0.5">
               <div className="flex items-center gap-2 font-medium text-[11px]">
-                {formatBytes(data.status.MemUsed)} / {formatBytes(data.host.MemTotal)}
+                {formatBytes(current.memoryUsed)} /{" "}
+                {formatBytes(current.memoryTotal)}
               </div>
               <div className="flex items-center gap-2 font-medium text-[11px]">
-                swap: {formatBytes(data.status.SwapUsed)}
+                {formatBytes(current.swapUsed)} /{" "}
+                {formatBytes(current.swapTotal)}
               </div>
             </section>
           </div>
-          <ChartContainer config={chartConfig} className="aspect-auto h-[130px] w-full">
+          <ChartContainer
+            config={chartConfig}
+            className="aspect-auto h-[130px] w-full"
+          >
             <AreaChart
               accessibilityLayer
-              data={memChartData}
+              data={data}
               margin={{
                 top: 12,
                 left: 12,
@@ -444,7 +298,7 @@ function MemChart({
             >
               <CartesianGrid vertical={false} />
               <XAxis
-                dataKey="timeStamp"
+                dataKey="time"
                 tickLine={false}
                 axisLine={false}
                 tickMargin={8}
@@ -462,7 +316,7 @@ function MemChart({
               />
               <Area
                 isAnimationActive={false}
-                dataKey="mem"
+                dataKey="memoryUsage"
                 type="step"
                 fill="hsl(var(--chart-8))"
                 fillOpacity={0.3}
@@ -470,7 +324,7 @@ function MemChart({
               />
               <Area
                 isAnimationActive={false}
-                dataKey="swap"
+                dataKey="swapUsage"
                 type="step"
                 fill="hsl(var(--chart-10))"
                 fillOpacity={0.3}
@@ -481,70 +335,25 @@ function MemChart({
         </section>
       </CardContent>
     </Card>
-  )
+  );
 }
 
-function DiskChart({
-  data,
-  history,
-}: {
-  data: NezhaAPISafe
-  history: ServerDataWithTimestamp[]
-}) {
-  const t = useTranslations("ServerDetailChartClient")
-  const [diskChartData, setDiskChartData] = useState([] as diskChartData[])
-  const hasInitialized = useRef(false)
-  const [historyLoaded, setHistoryLoaded] = useState(false)
-
-  useEffect(() => {
-    if (!hasInitialized.current && history.length > 0) {
-      const historyData = history
-        .map((msg) => {
-          const server = msg.data?.result?.find((item) => item.id === data.id)
-          if (!server) return null
-          const { disk } = formatNezhaInfo(server)
-          return {
-            timeStamp: msg.timestamp.toString(),
-            disk: disk,
-          }
-        })
-        .filter((item): item is diskChartData => item !== null)
-        .reverse()
-
-      setDiskChartData(historyData)
-      hasInitialized.current = true
-      setHistoryLoaded(true)
-    } else if (history.length === 0) {
-      setHistoryLoaded(true)
-    }
-  }, [])
-
-  const { disk } = formatNezhaInfo(data)
-
-  useEffect(() => {
-    if (data && historyLoaded) {
-      const timestamp = Date.now().toString()
-      let newData = [] as diskChartData[]
-      if (diskChartData.length === 0) {
-        newData = [
-          { timeStamp: timestamp, disk: disk },
-          { timeStamp: timestamp, disk: disk },
-        ]
-      } else {
-        newData = [...diskChartData, { timeStamp: timestamp, disk: disk }]
-      }
-      if (newData.length > MAX_HISTORY_LENGTH) {
-        newData.shift()
-      }
-      setDiskChartData(newData)
-    }
-  }, [data, historyLoaded])
+function DiskChart({ data }: ChartProps) {
+  const t = useTranslations("ServerDetailChartClient");
+  const current = data[data.length - 1] ||
+    data[0] || {
+      diskUsed: 0,
+      diskTotal: 0,
+      diskUsage: 0,
+      diskReadSpeed: 0,
+      diskWriteSpeed: 0,
+    };
 
   const chartConfig = {
     disk: {
       label: "Disk",
     },
-  } satisfies ChartConfig
+  } satisfies ChartConfig;
 
   return (
     <Card>
@@ -554,24 +363,30 @@ function DiskChart({
             <p className="font-medium text-md">{t("Disk")}</p>
             <section className="flex flex-col items-end gap-0.5">
               <section className="flex items-center gap-2">
-                <p className="w-10 text-end font-medium text-xs">{disk.toFixed(0)}%</p>
+                <p className="w-10 text-end font-medium text-xs">
+                  {current.diskUsage.toFixed(0)}%
+                </p>
                 <AnimatedCircularProgressBar
                   className="size-3 text-[0px]"
                   max={100}
                   min={0}
-                  value={disk}
+                  value={current.diskUsage}
                   primaryColor="hsl(var(--chart-5))"
                 />
               </section>
               <div className="flex items-center gap-2 font-medium text-[11px]">
-                {formatBytes(data.status.DiskUsed)} / {formatBytes(data.host.DiskTotal)}
+                {formatBytes(current.diskUsed)} /{" "}
+                {formatBytes(current.diskTotal)}
               </div>
             </section>
           </div>
-          <ChartContainer config={chartConfig} className="aspect-auto h-[130px] w-full">
+          <ChartContainer
+            config={chartConfig}
+            className="aspect-auto h-[130px] w-full"
+          >
             <AreaChart
               accessibilityLayer
-              data={diskChartData}
+              data={data}
               margin={{
                 top: 12,
                 left: 12,
@@ -598,7 +413,7 @@ function DiskChart({
               />
               <Area
                 isAnimationActive={false}
-                dataKey="disk"
+                dataKey="diskUsage"
                 type="step"
                 fill="hsl(var(--chart-5))"
                 fillOpacity={0.3}
@@ -609,80 +424,30 @@ function DiskChart({
         </section>
       </CardContent>
     </Card>
-  )
+  );
 }
 
-function NetworkChart({
-  data,
-  history,
-}: {
-  data: NezhaAPISafe
-  history: ServerDataWithTimestamp[]
-}) {
-  const t = useTranslations("ServerDetailChartClient")
-  const [networkChartData, setNetworkChartData] = useState([] as networkChartData[])
-  const hasInitialized = useRef(false)
-  const [historyLoaded, setHistoryLoaded] = useState(false)
-
-  useEffect(() => {
-    if (!hasInitialized.current && history.length > 0) {
-      const historyData = history
-        .map((msg) => {
-          const server = msg.data?.result?.find((item) => item.id === data.id)
-          if (!server) return null
-          const { up, down } = formatNezhaInfo(server)
-          return {
-            timeStamp: msg.timestamp.toString(),
-            upload: up,
-            download: down,
-          }
-        })
-        .filter((item): item is networkChartData => item !== null)
-        .reverse()
-
-      setNetworkChartData(historyData)
-      hasInitialized.current = true
-      setHistoryLoaded(true)
-    } else if (history.length === 0) {
-      setHistoryLoaded(true)
-    }
-  }, [])
-
-  const { up, down } = formatNezhaInfo(data)
-
-  useEffect(() => {
-    if (data && historyLoaded) {
-      const timestamp = Date.now().toString()
-      let newData = [] as networkChartData[]
-      if (networkChartData.length === 0) {
-        newData = [
-          { timeStamp: timestamp, upload: up, download: down },
-          { timeStamp: timestamp, upload: up, download: down },
-        ]
-      } else {
-        newData = [...networkChartData, { timeStamp: timestamp, upload: up, download: down }]
-      }
-      if (newData.length > MAX_HISTORY_LENGTH) {
-        newData.shift()
-      }
-      setNetworkChartData(newData)
-    }
-  }, [data, historyLoaded])
-
-  let maxDownload = Math.max(...networkChartData.map((item) => item.download))
-  maxDownload = Math.ceil(maxDownload)
-  if (maxDownload < 1) {
-    maxDownload = 1
-  }
+function NetworkChart({ data }: ChartProps) {
+  const t = useTranslations("ServerDetailChartClient");
+  const current = data[data.length - 1] ||
+    data[0] || {
+      networkInSpeed: 0,
+      networkOutSpeed: 0,
+    };
+  // let maxDownload = Math.max(...networkChartData.map((item) => item.download));
+  // maxDownload = Math.ceil(maxDownload);
+  // if (maxDownload < 1) {
+  //   maxDownload = 1;
+  // }
 
   const chartConfig = {
-    upload: {
+    networkInSpeed: {
       label: "Upload",
     },
-    download: {
+    networkOutSpeed: {
       label: "Download",
     },
-  } satisfies ChartConfig
+  } satisfies ChartConfig;
 
   return (
     <Card>
@@ -694,22 +459,31 @@ function NetworkChart({
                 <p className="text-muted-foreground text-xs">{t("Upload")}</p>
                 <div className="flex items-center gap-1">
                   <span className="relative inline-flex size-1.5 rounded-full bg-[hsl(var(--chart-1))]" />
-                  <p className="font-medium text-xs">{up.toFixed(2)} M/s</p>
+                  <p className="font-medium text-xs">
+                    {current.networkInSpeed.toFixed(2)} M/s
+                  </p>
                 </div>
               </div>
               <div className="flex w-20 flex-col">
-                <p className=" text-muted-foreground text-xs">{t("Download")}</p>
+                <p className=" text-muted-foreground text-xs">
+                  {t("Download")}
+                </p>
                 <div className="flex items-center gap-1">
                   <span className="relative inline-flex size-1.5 rounded-full bg-[hsl(var(--chart-4))]" />
-                  <p className="font-medium text-xs">{down.toFixed(2)} M/s</p>
+                  <p className="font-medium text-xs">
+                    {current.networkOutSpeed.toFixed(2)} M/s
+                  </p>
                 </div>
               </div>
             </section>
           </div>
-          <ChartContainer config={chartConfig} className="aspect-auto h-[130px] w-full">
+          <ChartContainer
+            config={chartConfig}
+            className="aspect-auto h-[130px] w-full"
+          >
             <LineChart
               accessibilityLayer
-              data={networkChartData}
+              data={data}
               margin={{
                 top: 12,
                 left: 12,
@@ -734,12 +508,12 @@ function NetworkChart({
                 type="number"
                 minTickGap={50}
                 interval="preserveStartEnd"
-                domain={[1, maxDownload]}
+                // domain={[1, maxDownload]}
                 tickFormatter={(value) => `${value.toFixed(0)}M/s`}
               />
               <Line
                 isAnimationActive={false}
-                dataKey="upload"
+                dataKey="networkInSpeed"
                 type="linear"
                 stroke="hsl(var(--chart-1))"
                 strokeWidth={1}
@@ -747,7 +521,7 @@ function NetworkChart({
               />
               <Line
                 isAnimationActive={false}
-                dataKey="download"
+                dataKey="networkOutSpeed"
                 type="linear"
                 stroke="hsl(var(--chart-4))"
                 strokeWidth={1}
@@ -758,73 +532,24 @@ function NetworkChart({
         </section>
       </CardContent>
     </Card>
-  )
+  );
 }
 
-function ConnectChart({
-  data,
-  history,
-}: {
-  data: NezhaAPISafe
-  history: ServerDataWithTimestamp[]
-}) {
-  const [connectChartData, setConnectChartData] = useState([] as connectChartData[])
-  const hasInitialized = useRef(false)
-  const [historyLoaded, setHistoryLoaded] = useState(false)
-
-  useEffect(() => {
-    if (!hasInitialized.current && history.length > 0) {
-      const historyData = history
-        .map((msg) => {
-          const server = msg.data?.result?.find((item) => item.id === data.id)
-          if (!server) return null
-          const { tcp, udp } = formatNezhaInfo(server)
-          return {
-            timeStamp: msg.timestamp.toString(),
-            tcp: tcp,
-            udp: udp,
-          }
-        })
-        .filter((item): item is connectChartData => item !== null)
-        .reverse()
-
-      setConnectChartData(historyData)
-      hasInitialized.current = true
-      setHistoryLoaded(true)
-    } else if (history.length === 0) {
-      setHistoryLoaded(true)
-    }
-  }, [])
-
-  const { tcp, udp } = formatNezhaInfo(data)
-
-  useEffect(() => {
-    if (data && historyLoaded) {
-      const timestamp = Date.now().toString()
-      let newData = [] as connectChartData[]
-      if (connectChartData.length === 0) {
-        newData = [
-          { timeStamp: timestamp, tcp: tcp, udp: udp },
-          { timeStamp: timestamp, tcp: tcp, udp: udp },
-        ]
-      } else {
-        newData = [...connectChartData, { timeStamp: timestamp, tcp: tcp, udp: udp }]
-      }
-      if (newData.length > MAX_HISTORY_LENGTH) {
-        newData.shift()
-      }
-      setConnectChartData(newData)
-    }
-  }, [data, historyLoaded])
+function ConnectionsChart({ data }: ChartProps) {
+  const current = data[data.length - 1] ||
+    data[0] || {
+      tcpConnections: 0,
+      udpConnections: 0,
+    };
 
   const chartConfig = {
-    tcp: {
+    tcpConnections: {
       label: "TCP",
     },
-    udp: {
+    udpConnections: {
       label: "UDP",
     },
-  } satisfies ChartConfig
+  } satisfies ChartConfig;
 
   return (
     <Card>
@@ -836,22 +561,29 @@ function ConnectChart({
                 <p className="text-muted-foreground text-xs">TCP</p>
                 <div className="flex items-center gap-1">
                   <span className="relative inline-flex size-1.5 rounded-full bg-[hsl(var(--chart-1))]" />
-                  <p className="font-medium text-xs">{tcp}</p>
+                  <p className="font-medium text-xs">
+                    {current.tcpConnections}
+                  </p>
                 </div>
               </div>
               <div className="flex w-12 flex-col">
                 <p className=" text-muted-foreground text-xs">UDP</p>
                 <div className="flex items-center gap-1">
                   <span className="relative inline-flex size-1.5 rounded-full bg-[hsl(var(--chart-4))]" />
-                  <p className="font-medium text-xs">{udp}</p>
+                  <p className="font-medium text-xs">
+                    {current.udpConnections}
+                  </p>
                 </div>
               </div>
             </section>
           </div>
-          <ChartContainer config={chartConfig} className="aspect-auto h-[130px] w-full">
+          <ChartContainer
+            config={chartConfig}
+            className="aspect-auto h-[130px] w-full"
+          >
             <LineChart
               accessibilityLayer
-              data={connectChartData}
+              data={data}
               margin={{
                 top: 12,
                 left: 12,
@@ -860,7 +592,7 @@ function ConnectChart({
             >
               <CartesianGrid vertical={false} />
               <XAxis
-                dataKey="timeStamp"
+                dataKey="time"
                 tickLine={false}
                 axisLine={false}
                 tickMargin={8}
@@ -878,7 +610,7 @@ function ConnectChart({
               />
               <Line
                 isAnimationActive={false}
-                dataKey="tcp"
+                dataKey="tcpConnections"
                 type="linear"
                 stroke="hsl(var(--chart-1))"
                 strokeWidth={1}
@@ -886,7 +618,7 @@ function ConnectChart({
               />
               <Line
                 isAnimationActive={false}
-                dataKey="udp"
+                dataKey="udpConnections"
                 type="linear"
                 stroke="hsl(var(--chart-4))"
                 strokeWidth={1}
@@ -897,5 +629,5 @@ function ConnectChart({
         </section>
       </CardContent>
     </Card>
-  )
+  );
 }

@@ -7,100 +7,88 @@
  * Derived from: https://github.com/hamster1963/nezha-dash/raw/ac15be6e71ba9804681b1fe760fa245f94912372/app/(main)/ClientComponents/detail/ServerDetailClient.tsx
  * Licensed under the GNU General Public License v3.0 (GPLv3).
  */
-"use client"
+"use client";
 
-import { useServerData } from "@/app/context/server-data-context"
-import { BackIcon } from "@/components/Icon"
-import ServerFlag from "@/components/monitor/server-ip-info"
-import { ServerDetailLoading } from "@/components/monitor/server-detail-loading"
-import { Badge } from "@/components/ui/badge"
-import { Card, CardContent } from "@/components/ui/card"
-import { cn, formatBytes, formatNezhaInfo } from "@/lib/utils"
-import countries from "i18n-iso-countries"
-import enLocale from "i18n-iso-countries/langs/en.json"
-import { useTranslations } from "next-intl"
-import { notFound, useRouter } from "next/navigation"
-import { useEffect, useState } from "react"
+// import { BackIcon } from "@/components/Icon";
+import ServerFlag from "@/components/monitor/server-ip-info";
+import { ServerDetailLoading } from "@/components/monitor/server-detail-loading";
+import { Badge } from "@/components/ui/badge";
+import { Card, CardContent } from "@/components/ui/card";
+import { cn, formatBytes } from "@/lib/utils";
+import countries from "i18n-iso-countries";
+import enLocale from "i18n-iso-countries/langs/en.json";
+import { useTranslations } from "next-intl";
+import { notFound, useRouter } from "next/navigation";
+import { useEffect, useState } from "react";
+import useSWR from "swr";
+import apiClient, { fetchWrapper } from "@/lib/api-client";
 
-countries.registerLocale(enLocale)
+countries.registerLocale(enLocale);
 
-export default function ServerDetailClient({
-  server_id,
-}: {
-  server_id: number
-}) {
-  const t = useTranslations("ServerDetailClient")
-  const router = useRouter()
+interface ServerDetailProps {
+  vmId: number;
+}
 
-  const [hasHistory, setHasHistory] = useState(false)
+export default function ServerDetail({ vmId }: ServerDetailProps) {
+  const t = useTranslations("ServerDetailClient");
+  const router = useRouter();
 
-  useEffect(() => {
-    window.scrollTo({ top: 0, left: 0, behavior: "instant" })
-  }, [])
+  // const [hasHistory, setHasHistory] = useState(false);
 
-  useEffect(() => {
-    const previousPath = sessionStorage.getItem("fromMainPage")
-    if (previousPath) {
-      setHasHistory(true)
-    }
-  }, [])
+  // useEffect(() => {
+  //   window.scrollTo({ top: 0, left: 0, behavior: "instant" });
+  // }, []);
 
-  const linkClick = () => {
-    if (hasHistory) {
-      router.back()
-    } else {
-      router.push("/")
-    }
-  }
+  // useEffect(() => {
+  //   const previousPath = sessionStorage.getItem("fromMainPage");
+  //   if (previousPath) {
+  //     setHasHistory(true);
+  //   }
+  // }, []);
 
-  const { data: serverList, error, isLoading } = useServerData()
-  const serverData = serverList?.result?.find((item) => item.id === server_id)
+  // const linkClick = () => {
+  //   if (hasHistory) {
+  //     router.back();
+  //   } else {
+  //     router.push("/");
+  //   }
+  // };
 
-  if (!serverData && !isLoading) {
-    notFound()
-  }
+  const vmInfo = useSWR(
+    ["/api/vm/:id/monitor", { param: { id: vmId } }],
+    fetchWrapper(apiClient.vm[":id"].monitor.$get),
+  );
 
-  if (error) {
-    return (
-      <>
-        <div className="flex flex-col items-center justify-center">
-          <p className="font-medium text-sm opacity-40">{error.message}</p>
-          <p className="font-medium text-sm opacity-40">{t("detail_fetch_error_message")}</p>
-        </div>
-      </>
-    )
-  }
+  // if (!serverData && !isLoading) {
+  //   notFound();
+  // }
 
-  if (!serverData) return <ServerDetailLoading />
+  // if (error) {
+  //   return (
+  //     <>
+  //       <div className="flex flex-col items-center justify-center">
+  //         <p className="font-medium text-sm opacity-40">{error.message}</p>
+  //         <p className="font-medium text-sm opacity-40">
+  //           {t("detail_fetch_error_message")}
+  //         </p>
+  //       </div>
+  //     </>
+  //   );
+  // }
 
-  const {
-    name,
-    online,
-    uptime,
-    version,
-    arch,
-    mem_total,
-    disk_total,
-    country_code,
-    platform,
-    platform_version,
-    cpu_info,
-    gpu_info,
-    load_1,
-    load_5,
-    load_15,
-    net_out_transfer,
-    net_in_transfer,
-    last_active_time_string,
-  } = formatNezhaInfo(serverData)
+  if (!vmInfo.data) return <ServerDetailLoading />;
+
+  const { name, monitorInfo } = vmInfo.data;
+
+  if (!monitorInfo) return <ServerDetailLoading />;
 
   return (
     <div>
       <div
-        onClick={linkClick}
+        // onClick={linkClick}
         className="flex flex-none cursor-pointer items-center gap-0.5 break-all font-semibold text-xl leading-none tracking-tight transition-opacity duration-300 hover:opacity-50"
       >
-        <BackIcon />
+        {/* <BackIcon /> */}
         {name}
       </div>
       <section className="mt-3 flex flex-wrap gap-2">
@@ -108,7 +96,7 @@ export default function ServerDetailClient({
           <CardContent className="px-1.5 py-1">
             <section className="flex flex-col items-start gap-0.5">
               <p className="text-muted-foreground text-xs">{t("status")}</p>
-              <Badge
+              {/* <Badge
                 className={cn(
                   "-mt-[0.3px] w-fit rounded-[6px] px-1 py-0 text-[9px] dark:text-white",
                   {
@@ -118,7 +106,7 @@ export default function ServerDetailClient({
                 )}
               >
                 {online ? t("Online") : t("Offline")}
-              </Badge>
+              </Badge> */}
             </section>
           </CardContent>
         </Card>
@@ -128,29 +116,29 @@ export default function ServerDetailClient({
               <p className="text-muted-foreground text-xs">{t("Uptime")}</p>
               <div className="text-xs">
                 {" "}
-                {uptime / 86400 >= 1
-                  ? `${(uptime / 86400).toFixed(0)} ${t("Days")}`
-                  : `${(uptime / 3600).toFixed(0)} ${t("Hours")}`}
+                {Number(monitorInfo.uptime) / 86400 >= 1
+                  ? `${(Number(monitorInfo.uptime) / 86400).toFixed(0)} ${t("Days")}`
+                  : `${(Number(monitorInfo.uptime) / 3600).toFixed(0)} ${t("Hours")}`}
               </div>
             </section>
           </CardContent>
         </Card>
-        {version && (
+        {monitorInfo.version && (
           <Card className="rounded-[10px] border-none bg-transparent shadow-none">
             <CardContent className="px-1.5 py-1">
               <section className="flex flex-col items-start gap-0.5">
                 <p className="text-muted-foreground text-xs">{t("Version")}</p>
-                <div className="text-xs">{version} </div>
+                <div className="text-xs">{monitorInfo.version} </div>
               </section>
             </CardContent>
           </Card>
         )}
-        {arch && (
+        {monitorInfo.arch && (
           <Card className="rounded-[10px] border-none bg-transparent shadow-none">
             <CardContent className="px-1.5 py-1">
               <section className="flex flex-col items-start gap-0.5">
                 <p className="text-muted-foreground text-xs">{t("Arch")}</p>
-                <div className="text-xs">{arch} </div>
+                <div className="text-xs">{monitorInfo.arch} </div>
               </section>
             </CardContent>
           </Card>
@@ -160,7 +148,7 @@ export default function ServerDetailClient({
           <CardContent className="px-1.5 py-1">
             <section className="flex flex-col items-start gap-0.5">
               <p className="text-muted-foreground text-xs">{t("Mem")}</p>
-              <div className="text-xs">{formatBytes(mem_total)}</div>
+              <div className="text-xs">{formatBytes(monitorInfo.memory)}</div>
             </section>
           </CardContent>
         </Card>
@@ -168,26 +156,31 @@ export default function ServerDetailClient({
           <CardContent className="px-1.5 py-1">
             <section className="flex flex-col items-start gap-0.5">
               <p className="text-muted-foreground text-xs">{t("Disk")}</p>
-              <div className="text-xs">{formatBytes(disk_total)}</div>
+              <div className="text-xs">{formatBytes(monitorInfo.disk)}</div>
             </section>
           </CardContent>
         </Card>
-        {country_code && (
+        {/* {country_code && (
           <Card className="rounded-[10px] border-none bg-transparent shadow-none">
             <CardContent className="px-1.5 py-1">
               <section className="flex flex-col items-start gap-0.5">
                 <p className="text-muted-foreground text-xs">{t("Region")}</p>
                 <section className="flex items-start gap-1">
-                  <div className="text-start text-xs">{countries.getName(country_code, "en")}</div>
-                  <ServerFlag className="-mt-[1px] text-[11px]" country_code={country_code} />
+                  <div className="text-start text-xs">
+                    {countries.getName(country_code, "en")}
+                  </div>
+                  <ServerFlag
+                    className="-mt-[1px] text-[11px]"
+                    country_code={country_code}
+                  />
                 </section>
               </section>
             </CardContent>
           </Card>
-        )}
+        )} */}
       </section>
       <section className="mt-1 flex flex-wrap gap-2">
-        {platform && (
+        {monitorInfo.platform && (
           <Card className="rounded-[10px] border-none bg-transparent shadow-none">
             <CardContent className="px-1.5 py-1">
               <section className="flex flex-col items-start gap-0.5">
@@ -195,24 +188,25 @@ export default function ServerDetailClient({
 
                 <div className="text-xs">
                   {" "}
-                  {platform} - {platform_version}{" "}
+                  {monitorInfo.platform} - {monitorInfo.platformVersion}{" "}
                 </div>
               </section>
             </CardContent>
           </Card>
         )}
-        {cpu_info && cpu_info.length > 0 && (
+        {monitorInfo.cpu && monitorInfo.cpu.length > 0 && (
           <Card className="rounded-[10px] border-none bg-transparent shadow-none">
             <CardContent className="px-1.5 py-1">
               <section className="flex flex-col items-start gap-0.5">
                 <p className="text-muted-foreground text-xs">{t("CPU")}</p>
 
-                <div className="text-xs"> {cpu_info.join(", ")}</div>
+                <div className="text-xs"> {monitorInfo.cpu[0]}</div>
+                {/* <div className="text-xs"> {monitorInfo.cpu.join(", ")}</div> */}
               </section>
             </CardContent>
           </Card>
         )}
-        {gpu_info && gpu_info.length > 0 && (
+        {/* {monitorInfo.gpu && monitorInfo.gpu.length > 0 && (
           <Card className="rounded-[10px] border-none bg-transparent shadow-none">
             <CardContent className="px-1.5 py-1">
               <section className="flex flex-col items-start gap-0.5">
@@ -221,15 +215,17 @@ export default function ServerDetailClient({
               </section>
             </CardContent>
           </Card>
-        )}
+        )} */}
       </section>
-      <section className="mt-1 flex flex-wrap gap-2">
+      {/* <section className="mt-1 flex flex-wrap gap-2">
         <Card className="rounded-[10px] border-none bg-transparent shadow-none">
           <CardContent className="px-1.5 py-1">
             <section className="flex flex-col items-start gap-0.5">
               <p className="text-muted-foreground text-xs">{t("Load")}</p>
               <div className="text-xs">
-                {load_1 || "0.00"} / {load_5 || "0.00"} / {load_15 || "0.00"}
+                {monitorInfo.loadAvg.one || "0.00"} /{" "}
+                {monitorInfo.loadAvg.five || "0.00"} /{" "}
+                {monitorInfo.loadAvg.fifteen || "0.00"}
               </div>
             </section>
           </CardContent>
@@ -258,8 +254,8 @@ export default function ServerDetailClient({
             </section>
           </CardContent>
         </Card>
-      </section>
-      <section className="mt-1 flex flex-wrap gap-2">
+      </section> */}
+      {/* <section className="mt-1 flex flex-wrap gap-2">
         <Card className="rounded-[10px] border-none bg-transparent shadow-none">
           <CardContent className="px-1.5 py-1">
             <section className="flex flex-col items-start gap-0.5">
@@ -270,7 +266,7 @@ export default function ServerDetailClient({
             </section>
           </CardContent>
         </Card>
-      </section>
+      </section> */}
     </div>
-  )
+  );
 }
