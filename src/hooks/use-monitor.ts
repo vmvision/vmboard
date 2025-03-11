@@ -1,12 +1,12 @@
-import type { Monitor } from "@/db/schema/monitor";
+import type { Metrics } from "@/db/schema/metrics";
 import { unpack, pack } from "msgpackr";
 import { useEffect, useState, useRef } from "react";
 
 export interface MetricsEvent {
-  type: "metrics";
+  type: "liveMetrics";
   data: {
     vmId: number;
-    metrics: Monitor;
+    metrics: Metrics;
   };
 }
 
@@ -17,12 +17,23 @@ export interface StartMonitorEvent {
   };
 }
 
-export type MonitorEvent = MetricsEvent | StartMonitorEvent;
+export interface MonitorMetricsEvent {
+  type: "monitorMetrics";
+  data: {
+    vmIds: number[];
+  };
+}
+
+export type MonitorEvent =
+  | MetricsEvent
+  | StartMonitorEvent
+  | MonitorMetricsEvent;
 
 export interface MonitorProps {
+  vmIds?: number[];
   pageHandle?: string;
 
-  onVMMetrics?: (vmId: number, metrics: Monitor) => void;
+  onVMMetrics?: (vmId: number, metrics: Metrics) => void;
   onEvent?: (event: MonitorEvent) => void;
   onError?: (error: Error) => void;
   onOpen?: () => void;
@@ -32,12 +43,14 @@ export interface MonitorProps {
 export interface MonitorResult {
   isConnected: boolean;
   montoringVmIds: number[];
+  getMonitorMetrics: (vmIds: number[]) => void;
   startMonitorVM: (vmIds: number[]) => void;
   stopMonitorVM: (vmIds: number[]) => void;
   startMonitorPage: (pageHandle: string) => void;
 }
 
 export default function useMonitor({
+  vmIds,
   pageHandle,
   onVMMetrics,
   onEvent,
@@ -73,6 +86,14 @@ export default function useMonitor({
     ws.current.send(pack({ type: "stopMonitor", data: { vmIds } }));
   };
 
+  const getMonitorMetrics = (vmIds: number[]) => {
+    if (!ws.current) {
+      throw new Error("WebSocket is not connected");
+    }
+
+    ws.current.send(pack({ type: "getMonitorMetrics", data: { vmIds } }));
+  };
+
   // biome-ignore lint/correctness/useExhaustiveDependencies: should not changed
   useEffect(() => {
     const newWs = new WebSocket(
@@ -82,15 +103,22 @@ export default function useMonitor({
     newWs.onopen = () => {
       setIsConnected(true);
       onOpen?.();
+      if (vmIds) {
+        startMonitorVM(vmIds);
+      }
       if (pageHandle) {
         startMonitorPage(pageHandle);
       }
     };
 
-    newWs.onmessage = (event) => {
-      const data = unpack(event.data) as MonitorEvent;
+    newWs.onmessage = async (event) => {
+      const data = event.data instanceof Blob 
+        ? unpack(await new Uint8Array(await event.data.arrayBuffer())) as MonitorEvent
+        : unpack(event.data) as MonitorEvent;
       onEvent?.(data);
-      if (data.type === "metrics") {
+      if (data.type === "monitorMetrics") {
+        getMonitorMetrics(data.data.vmIds);
+      } else if (data.type === "liveMetrics") {
         if (onVMMetrics) {
           onVMMetrics(data.data.vmId, data.data.metrics);
         }
@@ -117,6 +145,7 @@ export default function useMonitor({
 
   return {
     isConnected,
+    getMonitorMetrics,
     startMonitorVM,
     stopMonitorVM,
     montoringVmIds,

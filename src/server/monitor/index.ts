@@ -1,25 +1,20 @@
 import type http from "node:http";
 import { vm as vmTable } from "@/db/schema/vm";
-import { and, eq, or } from "drizzle-orm";
+import { and, desc, eq, inArray, or } from "drizzle-orm";
 import { WebSocket, WebSocketServer } from "ws";
 import db from "@/db";
-import { monitor as monitorTable } from "@/db/schema/monitor";
+import { metrics as metricsTable } from "@/db/schema/metrics";
 import { auth, type Session } from "@/lib/auth";
 import { pack } from "msgpackr";
-import type { MonitorUserClientEvent } from "./types";
+import type { MonitorServerClientEvent, MonitorUserClientEvent } from "./types";
 import { parseMsgPack } from "./utils";
 import { page as pageTable } from "@/db/schema/page";
-
-interface VMWebSocket extends WebSocket {
-  vmId: number;
-  token: string;
-}
+import { addVmSocket, removeVmSocket, type VMWebSocket } from "./socket";
 
 interface UserWebSocket extends WebSocket {
   session: Session | null;
 }
 
-const vmSocketMap = new Map<number, VMWebSocket>();
 const vmListenerMap = new Map<number, UserWebSocket[]>();
 
 // export const broadcastToAll = (message: unknown) => {
@@ -30,20 +25,6 @@ const vmListenerMap = new Map<number, UserWebSocket[]>();
 //     }
 //   }
 // };
-
-// export const broadcastToVms = (vmIds: number[], message: unknown) => {
-//   const messageStr = JSON.stringify(message);
-//   for (const vmId of vmIds) {
-//     const socket = vmSocketMap.get(vmId);
-//     if (socket?.readyState === WebSocket.OPEN) {
-//       socket.send(messageStr);
-//     }
-//   }
-// };
-
-export const getSocketByVmId = (vmId: number): VMWebSocket | undefined => {
-  return vmSocketMap.get(vmId);
-};
 
 export const addVMListener = (vmId: number, listener: UserWebSocket) => {
   const existingListeners = vmListenerMap.get(vmId) ?? [];
@@ -77,38 +58,6 @@ export const boardcastToUser = (vmId: number, message: unknown) => {
     }
   }
 };
-
-export const getAllConnections = () => vmSocketMap;
-
-const messageType = {
-  report: "report",
-} as const;
-
-interface ReportMessage {
-  uptime: number;
-  system: SystemMessage;
-  network: NetworkMessage;
-  disk: DiskMessage;
-}
-
-interface SystemMessage {
-  cpuUsage: number;
-  memoryUsed: number;
-  memoryTotal: number;
-  processCount: number;
-}
-
-interface DiskMessage {
-  spaceUsed: number;
-  spaceTotal: number;
-}
-
-interface NetworkMessage {
-  downloadTraffic: number;
-  uploadTraffic: number;
-  tcpCount: number;
-  udpCount: number;
-}
 
 export const setupMonitorWebSocketServer = (
   server: http.Server<typeof http.IncomingMessage, typeof http.ServerResponse>,
@@ -153,7 +102,7 @@ export const setupMonitorWebSocketServer = (
           return;
         }
         wssTerm.handleUpgrade(req, socket, head, function done(ws) {
-          const vmWs = ws as VMWebSocket;
+          const vmWs = ws as unknown as VMWebSocket;
           vmWs.vmId = vm.id;
           vmWs.token = vm.token;
           wssTerm.emit("connection", vmWs, req);
@@ -186,25 +135,14 @@ export const setupMonitorWebSocketServer = (
     });
 
     if (pathname === "/wss/monitor") {
-      const vmWs = ws as VMWebSocket;
-      // 将新连接添加到 Map 中
-      vmSocketMap.set(vmWs.vmId, vmWs);
-    }
-    //  else if (pathname === "/wss/monitor/user") {
-
-    // }
-
-    if (pathname === "/wss/monitor") {
-      const vmWs = ws as VMWebSocket;
+      const vmWs = ws as unknown as VMWebSocket;
+      addVmSocket(vmWs.vmId, vmWs);
       vmWs.on("close", () => {
-        vmSocketMap.delete(vmWs.vmId);
+        removeVmSocket(vmWs.vmId);
       });
       vmWs.on("message", async (data) => {
         try {
-          const message = parseMsgPack(data) as {
-            type: string;
-            data: unknown;
-          };
+          const message = parseMsgPack(data) as MonitorServerClientEvent;
           if (
             typeof message !== "object" ||
             message === null ||
@@ -213,11 +151,11 @@ export const setupMonitorWebSocketServer = (
             throw new Error("Invalid message");
           }
           switch (message.type) {
-            case messageType.report: {
-              const data = message.data as ReportMessage;
+            case "report": {
+              const data = message.data;
               const metrics = (
                 await db
-                  .insert(monitorTable)
+                  .insert(metricsTable)
                   .values({
                     vmId: vmWs.vmId,
                     uptime: data.uptime,
@@ -225,22 +163,40 @@ export const setupMonitorWebSocketServer = (
                     processCount: data.system.processCount,
                     memoryUsed: data.system.memoryUsed,
                     memoryTotal: data.system.memoryTotal,
+                    swapUsed: data.system.swapUsed,
+                    swapTotal: data.system.swapTotal,
                     diskUsed: data.disk.spaceUsed,
                     diskTotal: data.disk.spaceTotal,
+                    diskRead: data.disk.read,
+                    diskWrite: data.disk.write,
                     networkIn: data.network.uploadTraffic,
                     networkOut: data.network.downloadTraffic,
                     tcpConnections: data.network.tcpCount,
                     udpConnections: data.network.udpCount,
+                    load1: data.system.loadAvg.one,
+                    load5: data.system.loadAvg.five,
+                    load15: data.system.loadAvg.fifteen,
                   })
                   .returning()
               )?.[0];
               boardcastToUser(vmWs.vmId, {
-                type: "metrics",
+                type: "liveMetrics",
                 data: {
                   vmId: vmWs.vmId,
                   metrics,
                 },
               });
+              break;
+            }
+            case "vm_info": {
+              const data = message.data;
+              console.log(data);
+              await db
+                .update(vmTable)
+                .set({
+                  monitorInfo: data,
+                })
+                .where(eq(vmTable.id, vmWs.vmId));
               break;
             }
             default:
@@ -265,46 +221,51 @@ export const setupMonitorWebSocketServer = (
         const message = parseMsgPack(data) as MonitorUserClientEvent;
         switch (message.type) {
           case "startMonitor": {
-            if ("vmIds" in message.data) {
-              for (const vmId of message.data.vmIds) {
-                addVMListener(vmId, userWs);
-              }
-              userWs.send(
-                pack({
-                  type: "monitoring",
-                  data: {
-                    vmIds: message.data.vmIds,
-                  },
-                }),
-              );
-            } else if ("pageHandle" in message.data) {
-              const page = await db.query.page.findFirst({
-                where:
-                  message.data.pageHandle === "default"
-                    ? or(
-                        and(
-                          eq(pageTable.handle, "default"),
-                          eq(pageTable.hostname, hostname),
-                        ),
-                        eq(pageTable.handle, "default"),
-                      )
-                    : eq(pageTable.handle, message.data.pageHandle),
-              });
-              if (!page) {
-                throw new Error("Page not found");
-              }
-              for (const vmId of page.vmIds) {
-                addVMListener(vmId, userWs);
-              }
-              userWs.send(
-                pack({
-                  type: "monitoring",
-                  data: {
-                    vmIds: page.vmIds,
-                  },
-                }),
-              );
+            const vmIds =
+              "vmIds" in message.data
+                ? message.data.vmIds
+                : "pageHandle" in message.data
+                  ? ((
+                      await db.query.page.findFirst({
+                        where:
+                          message.data.pageHandle === "default"
+                            ? or(
+                                and(
+                                  eq(pageTable.handle, "default"),
+                                  eq(pageTable.hostname, hostname),
+                                ),
+                                eq(pageTable.handle, "default"),
+                              )
+                            : eq(pageTable.handle, message.data.pageHandle),
+                      })
+                    )?.vmIds ?? [])
+                  : [];
+            for (const vmId of vmIds) {
+              addVMListener(vmId, userWs);
             }
+            userWs.send(
+              pack({
+                type: "monitoring",
+                data: {
+                  vmIds,
+                },
+              }),
+            );
+            break;
+          }
+          case "getMonitorMetrics": {
+            const vmIds = message.data.vmIds;
+            const metrics = await db
+              .select()
+              .from(metricsTable)
+              .where(inArray(metricsTable.vmId, vmIds))
+              .orderBy(desc(metricsTable.time));
+            userWs.send(
+              pack({
+                type: "monitorMetrics",
+                data: metrics,
+              }),
+            );
             break;
           }
         }
@@ -314,9 +275,4 @@ export const setupMonitorWebSocketServer = (
       });
     }
   });
-
-  return {
-    getSocketByVmId,
-    getAllConnections,
-  };
 };

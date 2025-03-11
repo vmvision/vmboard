@@ -3,7 +3,7 @@ import { cors } from "hono/cors";
 
 // import { handleError } from './error'
 import merchantRouter from "./routes/merchant";
-import vmRouter from "./routes/terminal";
+import vmRouter from "./routes/vm";
 
 const app = new Hono();
 
