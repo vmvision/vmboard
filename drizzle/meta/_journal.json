@@ -26,22 +26,8 @@
     {
       "idx": 3,
       "version": "7",
-      "when": 1741076801159,
-      "tag": "0003_monitor",
-      "breakpoints": true
-    },
-    {
-      "idx": 4,
-      "version": "7",
-      "when": 1741665869073,
-      "tag": "0004_page",
-      "breakpoints": true
-    },
-    {
-      "idx": 5,
-      "version": "7",
-      "when": 1741666222546,
-      "tag": "0005_emp_merchant",
+      "when": 1741691539717,
+      "tag": "0003_metrics",
       "breakpoints": true
     }
   ]

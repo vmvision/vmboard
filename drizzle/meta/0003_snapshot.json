@@ -1,5 +1,5 @@
 {
-  "id": "6ceb7db4-d3ce-4181-bd0d-e714c8a3024b",
+  "id": "feafc492-6f9c-4b33-98ba-4839fd54d1ef",
   "prevId": "6dc9b715-2a8a-44bf-b166-a46f1bc117a7",
   "version": "7",
   "dialect": "postgresql",
@@ -549,7 +549,7 @@
           "name": "merchant_id",
           "type": "integer",
           "primaryKey": false,
-          "notNull": true
+          "notNull": false
         },
         "nickname": {
           "name": "nickname",
@@ -578,6 +578,12 @@
         },
         "ssh_info": {
           "name": "ssh_info",
+          "type": "jsonb",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "monitor_info": {
+          "name": "monitor_info",
           "type": "jsonb",
           "primaryKey": false,
           "notNull": false
@@ -716,8 +722,8 @@
       "checkConstraints": {},
       "isRLSEnabled": false
     },
-    "public.monitor": {
-      "name": "monitor",
+    "public.metrics": {
+      "name": "metrics",
       "schema": "",
       "columns": {
         "time": {
@@ -751,6 +757,24 @@
           "primaryKey": false,
           "notNull": true
         },
+        "load1": {
+          "name": "load1",
+          "type": "numeric",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "load5": {
+          "name": "load5",
+          "type": "numeric",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "load15": {
+          "name": "load15",
+          "type": "numeric",
+          "primaryKey": false,
+          "notNull": false
+        },
         "memory_used": {
           "name": "memory_used",
           "type": "numeric",
@@ -763,6 +787,18 @@
           "primaryKey": false,
           "notNull": true
         },
+        "swap_used": {
+          "name": "swap_used",
+          "type": "numeric",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "swap_total": {
+          "name": "swap_total",
+          "type": "numeric",
+          "primaryKey": false,
+          "notNull": true
+        },
         "disk_used": {
           "name": "disk_used",
           "type": "numeric",
@@ -771,6 +807,18 @@
         },
         "disk_total": {
           "name": "disk_total",
+          "type": "numeric",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "disk_read": {
+          "name": "disk_read",
+          "type": "numeric",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "disk_write": {
+          "name": "disk_write",
           "type": "numeric",
           "primaryKey": false,
           "notNull": true
@@ -802,9 +850,9 @@
       },
       "indexes": {},
       "foreignKeys": {
-        "monitor_vm_id_vm_id_fk": {
-          "name": "monitor_vm_id_vm_id_fk",
-          "tableFrom": "monitor",
+        "metrics_vm_id_vm_id_fk": {
+          "name": "metrics_vm_id_vm_id_fk",
+          "tableFrom": "metrics",
           "tableTo": "vm",
           "columnsFrom": [
             "vm_id"
@@ -813,6 +861,123 @@
             "id"
           ],
           "onDelete": "cascade",
+          "onUpdate": "cascade"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {},
+      "policies": {},
+      "checkConstraints": {},
+      "isRLSEnabled": false
+    },
+    "public.page": {
+      "name": "page",
+      "schema": "",
+      "columns": {
+        "handle": {
+          "name": "handle",
+          "type": "varchar(255)",
+          "primaryKey": true,
+          "notNull": true
+        },
+        "alias_id": {
+          "name": "alias_id",
+          "type": "varchar(255)",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "hostname": {
+          "name": "hostname",
+          "type": "varchar(255)",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "user_id": {
+          "name": "user_id",
+          "type": "varchar(255)",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "title": {
+          "name": "title",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "'VMboard'"
+        },
+        "description": {
+          "name": "description",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "''"
+        },
+        "vm_ids": {
+          "name": "vm_ids",
+          "type": "jsonb",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "'[]'::jsonb"
+        },
+        "created_at": {
+          "name": "created_at",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "now()"
+        },
+        "updated_at": {
+          "name": "updated_at",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "now()"
+        }
+      },
+      "indexes": {
+        "page_handle_idx": {
+          "name": "page_handle_idx",
+          "columns": [
+            {
+              "expression": "lower(\"handle\")",
+              "asc": true,
+              "isExpression": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": true,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        },
+        "page_hostname_idx": {
+          "name": "page_hostname_idx",
+          "columns": [
+            {
+              "expression": "lower(\"hostname\")",
+              "asc": true,
+              "isExpression": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": true,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        }
+      },
+      "foreignKeys": {
+        "page_alias_id_page_handle_fk": {
+          "name": "page_alias_id_page_handle_fk",
+          "tableFrom": "page",
+          "tableTo": "page",
+          "columnsFrom": [
+            "alias_id"
+          ],
+          "columnsTo": [
+            "handle"
+          ],
+          "onDelete": "set null",
           "onUpdate": "cascade"
         }
       },
