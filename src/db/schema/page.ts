@@ -36,7 +36,7 @@ export const page = pgTable(
       .defaultNow(),
   },
   (t) => [
-    uniqueIndex("page_handle_idx").on(sql`lower(t.handle)`),
-    uniqueIndex("page_hostname_idx").on(sql`lower(t.hostname)`),
+    uniqueIndex("page_handle_idx").on(sql`lower(${t.handle})`),
+    uniqueIndex("page_hostname_idx").on(sql`lower(${t.hostname})`),
   ],
 );

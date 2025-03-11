@@ -1,0 +1,1 @@
+ALTER TABLE "vm" ALTER COLUMN "merchant_id" DROP NOT NULL;

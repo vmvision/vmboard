@@ -13,6 +13,7 @@ import { user } from "./auth";
 import { merchant, type Merchant } from "./merchant";
 import type { VMMetadata } from "vmapi";
 import type { ConnectConfig } from "ssh2";
+import bigintJsonb from "../bigint-jsonb";
 
 export interface SSHInfo extends ConnectConfig {
   sshKeyId?: number;
@@ -26,10 +27,10 @@ export interface MonitorVMInfo {
   platformVersion: string;
   kernel: string;
   hostname: string;
-  cpu: string;
+  cpu: string[];
   memory: string;
+  disk: string[];
   uptime: string;
-  disk: string;
   version: string;
 }
 
@@ -41,12 +42,10 @@ export const vm = pgTable("vm", {
       onDelete: "cascade",
       onUpdate: "cascade",
     }),
-  merchantId: integer("merchant_id")
-    .notNull()
-    .references(() => merchant.id, {
-      onDelete: "cascade",
-      onUpdate: "cascade",
-    }),
+  merchantId: integer("merchant_id").references(() => merchant.id, {
+    onDelete: "cascade",
+    onUpdate: "cascade",
+  }),
 
   nickname: varchar("nickname", { length: 128 }).notNull(),
   status: varchar("status", {
@@ -56,8 +55,8 @@ export const vm = pgTable("vm", {
   ipAddress: inet("ip_address"),
   token: uuid("token").defaultRandom().notNull(),
   sshInfo: jsonb("ssh_info").$type<SSHInfo>(),
-  
-  monitorInfo: jsonb("monitor_info").$type<MonitorVMInfo>(),
+
+  monitorInfo: bigintJsonb("monitor_info").$type<MonitorVMInfo>(),
   metadata: jsonb("metadata").$type<VMMetadata>(),
 
   createdAt: timestamp("created_at", { withTimezone: true })
