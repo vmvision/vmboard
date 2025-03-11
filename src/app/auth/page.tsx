@@ -27,6 +27,7 @@ interface IAuth {
 export default function AuthPage() {
   const router = useTransitionRouter();
   const [isSignUp, setIsSignUp] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
 
   const form = useForm<IAuth>({
     defaultValues: {
@@ -44,6 +45,12 @@ export default function AuthPage() {
             name: values.email,
           },
           {
+            onRequest: () => {
+              setIsLoading(true);
+            },
+            onResponse: () => {
+              setIsLoading(false);
+            },
             onSuccess: () => {
               toast.success("注册成功");
               router.push("/dash");
@@ -60,6 +67,12 @@ export default function AuthPage() {
             password: values.password,
           },
           {
+            onRequest: () => {
+              setIsLoading(true);
+            },
+            onResponse: () => {
+              setIsLoading(false);
+            },
             onSuccess: () => {
               toast.success("登陆成功");
               router.push("/dash");
@@ -87,7 +100,7 @@ export default function AuthPage() {
   return (
     <Card className="mx-auto w-[384px]">
       <CardHeader>
-        <CardTitle className="text-2xl">登陆</CardTitle>
+        <CardTitle className="text-2xl">{isSignUp ? "注册" : "登录"}</CardTitle>
       </CardHeader>
       <CardContent>
         <Form {...form}>
@@ -123,6 +136,7 @@ export default function AuthPage() {
             <Button
               type="submit"
               className="w-full"
+              isLoading={isLoading}
               data-umami-event={isSignUp ? "signup" : "signin"}
             >
               {isSignUp ? "注册" : "登录"}

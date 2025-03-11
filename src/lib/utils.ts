@@ -17,6 +17,53 @@ export function formatDate(
   }).format(new Date(date));
 }
 
+export function formatBytes(bytes: number | string, decimals = 2) {
+  bytes = Number(bytes);
+
+  if (!+bytes) return "0 Bytes";
+
+  const k = 1024;
+  const dm = decimals < 0 ? 0 : decimals;
+  const sizes = [
+    "Bytes",
+    "KiB",
+    "MiB",
+    "GiB",
+    "TiB",
+    "PiB",
+    "EiB",
+    "ZiB",
+    "YiB",
+  ];
+
+  const i = Math.floor(Math.log(bytes) / Math.log(k));
+
+  return `${Number.parseFloat((bytes / k ** i).toFixed(dm))} ${sizes[i]}`;
+}
+
+export function formatRelativeTime(timestamp: number): string {
+  const now = Date.now();
+  const diff = now - timestamp;
+  const hours = Math.floor(diff / (1000 * 60 * 60));
+  const minutes = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
+  const seconds = Math.floor((diff % (1000 * 60)) / 1000);
+
+  if (hours > 24) {
+    const days = Math.floor(hours / 24);
+    return `${days}d`;
+  }
+  if (hours > 0) {
+    return `${hours}h`;
+  }
+  if (minutes > 0) {
+    return `${minutes}m`;
+  }
+  if (seconds >= 0) {
+    return `${seconds}s`;
+  }
+  return "0s";
+}
+
 export function toSentenceCase(str: string) {
   return str
     .replace(/_/g, " ")
@@ -45,4 +92,13 @@ export function composeEventHandlers<E>(
       return ourEventHandler?.(event);
     }
   };
+}
+
+export function calculatePercentage(
+  value: number | string,
+  total: number | string,
+  fixed = 2,
+) {
+  const percentage = (Number(value) / Number(total)) * 100;
+  return Number.isNaN(percentage) ? 0 : Number(percentage.toFixed(fixed));
 }
