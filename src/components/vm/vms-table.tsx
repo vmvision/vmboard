@@ -14,8 +14,12 @@ import { DataTableToolbar } from "@/components/data-table/data-table-toolbar";
 import { useDataTable } from "@/hooks/use-data-table";
 import { toSentenceCase } from "@/lib/utils";
 
-import type { getMerchants, getVMs, getVMStatusCounts } from "../../app/_lib/queries";
-import { getPriorityIcon, getStatusIcon } from "../../app/_lib/utils";
+import type {
+  getMerchants,
+  getVMs,
+  getVMStatusCounts,
+} from "../../app/_lib/queries";
+import { getStatusIcon } from "../../app/_lib/utils";
 import { DeleteVMsDialog } from "./delete-vms-dialog";
 import { useFeatureFlags } from "./feature-flags-provider";
 import { getColumns } from "./vms-table-columns";

@@ -31,7 +31,6 @@ import { updateVM } from "../../app/_lib/actions";
 import {
   getDMITLocationIcon,
   getMerchantIcon,
-  getPriorityIcon,
   getStatusIcon,
 } from "../../app/_lib/utils";
 import type { Merchant } from "@/db/schema";
@@ -88,6 +87,7 @@ export function getColumns({
       ),
       cell: ({ row }) => {
         const merchant: Merchant = row.getValue("merchant");
+        if (!merchant) return null;
         const Icon = getMerchantIcon(merchant.merchant);
         return (
           <div className="flex items-center gap-2">

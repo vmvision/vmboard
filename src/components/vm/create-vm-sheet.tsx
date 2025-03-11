@@ -37,7 +37,7 @@ import {
 } from "@/components/ui/sheet";
 import { Textarea } from "@/components/ui/textarea";
 
-import { updateVM } from "../../app/_lib/actions";
+import { createVM, updateVM } from "../../app/_lib/actions";
 import {
   createVMSchema,
   type CreateVMSchema,
@@ -95,13 +95,9 @@ export function CreateVMSheet({ children, ...props }: CreateVMSheetProps) {
   }, [vm, form.setValue]);
 
   function onSubmit(input: CreateVMSchema) {
+    console.log(input);
     startCreateTransition(async () => {
-      if (!vm) return;
-
-      const { error } = await updateVM({
-        id: vm.id,
-        ...input,
-      });
+      const { error } = await createVM(input);
 
       if (error) {
         toast.error(error);
@@ -146,6 +142,8 @@ export function CreateVMSheet({ children, ...props }: CreateVMSheetProps) {
                       <SelectGroup>
                         {merchantList.isLoading ? (
                           <SelectItem value="loading">Loading...</SelectItem>
+                        ) : merchantList.data?.length === 0 ? (
+                          <div>none</div>
                         ) : (
                           merchantList.data?.map((merchant) => (
                             <SelectItem

@@ -2,6 +2,7 @@ import "server-only";
 
 import db from "@/db";
 import { vm as vmTable, type VM } from "@/db/schema/vm";
+import { page as pageTable } from "@/db/schema/page";
 import { merchant as merchantTable } from "@/db/schema/merchant";
 import {
   and,
@@ -184,6 +185,22 @@ export async function getSSHKey() {
     {
       revalidate: 3600,
       tags: ["ssh-key"],
+    },
+  )();
+}
+
+export async function getPageData(handle: string) {
+  return await unstable_cache(
+    async () => {
+      const data = await db.query.page.findFirst({
+        where: eq(pageTable.handle, handle),
+      });
+      return data;
+    },
+    [handle],
+    {
+      revalidate: 3600,
+      tags: ["page"],
     },
   )();
 }
