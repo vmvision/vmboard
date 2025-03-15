@@ -112,9 +112,9 @@ const ServerCard: React.FC<{
             <div className={"flex w-14 flex-col"}>
               <p className="text-muted-foreground text-xs">{t("Mem")}</p>
               <div className="flex items-center font-semibold text-xs">
-                {metrics.memoryUsage}%
+                {Number(metrics.memoryUsage).toFixed(2)}%
               </div>
-              <ServerUsageBar value={metrics.memoryUsed} />
+              <ServerUsageBar value={metrics.memoryUsage} />
             </div>
             <div className={"flex w-14 flex-col"}>
               <p className="text-muted-foreground text-xs">{t("STG")}</p>
@@ -176,14 +176,14 @@ const ServerCard: React.FC<{
           style={{ gridTemplateColumns: "auto auto 1fr" }}
         >
           <span className="h-2 w-2 shrink-0 self-center rounded-full bg-red-500" />
-          {/* <div
+          <div
             className={cn(
               "flex items-center justify-center",
               showFlag ? "min-w-[17px]" : "min-w-0",
             )}
           >
-            {showFlag ? <ServerFlag country_code={country_code} /> : null}
-          </div> */}
+            {showFlag ? <ServerFlag country_code="cn" /> : null}
+          </div>
           <div className="relative">
             <p
               className={cn(

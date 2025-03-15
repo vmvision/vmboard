@@ -116,6 +116,9 @@ importers:
       drizzle-orm:
         specifier: ^0.39.1
         version: 0.39.3(@libsql/client-wasm@0.14.0)(@types/pg@8.11.11)(kysely@0.27.5)(pg@8.13.3)(postgres@3.4.5)
+      drizzle-zod:
+        specifier: ^0.7.0
+        version: 0.7.0(drizzle-orm@0.39.3(@libsql/client-wasm@0.14.0)(@types/pg@8.11.11)(kysely@0.27.5)(pg@8.13.3)(postgres@3.4.5))(zod@3.24.2)
       export-to-csv:
         specifier: ^1.4.0
         version: 1.4.0
@@ -2188,6 +2191,12 @@ packages:
         optional: true
       sqlite3:
         optional: true
+
+  drizzle-zod@0.7.0:
+    resolution: {integrity: sha512-xgCRYYVEzRkeXTS33GSMgoowe3vKsMNBjSI+cwG1oLQVEhAWWbqtb/AAMlm7tkmV4fG/uJjEmWzdzlEmTgWOoQ==}
+    peerDependencies:
+      drizzle-orm: '>=0.36.0'
+      zod: '>=3.0.0'
 
   eastasianwidth@0.2.0:
     resolution: {integrity: sha512-I88TYZWc9XiYHRQ4/3c5rjjfgkjhLyW2luGIheGERbNQ6OY7yTybanSpDXZa8y7VUP9YmDcYa+eyq4ca7iLqWA==}
@@ -4868,6 +4877,11 @@ snapshots:
       kysely: 0.27.5
       pg: 8.13.3
       postgres: 3.4.5
+
+  drizzle-zod@0.7.0(drizzle-orm@0.39.3(@libsql/client-wasm@0.14.0)(@types/pg@8.11.11)(kysely@0.27.5)(pg@8.13.3)(postgres@3.4.5))(zod@3.24.2):
+    dependencies:
+      drizzle-orm: 0.39.3(@libsql/client-wasm@0.14.0)(@types/pg@8.11.11)(kysely@0.27.5)(pg@8.13.3)(postgres@3.4.5)
+      zod: 3.24.2
 
   eastasianwidth@0.2.0: {}
 

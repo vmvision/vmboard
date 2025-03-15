@@ -10,6 +10,8 @@ import type { Metadata, Viewport } from "next";
 
 import { Toaster } from "@/components/ui/toaster";
 import { fontMono, fontSans } from "@/lib/fonts";
+import { getLocale, getMessages } from "next-intl/server";
+import { NextIntlClientProvider } from "next-intl";
 
 export const metadata: Metadata = {
   metadataBase: new URL(siteConfig.url),
@@ -55,9 +57,15 @@ export const viewport: Viewport = {
   ],
 };
 
-export default function RootLayout({ children }: React.PropsWithChildren) {
+export default async function RootLayout({
+  children,
+}: React.PropsWithChildren) {
+  const locale = await getLocale();
+  // Providing all messages to the client
+  // side is the easiest way to get started
+  const messages = await getMessages();
   return (
-    <html lang="en" suppressHydrationWarning>
+    <html lang={locale} suppressHydrationWarning>
       <head />
       <body
         className={cn(
@@ -66,19 +74,21 @@ export default function RootLayout({ children }: React.PropsWithChildren) {
           fontMono.variable,
         )}
       >
-        <ThemeProvider
-          attribute="class"
-          defaultTheme="system"
-          enableSystem
-          disableTransitionOnChange
-        >
-          <div className="relative flex min-h-screen flex-col">
-            <SiteHeader />
-            {children}
-          </div>
-          <TailwindIndicator />
-        </ThemeProvider>
-        <Toaster />
+        <NextIntlClientProvider messages={messages}>
+          <ThemeProvider
+            attribute="class"
+            defaultTheme="system"
+            enableSystem
+            disableTransitionOnChange
+          >
+            <div className="relative flex min-h-screen flex-col">
+              <SiteHeader />
+              {children}
+            </div>
+            <TailwindIndicator />
+          </ThemeProvider>
+          <Toaster />
+        </NextIntlClientProvider>
       </body>
     </html>
   );

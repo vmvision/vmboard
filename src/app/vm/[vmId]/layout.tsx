@@ -18,5 +18,5 @@ export default function ServerLayout({
 }: {
   children: React.ReactNode;
 }) {
-  return <MetricsDataProvider>{children}</MetricsDataProvider>;
+  return <>{children}</>;
 }

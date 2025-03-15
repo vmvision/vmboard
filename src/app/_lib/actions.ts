@@ -9,8 +9,8 @@ import { revalidateTag, unstable_noStore } from "next/cache";
 import { getSession, getSessionOrThrow } from "@/lib/session";
 import { getErrorMessage } from "@/lib/handle-error";
 
-import { generateRandomTask } from "./utils";
 import type { CreateVMSchema, UpdateVMSchema } from "./validations";
+import type { Page, NewPage } from "@/db/schema/page";
 
 // export async function getCustomConfig(key: string) {
 //   const session = await getSession();
@@ -145,7 +145,7 @@ export async function deleteVM(input: { id: number }) {
       await tx.delete(vmTable).where(eq(vmTable.id, input.id));
 
       // Create a new task for the deleted one
-      await tx.insert(vmTable).values(generateRandomTask());
+      // await tx.insert(vmTable).values(generateRandomTask());
     });
 
     revalidateTag("vms");
@@ -219,4 +219,3 @@ export async function setupVMSSHInfo(input: {
     };
   }
 }
-

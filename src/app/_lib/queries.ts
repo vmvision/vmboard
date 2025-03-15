@@ -192,10 +192,30 @@ export async function getSSHKey() {
 export async function getPageData(handle: string) {
   return await unstable_cache(
     async () => {
-      const data = await db.query.page.findFirst({
+      const page = await db.query.page.findFirst({
         where: eq(pageTable.handle, handle),
       });
-      return data;
+      const vms = await db.query.vm.findMany({
+        where: inArray(vmTable.id, page?.vmIds ?? []),
+        columns: {
+          id: true,
+          nickname: true,
+          monitorInfo: true,
+        },
+      });
+      return {
+        page,
+        vms: vms.map((vm) => ({
+          id: vm.id,
+          nickname: vm.nickname,
+          monitorInfo: {
+            os: vm.monitorInfo?.os,
+            osVersion: vm.monitorInfo?.osVersion,
+            platform: vm.monitorInfo?.platform,
+            platformVersion: vm.monitorInfo?.platformVersion,
+          },
+        })),
+      };
     },
     [handle],
     {

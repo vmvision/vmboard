@@ -14,6 +14,8 @@ import { merchant, type Merchant } from "./merchant";
 import type { VMMetadata } from "vmapi";
 import type { ConnectConfig } from "ssh2";
 import bigintJsonb from "../bigint-jsonb";
+import { relations } from "drizzle-orm";
+import { pageVM } from "./page";
 
 export interface SSHInfo extends ConnectConfig {
   sshKeyId?: number;
@@ -67,6 +69,18 @@ export const vm = pgTable("vm", {
     .defaultNow()
     .$onUpdate(() => new Date()),
 });
+
+export const vmRelations = relations(vm, ({ one, many }) => ({
+  user: one(user, {
+    fields: [vm.userId],
+    references: [user.id],
+  }),
+  merchant: one(merchant, {
+    fields: [vm.merchantId],
+    references: [merchant.id],
+  }),
+  pages: many(pageVM),
+}));
 
 export type VM = typeof vm.$inferSelect;
 export type NewVM = typeof vm.$inferInsert;

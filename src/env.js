@@ -22,7 +22,12 @@ export const env = createEnv({
    * `NEXT_PUBLIC_`.
    */
   client: {
-    // NEXT_PUBLIC_CLIENTVAR: z.string(),
+    // Monitor styles
+    NEXT_PUBLIC_SHOW_IP_INFO: z.boolean().default(true),
+    NEXT_PUBLIC_SHOW_FLAG: z.boolean().default(true),
+    NEXT_PUBLIC_SHOW_NETWORK_TRANSFER: z.boolean().default(true),
+    NEXT_PUBLIC_FORCE_USE_SVG_FLAG: z.boolean().default(false),
+    NEXT_PUBLIC_FIXED_TOP_SERVER_NAME: z.boolean().default(true),
   },
 
   /**
@@ -33,7 +38,12 @@ export const env = createEnv({
     DATABASE_URL: process.env.DATABASE_URL,
     BASE_URL: process.env.BASE_URL,
     NODE_ENV: process.env.NODE_ENV,
-    // NEXT_PUBLIC_CLIENTVAR: process.env.NEXT_PUBLIC_CLIENTVAR,
+    NEXT_PUBLIC_FORCE_USE_SVG_FLAG: process.env.NEXT_PUBLIC_FORCE_USE_SVG_FLAG,
+    NEXT_PUBLIC_SHOW_IP_INFO: process.env.NEXT_PUBLIC_SHOW_IP_INFO,
+    NEXT_PUBLIC_SHOW_FLAG: process.env.NEXT_PUBLIC_SHOW_FLAG,
+    NEXT_PUBLIC_SHOW_NETWORK_TRANSFER: process.env.NEXT_PUBLIC_SHOW_NET_TRANSFER,
+    NEXT_PUBLIC_FIXED_TOP_SERVER_NAME:
+      process.env.NEXT_PUBLIC_FIXED_TOP_SERVER_NAME,
   },
   /**
    * Run `build` or `dev` with `SKIP_ENV_VALIDATION` to skip env validation. This is especially

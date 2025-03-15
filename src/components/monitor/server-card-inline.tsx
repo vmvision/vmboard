@@ -29,7 +29,9 @@ import { useMetricsData } from "./vm-data-context";
 const ServerCardInline: React.FC<{
   vmId: number;
   nickname: string;
-}> = ({ vmId, nickname }) => {
+  os?: string;
+  osVersion?: string;
+}> = ({ vmId, nickname, os, osVersion }) => {
   const t = useTranslations("Monitor");
   const { getLatestMetrics } = useMetricsData();
   const metrics = getLatestMetrics(vmId);
@@ -49,14 +51,14 @@ const ServerCardInline: React.FC<{
           style={{ gridTemplateColumns: "auto auto 1fr" }}
         >
           <span className="h-2 w-2 shrink-0 self-center rounded-full bg-green-500" />
-          {/* <div
+          <div
             className={cn(
               "flex items-center justify-center",
               showFlag ? "min-w-[17px]" : "min-w-0",
             )}
           >
-            {showFlag ? <ServerFlag country_code={country_code} /> : null}
-          </div> */}
+            {showFlag ? <ServerFlag country_code="cn" /> : null}
+          </div>
           <div className="relative w-28">
             <p
               className={cn(
@@ -71,31 +73,31 @@ const ServerCardInline: React.FC<{
         <Separator orientation="vertical" className="mx-0 ml-2 h-8" />
         <div className="flex flex-col gap-2">
           <section className={cn("grid flex-1 grid-cols-9 items-center gap-3")}>
-            {/* <div
+            <div
               className={"flex flex-row items-center gap-2 whitespace-nowrap"}
             >
               <div className="font-semibold text-xs">
-                {vmInfo.platform.includes("Windows") ? (
+                {/* {vmInfo.platform.includes("Windows") ? (
                   <MageMicrosoftWindows className="size-[10px]" />
                 ) : (
                   <p className={`fl-${GetFontLogoClass(vmInfo.platform)}`} />
-                )}
+                )} */}
               </div>
               <div className={"flex w-14 flex-col"}>
                 <p className="text-muted-foreground text-xs">{t("System")}</p>
                 <div className="flex items-center font-semibold text-[10.5px]">
-                  {vmInfo.platform.includes("Windows")
+                  {/* {vmInfo.platform.includes("Windows")
                     ? "Windows"
-                    : GetOsName(vmInfo.platform)}
+                    : GetOsName(vmInfo.platform)} */}
                 </div>
               </div>
             </div>
             <div className={"flex w-20 flex-col"}>
               <p className="text-muted-foreground text-xs">{t("Uptime")}</p>
               <div className="flex items-center font-semibold text-xs">
-                {(serverWithMetrics.metrics.uptime / 86400).toFixed(0)} {"Days"}
+                {(metrics.uptime / 86400).toFixed(0)} {"Days"}
               </div>
-            </div> */}
+            </div>
             <div className={"flex w-14 flex-col"}>
               <p className="text-muted-foreground text-xs">{t("CPU")}</p>
               <div className="flex items-center font-semibold text-xs">

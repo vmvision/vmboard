@@ -24,6 +24,8 @@ import { useTranslations } from "next-intl";
 // import dynamic from "next/dynamic";
 import { useEffect, useRef, useState } from "react";
 import type { ServerWithLiveMetrics } from "@/types/metrics";
+import { VM } from "@/db/schema/vm";
+import { MonitorVM } from "@/app/[handle]/page.client";
 
 // const ServerGlobal = dynamic(() => import("./Global"), {
 //   ssr: false,
@@ -94,33 +96,23 @@ import type { ServerWithLiveMetrics } from "@/types/metrics";
 // );
 
 export const ServerList: React.FC<{
-  containerRef?: React.RefObject<HTMLDivElement>;
-  servers: {
-    id: number;
-    nickname: string;
-  }[];
+  servers: MonitorVM[];
   inline?: boolean;
-}> = ({ servers, inline = false, containerRef }) => {
+}> = ({ servers, inline = false }) => {
   if (inline) {
     return (
-      <section
-        ref={containerRef}
-        className="scrollbar-hidden flex flex-col gap-2 overflow-x-scroll"
-      >
+      <section className="scrollbar-hidden flex flex-col gap-2 overflow-x-scroll">
         {servers.map((vm) => (
-          <ServerCardInline key={vm.id} vmId={vm.id} nickname={vm.nickname} />
+          <ServerCardInline key={vm.id} vmId={vm.id} {...vm} />
         ))}
       </section>
     );
   }
 
   return (
-    <section
-      ref={containerRef}
-      className="grid grid-cols-1 gap-2 md:grid-cols-2"
-    >
+    <section className="grid grid-cols-1 gap-2 md:grid-cols-2">
       {servers.map((vm) => (
-        <ServerCard key={vm.id} vmId={vm.id} nickname={vm.nickname} />
+        <ServerCard key={vm.id} vmId={vm.id} {...vm} />
       ))}
     </section>
   );

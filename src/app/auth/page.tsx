@@ -154,11 +154,11 @@ export default function AuthPage() {
             使用 Passkey 登录
           </Button>
         </div>
-        <div className="mt-4 text-center text-sm">
+        <div className="mt-4 flex items-center justify-center gap-1 text-center text-sm">
           {isSignUp ? "已有账号？" : "没有账号？"}
           <Button
             variant="link"
-            className="underline underline-offset-4"
+            className="h-auto p-0 underline underline-offset-4"
             onClick={() => setIsSignUp((prev) => !prev)}
           >
             {isSignUp ? "登录" : "注册"}

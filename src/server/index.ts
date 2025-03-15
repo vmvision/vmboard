@@ -1,14 +1,17 @@
 import { Hono } from "hono";
 import { cors } from "hono/cors";
 
-// import { handleError } from './error'
 import merchantRouter from "./routes/merchant";
 import vmRouter from "./routes/vm";
+import pageRouter from "./routes/page";
+import { errorHandler } from "./error";
 
 const app = new Hono();
 
-// app.onError(handleError);
+// Error Handler
+app.onError(errorHandler);
 
+// CORS
 app.use(
   "*",
   cors({
@@ -20,7 +23,8 @@ app.use(
 // Business Routes
 export const routes = app
   .route("/vm", vmRouter)
-  .route("/merchant", merchantRouter);
+  .route("/merchant", merchantRouter)
+  .route("/page", pageRouter);
 
 app.use(async (c, next) => {
   await next();

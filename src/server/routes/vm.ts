@@ -3,8 +3,8 @@ import appFactory from "../factory";
 import { vm as vmsTable } from "@/db/schema/vm";
 import { zValidator } from "@hono/zod-validator";
 import { z } from "zod";
-import { broadcastToVms } from "../monitor/socket";
-import JsonBigInt from "json-bigint";
+import { broadcastToVms, checkVmSocket } from "../monitor/socket";
+
 const app = appFactory
   .createApp()
   .get(
@@ -63,6 +63,21 @@ const app = appFactory
       return c.json({
         name: vm.nickname,
         monitorInfo: vm.monitorInfo,
+      });
+    },
+  )
+  .get(
+    "/:id/monitor/status",
+    zValidator(
+      "param",
+      z.object({
+        id: z.coerce.number(),
+      }),
+    ),
+    async (c) => {
+      const input = c.req.valid("param");
+      return c.json({
+        status: checkVmSocket(input.id),
       });
     },
   );

@@ -30,6 +30,26 @@ class SocketManager {
     return SocketManager.instance;
   }
 
+  /**
+   * Check if the socket is open for the given VM ID
+   * @param vmId - The ID of the VM to check
+   * @returns true if the socket is open, false otherwise
+   */
+  checkSocket(vmId: number) {
+    const socket = this.vmSocketMap.get(vmId);
+    if (!socket) {
+      return false;
+    }
+    if (
+      socket.readyState !== WebSocket.OPEN &&
+      socket.readyState !== WebSocket.CONNECTING
+    ) {
+      this.removeSocket(vmId);
+      return false;
+    }
+    return true;
+  }
+
   addSocket(vmId: number, socket: VMWebSocket) {
     this.vmSocketMap.set(vmId, socket);
     console.log(
@@ -61,3 +81,4 @@ export const addVmSocket = (vmId: number, socket: VMWebSocket) =>
   socketManager.addSocket(vmId, socket);
 export const removeVmSocket = (vmId: number) =>
   socketManager.removeSocket(vmId);
+export const checkVmSocket = (vmId: number) => socketManager.checkSocket(vmId);
