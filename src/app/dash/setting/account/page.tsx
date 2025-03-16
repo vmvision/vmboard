@@ -1,19 +1,18 @@
-"use client"; // 客户端组件
-
 import { Shell } from "@/components/shell";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { useTranslations } from "next-intl";
-import { useState } from "react";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { auth } from "@/lib/auth";
 import { getUser, getLatestSession } from "@/app/_lib/queries";
+import { redirect } from "next/navigation";
+import { headers } from "next/headers";
+import { getTranslations } from "next-intl/server";
 
 interface User {
   name: string;
   email: string;
   username: string | null;
-  createdAt: string; // 不可为 null
+  createdAt: string;
   role: string | null;
   emailVerified: boolean;
   banned: boolean | null;
@@ -25,157 +24,124 @@ interface User {
 interface Session {
   ipAddress: string | null;
   userAgent: string | null;
-  createdAt: string; // 不可为 null
+  createdAt: string;
 }
 
-interface UpdateUserResponse {
-  success: boolean;
-  error?: string;
-}
+export default async function AccountPage() {
+  const t = await getTranslations("account");
 
-export default function AccountPage({
-  user: initialUser,
-  latestSession: initialSession,
-}: {
-  user: User;
-  latestSession: Session | null;
-}) {
-  const t = useTranslations("account");
-  const [user, setUser] = useState(initialUser);
-  const [name, setName] = useState(user.name);
-  const [username, setUsername] = useState(user.username || "");
-  const [isSubmitting, setIsSubmitting] = useState(false);
+  try {
+    // 获取 headers 并转换为 Headers 类型
+    const readonlyHeaders = await headers();
+    const mutableHeaders = new Headers();
+    readonlyHeaders.forEach((value, key) => {
+      mutableHeaders.set(key, value);
+    });
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setIsSubmitting(true);
-
-    try {
-      const response = await fetch("/api/update-user", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        credentials: "include",
-        body: JSON.stringify({ name, username }),
-      });
-
-      const data = (await response.json()) as UpdateUserResponse;
-
-      if (data.success) {
-        setUser({ ...user, name, username });
-        window.alert(t("update_success"));
-      } else {
-        throw new Error(data.error || "Failed to update");
-      }
-    } catch (error) {
-      const errorMessage = error instanceof Error ? error.message : String(error);
-      window.alert(t("update_failed") + ": " + errorMessage);
-    } finally {
-      setIsSubmitting(false);
+    // 获取会话
+    const session = await auth.api.getSession({ headers: mutableHeaders });
+    if (!session) {
+      redirect("/auth");
     }
-  };
 
-  return (
-    <Shell>
-      <div className="space-y-2">
-        <h2 className="text-2xl font-bold">{t("title")}</h2>
-        <p className="text-muted-foreground">{t("description")}</p>
-      </div>
-      <Card>
-        <CardHeader>
-          <CardTitle>{t("account_details")}</CardTitle>
-        </CardHeader>
-        <CardContent className="space-y-4">
-          <form onSubmit={handleSubmit} className="space-y-4">
-            <div>
-              <label htmlFor="name" className="block text-sm font-medium">
-                {t("name")}
-              </label>
-              <Input
-                id="name"
-                value={name}
-                onChange={(e) => setName(e.target.value)}
-                required
-              />
-            </div>
-            <div>
-              <label htmlFor="username" className="block text-sm font-medium">
-                {t("username")}
-              </label>
-              <Input
-                id="username"
-                value={username}
-                onChange={(e) => setUsername(e.target.value)}
-                placeholder="Optional"
-              />
-            </div>
-            <Button type="submit" disabled={isSubmitting}>
-              {isSubmitting ? t("submitting") : t("save")}
-            </Button>
-          </form>
-          <div className="space-y-2">
-            <p>{t("email")}: {user.email}</p>
-            <p>{t("created_at")}: {new Date(user.createdAt).toLocaleDateString()}</p>
-            <p>{t("role")}: {user.role || "user"}</p>
-            <p>{t("email_verified")}: {user.emailVerified ? "Yes" : "No"}</p>
-            {user.banned && (
+    // 获取用户数据
+    const user = await getUser(session.user.id);
+    if (!user) {
+      redirect("/auth");
+    }
+
+    // 获取最近会话
+    const latestSession = await getLatestSession(session.user.id);
+
+    return (
+      <Shell>
+        <div className="space-y-2">
+          <h2 className="text-2xl font-bold">{t("title")}</h2>
+          <p className="text-muted-foreground">{t("description")}</p>
+        </div>
+        <Card>
+          <CardHeader>
+            <CardTitle>{t("account_details")}</CardTitle>
+          </CardHeader>
+          <CardContent className="space-y-4">
+            <form action="/api/update-user" method="POST" className="space-y-4">
+              <input type="hidden" name="userId" value={user.id} />
+              <div>
+                <label htmlFor="name" className="block text-sm font-medium">
+                  {t("name")}
+                </label>
+                <Input
+                  id="name"
+                  name="name"
+                  defaultValue={user.name}
+                  required
+                />
+              </div>
+              <div>
+                <label htmlFor="username" className="block text-sm font-medium">
+                  {t("username")}
+                </label>
+                <Input
+                  id="username"
+                  name="username"
+                  defaultValue={user.username || ""}
+                  placeholder="Optional"
+                />
+              </div>
+              <Button type="submit">{t("save")}</Button>
+            </form>
+            <div className="space-y-2">
+              <p>{t("email")}: {user.email}</p>
               <p>
-                {t("banned")}: {user.banReason || "No reason"}
-                {user.banExpires && ` (until ${new Date(user.banExpires).toLocaleString()})`}
+                {t("created_at")}:{" "}
+                {new Date(user.createdAt).toLocaleDateString()}
               </p>
-            )}
-            {user.image && (
-              <p>
-                {t("avatar")}: <img src={user.image} alt="Avatar" width="50" />
-              </p>
-            )}
-          </div>
-        </CardContent>
-      </Card>
-      <Card className="mt-4">
-        <CardHeader>
-          <CardTitle>{t("recent_activity")}</CardTitle>
-        </CardHeader>
-        <CardContent className="space-y-2">
-          <p>
-            {t("last_login")}:{" "}
-            {initialSession?.createdAt
-              ? new Date(initialSession.createdAt).toLocaleString()
-              : "Never"}
+              <p>{t("role")}: {user.role || "user"}</p>
+              <p>{t("email_verified")}: {user.emailVerified ? "Yes" : "No"}</p>
+              {user.banned && (
+                <p>
+                  {t("banned")}: {user.banReason || "No reason"}
+                  {user.banExpires &&
+                    ` (until ${new Date(user.banExpires).toLocaleString()})`}
+                </p>
+              )}
+              {user.image && (
+                <p>
+                  {t("avatar")}:{" "}
+                  <img src={user.image} alt="Avatar" width="50" />
+                </p>
+              )}
+            </div>
+          </CardContent>
+        </Card>
+        <Card className="mt-4">
+          <CardHeader>
+            <CardTitle>{t("recent_activity")}</CardTitle>
+          </CardHeader>
+          <CardContent className="space-y-2">
+            <p>
+              {t("last_login")}:{" "}
+              {latestSession?.createdAt
+                ? new Date(latestSession.createdAt).toLocaleString()
+                : "Never"}
+            </p>
+            <p>{t("ip_address")}: {latestSession?.ipAddress || "Unknown"}</p>
+            <p>{t("device")}: {latestSession?.userAgent || "Unknown"}</p>
+          </CardContent>
+        </Card>
+      </Shell>
+    );
+  } catch (error) {
+    console.error("Error in AccountPage:", error);
+    return (
+      <Shell>
+        <div className="space-y-2">
+          <h2 className="text-2xl font-bold">Error</h2>
+          <p className="text-muted-foreground">
+            Failed to load account page. Please try again later.
           </p>
-          <p>{t("ip_address")}: {initialSession?.ipAddress || "Unknown"}</p>
-          <p>{t("device")}: {initialSession?.userAgent || "Unknown"}</p>
-        </CardContent>
-      </Card>
-    </Shell>
-  );
-}
-
-export async function getServerSideProps() {
-  const session = await auth.api.getSession({ headers: {} as Headers });
-  if (!session) {
-    return { redirect: { destination: "/auth", permanent: false } };
+        </div>
+      </Shell>
+    );
   }
-
-  const user = await getUser(session.user.id);
-  if (!user) {
-    return { redirect: { destination: "/auth", permanent: false } };
-  }
-
-  const latestSession = await getLatestSession(session.user.id);
-
-  return {
-    props: {
-      user: {
-        ...user,
-        createdAt: user.createdAt.toISOString(),
-        banExpires: user.banExpires?.toISOString() || null,
-      },
-      latestSession: latestSession
-        ? {
-            ...latestSession,
-            createdAt: latestSession.createdAt.toISOString(),
-          }
-        : null,
-    },
-  };
 }

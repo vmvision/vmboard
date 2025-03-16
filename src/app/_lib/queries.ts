@@ -4,7 +4,7 @@ import db from "@/db";
 import { vm as vmTable, type VM } from "@/db/schema/vm";
 import { page as pageTable } from "@/db/schema/page";
 import { merchant as merchantTable } from "@/db/schema/merchant";
-import { users, session } from "@/db/schema"; // 导入 user 和 session 表
+import { user, session } from "@/db/schema"; // 导入 user 和 session 表
 import {
   and,
   asc,
@@ -231,8 +231,8 @@ export async function getPageData(handle: string) {
 export async function getUser(userId: string) {
   return await db
     .select()
-    .from(users)
-    .where(eq(users.id, userId))
+    .from(user)
+    .where(eq(user.id, userId))
     .limit(1)
     .execute()
     .then((res) => res[0] || null);
