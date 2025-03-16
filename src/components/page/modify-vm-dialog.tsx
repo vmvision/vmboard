@@ -37,6 +37,7 @@ import useSWR from "swr";
 import useSWRMutation from "swr/mutation";
 
 import apiClient, { fetchWrapper, mutationWrapper } from "@/lib/api-client";
+import { useTranslations } from "next-intl";
 
 const modifyVmToPageSchema = z.object({
   nickname: z.string(),
@@ -44,19 +45,22 @@ const modifyVmToPageSchema = z.object({
 
 type FormValues = z.infer<typeof modifyVmToPageSchema>;
 
-export function ModifyVmDialog({
+export function ModifyVmDetailInPageDialog({
   children,
   vmId,
 }: {
   children?: React.ReactNode;
   vmId: number;
 }) {
+  const t = useTranslations("Private.Page.Detail");
+  const tAction = useTranslations("Private.Action");
+
   const router = useRouter();
   const [open, setOpen] = React.useState(false);
 
   const { trigger, isMutating } = useSWRMutation(
     `/api/vm/${vmId}`,
-    mutationWrapper(apiClient.vm[":id"].$put)
+    mutationWrapper(apiClient.vm[":id"].$put),
   );
 
   const form = useForm<FormValues>({
@@ -83,7 +87,7 @@ export function ModifyVmDialog({
       router.refresh();
     } catch (error) {
       toast.error(
-        error instanceof Error ? error.message : "Failed to update VM nickname"
+        error instanceof Error ? error.message : "Failed to update VM nickname",
       );
     }
   }
@@ -93,9 +97,9 @@ export function ModifyVmDialog({
       {children && <DialogTrigger asChild>{children}</DialogTrigger>}
       <DialogContent className="sm:max-w-[425px]">
         <DialogHeader>
-          <DialogTitle>Update VM Nickname</DialogTitle>
+          <DialogTitle>{t("updateVmInPage")}</DialogTitle>
           <DialogDescription>
-            Set a custom display name for this VM.
+            {t("updateVmInPageDescription")}
           </DialogDescription>
         </DialogHeader>
         <Form {...form}>
@@ -105,15 +109,15 @@ export function ModifyVmDialog({
               name="nickname"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Display Name (Optional)</FormLabel>
+                  <FormLabel>{t("updateVmDisplayName")}</FormLabel>
                   <FormControl>
                     <Input
-                      placeholder="Custom name for this VM on this page"
+                      placeholder={t("updateVmDisplayNameDescription")}
                       {...field}
                     />
                   </FormControl>
                   <FormDescription>
-                    You can give this VM a custom display name for this page.
+                    {t("updateVmDisplayNameDescription")}
                   </FormDescription>
                   <FormMessage />
                 </FormItem>
@@ -126,14 +130,14 @@ export function ModifyVmDialog({
                 disabled={isMutating}
                 onClick={() => setOpen(false)}
               >
-                Cancel
+                {tAction("cancel")}
               </Button>
               <Button
                 type="submit"
                 disabled={isMutating}
                 isLoading={isMutating}
               >
-                Update Nickname
+                {t("updateVmNickname")}
               </Button>
             </div>
           </form>

@@ -1,1 +1,59 @@
-{}
+{
+  "Public": {
+    "Common":{
+      "unknownError": "发生未知错误"
+    },
+    "VM": {
+      "uptime": "运行时间",
+      "os": "系统",
+      "arch": "架构",
+      "platform": "平台",
+      "version": "版本",
+      "system": "系统",
+      "cpu": "CPU",
+      "memory": "内存",
+      "storage": "存储",
+      "network": "网络",
+      "tcp": "TCP",
+      "udp": "UDP",
+      "totalUpload": "总上传",
+      "totalDownload": "总下载",
+      "region": "地区"
+    },
+    "ThemeSwitcher": {
+      "light": "亮色",
+      "dark": "暗色",
+      "system": "系统"
+    }
+  },
+  "Private":{
+    "Action":{
+      "edit": "编辑",
+      "delete": "删除",
+      "cancel": "取消"
+    },
+    "Page":{
+      "Management":{
+        "title": "页面管理",
+        "emptyPage": "您还没有创建任何监控页面",
+        "addPage": "添加新页面",
+        "createFirstPage": "创建第一个页面",
+        "vmCount": "{count} 台虚拟机"
+      },
+      "Detail":{
+        "accessLink": "访问链接",
+        "customDomain": "自定义域名",
+        "editPage": "编辑页面",
+        "deletePage": "删除页面",
+        "vmList": "虚拟机列表",
+        "emptyVm": "该页面还没有添加任何虚拟机",
+        "addVm": "添加虚拟机",
+        "addFirstVm": "添加第一台虚拟机",
+        "updateVmInPage": "更新虚拟机",
+        "updateVmInPageDescription": "更新虚拟机在当前页面中的相关信息",
+        "updateVmDisplayName": "更新虚拟机昵称",
+        "updateVmDisplayNameDescription": "为该虚拟机设置一个自定义昵称"
+      }
+    }
+  }
+}
