@@ -26,6 +26,8 @@
       "save": "保存更改",
       "submitting": "提交中...",
       "update_success": "更新成功",
-      "update_failed": "更新失败"
+      "update_failed": "更新失败",
+      "optional": "可选",
+      "saving": "保存中..."
     }
   }

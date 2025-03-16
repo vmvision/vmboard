@@ -1,14 +1,14 @@
 import { Shell } from "@/components/shell";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Input } from "@/components/ui/input";
-import { Button } from "@/components/ui/button";
 import { auth } from "@/lib/auth";
 import { getUser, getLatestSession } from "@/app/_lib/queries";
 import { redirect } from "next/navigation";
 import { headers } from "next/headers";
 import { getTranslations } from "next-intl/server";
+import AccountForm from "./AccountForm";
 
 interface User {
+  id: string;
   name: string;
   email: string;
   username: string | null;
@@ -64,32 +64,13 @@ export default async function AccountPage() {
             <CardTitle>{t("account_details")}</CardTitle>
           </CardHeader>
           <CardContent className="space-y-4">
-            <form action="/api/update-user" method="POST" className="space-y-4">
-              <input type="hidden" name="userId" value={user.id} />
-              <div>
-                <label htmlFor="name" className="block text-sm font-medium">
-                  {t("name")}
-                </label>
-                <Input
-                  id="name"
-                  name="name"
-                  defaultValue={user.name}
-                  required
-                />
-              </div>
-              <div>
-                <label htmlFor="username" className="block text-sm font-medium">
-                  {t("username")}
-                </label>
-                <Input
-                  id="username"
-                  name="username"
-                  defaultValue={user.username || ""}
-                  placeholder="Optional"
-                />
-              </div>
-              <Button type="submit">{t("save")}</Button>
-            </form>
+            <AccountForm
+              user={{
+                id: user.id,
+                name: user.name,
+                username: user.username,
+              }}
+            />
             <div className="space-y-2">
               <p>{t("email")}: {user.email}</p>
               <p>

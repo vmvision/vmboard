@@ -26,6 +26,11 @@
       "save": "Save Changes",
       "submitting": "Submitting...",
       "update_success": "Update Successful",
-      "update_failed": "Update Failed"
+      "update_failed": "Update Failed",
+      "optional": "Optional",
+      "saving": "Saving..."
+      
     }
   }
+
+    
