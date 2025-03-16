@@ -1,6 +1,6 @@
 {
   "Public": {
-    "Common":{
+    "Common": {
       "unknownError": "发生未知错误"
     },
     "VM": {
@@ -26,23 +26,33 @@
       "system": "系统"
     }
   },
-  "Private":{
-    "Action":{
+  "Private": {
+    "Action": {
       "edit": "编辑",
       "delete": "删除",
       "cancel": "取消"
     },
-    "Page":{
-      "Management":{
+    "Page": {
+      "Management": {
         "title": "页面管理",
         "emptyPage": "您还没有创建任何监控页面",
         "addPage": "添加新页面",
         "createFirstPage": "创建第一个页面",
         "vmCount": "{count} 台虚拟机"
       },
-      "Detail":{
+      "Detail": {
         "accessLink": "访问链接",
         "customDomain": "自定义域名",
+        "createPage": "创建页面",
+        "createPageDescription": "创建一个新页面来展示您的虚拟机。填写以下详细信息。",
+        "title": "标题",
+        "titleDescription": "页面标题",
+        "handle": "唯一标识符",
+        "handleDescription": "一个唯一的标识符用于您的页面 URL (e.g., vmboard.io/p/my-vm-page).",
+        "hostname": "主机名",
+        "hostnameDescription": "一个可选的主机名用于您的页面 URL (e.g., my-vm.example.com).",
+        "description": "描述",
+        "descriptionDescription": "一个简短的描述您的页面。",
         "editPage": "编辑页面",
         "deletePage": "删除页面",
         "vmList": "虚拟机列表",

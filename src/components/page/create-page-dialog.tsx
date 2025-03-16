@@ -31,10 +31,14 @@ import useSWRMutation from "swr/mutation";
 
 import { createPageSchema } from "@/db/schema/page";
 import apiClient, { mutationWrapper } from "@/lib/api-client";
+import { useTranslations } from "next-intl";
 
 type FormValues = z.infer<typeof createPageSchema>;
 
 export function CreatePageDialog({ children }: { children?: React.ReactNode }) {
+  const t = useTranslations("Private.Page.Detail");
+  const tAction = useTranslations("Private.Action");
+
   const router = useRouter();
   const [open, setOpen] = React.useState(false);
   const { trigger, error, isMutating } = useSWRMutation(
@@ -78,9 +82,9 @@ export function CreatePageDialog({ children }: { children?: React.ReactNode }) {
       {children && <DialogTrigger asChild>{children}</DialogTrigger>}
       <DialogContent className="sm:max-w-[425px]">
         <DialogHeader>
-          <DialogTitle>Create a new page</DialogTitle>
+          <DialogTitle>{t("createPage")}</DialogTitle>
           <DialogDescription>
-            Create a new page to showcase your VMs. Fill in the details below.
+            {t("createPageDescription")}
           </DialogDescription>
         </DialogHeader>
         <Form {...form}>
@@ -90,11 +94,11 @@ export function CreatePageDialog({ children }: { children?: React.ReactNode }) {
               name="title"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Title</FormLabel>
+                  <FormLabel>{t("title")}</FormLabel>
                   <FormControl>
                     <Input placeholder="My VM Page" {...field} />
                   </FormControl>
-                  <FormDescription>The title of your page.</FormDescription>
+                  <FormDescription>{t("titleDescription")}</FormDescription>
                   <FormMessage />
                 </FormItem>
               )}
@@ -104,14 +108,11 @@ export function CreatePageDialog({ children }: { children?: React.ReactNode }) {
               name="handle"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Handle</FormLabel>
+                  <FormLabel>{t("handle")}</FormLabel>
                   <FormControl>
                     <Input placeholder="my-vm-page" {...field} />
                   </FormControl>
-                  <FormDescription>
-                    A unique identifier for your page URL (e.g.,
-                    vmboard.io/p/my-vm-page).
-                  </FormDescription>
+                  <FormDescription>{t("handleDescription")}</FormDescription>
                   <FormMessage />
                 </FormItem>
               )}
@@ -121,13 +122,12 @@ export function CreatePageDialog({ children }: { children?: React.ReactNode }) {
               name="hostname"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Hostname (optional)</FormLabel>
+                  <FormLabel>{t("hostname")}</FormLabel>
                   <FormControl>
                     <Input placeholder="my-vm.example.com" {...field} />
                   </FormControl>
                   <FormDescription>
-                    A custom domain for your page. Leave blank to use the
-                    default domain.
+                    {t("hostnameDescription")}
                   </FormDescription>
                   <FormMessage />
                 </FormItem>
@@ -138,16 +138,14 @@ export function CreatePageDialog({ children }: { children?: React.ReactNode }) {
               name="description"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Description</FormLabel>
+                  <FormLabel>{t("description")}</FormLabel>
                   <FormControl>
                     <Textarea
                       placeholder="Describe your VM page..."
                       {...field}
                     />
                   </FormControl>
-                  <FormDescription>
-                    A short description of your page.
-                  </FormDescription>
+                  <FormDescription>{t("descriptionDescription")}</FormDescription>
                   <FormMessage />
                 </FormItem>
               )}
@@ -159,14 +157,14 @@ export function CreatePageDialog({ children }: { children?: React.ReactNode }) {
                 disabled={isMutating}
                 onClick={() => setOpen(false)}
               >
-                Cancel
+                {tAction("cancel")}
               </Button>
               <Button
                 type="submit"
                 disabled={isMutating}
                 isLoading={isMutating}
               >
-                Create
+                {tAction("create")}
               </Button>
             </div>
           </form>
