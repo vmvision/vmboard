@@ -61,7 +61,9 @@ export function PageManagementData() {
               </div>
             </div>
           ))}
-          <Button className="mt-2 w-full">添加新页面</Button>
+          <CreatePageDialog>
+            <Button className="mt-2 w-full">添加新页面</Button>
+          </CreatePageDialog>
         </div>
       )}
     </div>

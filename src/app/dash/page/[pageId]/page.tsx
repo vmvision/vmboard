@@ -7,7 +7,8 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Shell } from "@/components/shell";
-
+import { ModifyVmDialog } from "@/components/page/modify-vm-dialog";
+import { AddVmDialog } from "@/components/page/add-vm-dialog";
 type Params = Promise<{ pageId: string }>;
 
 export default function PageDetail({ params }: { params: Params }) {
@@ -62,7 +63,9 @@ export default function PageDetail({ params }: { params: Params }) {
         <div className="space-y-4">
           <div className="flex items-center justify-between">
             <h2 className="font-semibold text-xl">虚拟机列表</h2>
-            <Button>添加虚拟机</Button>
+            <AddVmDialog pageId={pageId}>
+              <Button>添加虚拟机</Button>
+            </AddVmDialog>
           </div>
 
           {data.vms && data.vms.length > 0 ? (
@@ -85,9 +88,11 @@ export default function PageDetail({ params }: { params: Params }) {
                         {pageVm.vm.monitorInfo?.platformVersion || ""}
                       </p>
                       <div className="mt-4 flex gap-2">
-                        <Button size="sm" variant="outline">
-                          编辑
-                        </Button>
+                        <ModifyVmDialog pageId={pageId} vmId={pageVm.vmId}>
+                          <Button size="sm" variant="outline">
+                            编辑
+                          </Button>
+                        </ModifyVmDialog>
                         <Button size="sm" variant="destructive">
                           移除
                         </Button>

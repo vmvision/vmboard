@@ -220,7 +220,7 @@ const app = appFactory
         id: z.coerce.number(),
       }),
     ),
-    zValidator("json", createPageVMSchema),
+    zValidator("json", createPageVMSchema.omit({ pageId: true })),
     async (c) => {
       const input = c.req.valid("param");
       const body = c.req.valid("json");
