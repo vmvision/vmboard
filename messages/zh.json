@@ -1,19 +1,28 @@
 {
   "Public": {
+    "Link": {
+      "docs": "文档",
+      "page": "页面"
+    },
     "Common": {
       "unknownError": "发生未知错误"
     },
     "VM": {
+      "status": "状态",
+      "online": "在线",
+      "offline": "离线",
       "uptime": "运行时间",
       "os": "系统",
       "arch": "架构",
       "platform": "平台",
       "version": "版本",
       "system": "系统",
+      "swap": "交换",
       "cpu": "CPU",
       "memory": "内存",
-      "storage": "存储",
+      "disk": "存储",
       "network": "网络",
+      "process": "进程",
       "tcp": "TCP",
       "udp": "UDP",
       "totalUpload": "总上传",
