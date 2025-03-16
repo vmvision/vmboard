@@ -52,7 +52,7 @@ export function getMerchantIcon(merchant: Merchant["merchant"]) {
     dmit: DMITLogoWithText2022,
   };
 
-  return merchantIcons[merchant] || CircleIcon;
+  return merchantIcons[merchant as keyof typeof merchantIcons] || CircleIcon;
 }
 export function getDMITLocationIcon(location: "HKG" | "LAX" | "TYO") {
   const dmitLocationIcons = {

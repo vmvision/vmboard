@@ -4,6 +4,7 @@ import db from "@/db";
 import { vm as vmTable, type VM } from "@/db/schema/vm";
 import { page as pageTable } from "@/db/schema/page";
 import { merchant as merchantTable } from "@/db/schema/merchant";
+import { users, session } from "@/db/schema"; // 导入 user 和 session 表
 import {
   and,
   asc,
@@ -24,6 +25,7 @@ import { unstable_cache } from "@/lib/unstable-cache";
 import type { GetVMSchema } from "./validations";
 import { sshKeysTable } from "@/db/schema";
 
+// 现有查询函数（保持不变）
 export async function getVM(vmId: number) {
   const session = await getSessionOrThrow();
   return await unstable_cache(
@@ -196,7 +198,7 @@ export async function getPageData(handle: string) {
         where: eq(pageTable.handle, handle),
       });
       const vms = await db.query.vm.findMany({
-        where: inArray(vmTable.id, page?.vmIds ?? []),
+        where: page?.vmIds ? inArray(vmTable.id, page.vmIds as number[]) : undefined,
         columns: {
           id: true,
           nickname: true,
@@ -223,4 +225,33 @@ export async function getPageData(handle: string) {
       tags: ["page"],
     },
   )();
+}
+
+// 新增：获取用户信息
+export async function getUser(userId: string) {
+  return await db
+    .select()
+    .from(users)
+    .where(eq(users.id, userId))
+    .limit(1)
+    .execute()
+    .then((res) => res[0] || null);
+}
+
+// 新增：获取最近会话
+export async function getLatestSession(userId: string) {
+  const sessionRecord = await db
+    .select({
+      ipAddress: session.ipAddress,
+      userAgent: session.userAgent,
+      createdAt: session.createdAt,
+    })
+    .from(session)
+    .where(eq(session.userId, userId))
+    .orderBy(desc(session.createdAt))
+    .limit(1)
+    .execute()
+    .then((res) => res[0] || null);
+
+  return sessionRecord;
 }

@@ -1,4 +1,31 @@
 {
     "welcome": "欢迎使用 VMBoard",
-    "title": "我的应用"
+    "title": "我的应用", 
+    "settings": {
+      "title": "设置",
+      "description": "管理您的账户和偏好设置",
+      "settings": "设置",
+      "account": "我的账户"
+    },
+    "account": {
+      "title": "我的账户",
+      "description": "管理您的账户详情",
+      "account_details": "账户详情",
+      "name": "昵称",
+      "email": "邮箱",
+      "username": "用户名",
+      "created_at": "注册时间",
+      "role": "角色",
+      "email_verified": "邮箱已验证",
+      "banned": "已禁用",
+      "recent_activity": "最近活动",
+      "last_login": "最后登录",
+      "ip_address": "IP 地址",
+      "device": "设备",
+      "avatar": "头像",
+      "save": "保存更改",
+      "submitting": "提交中...",
+      "update_success": "更新成功",
+      "update_failed": "更新失败"
+    }
   }
