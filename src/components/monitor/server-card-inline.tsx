@@ -32,7 +32,7 @@ const ServerCardInline: React.FC<{
   os?: string;
   osVersion?: string;
 }> = ({ vmId, nickname, os, osVersion }) => {
-  const t = useTranslations("Monitor");
+  const t = useTranslations("Public.VM");
   const { getLatestMetrics } = useMetricsData();
   const metrics = getLatestMetrics(vmId);
   const online = !!metrics;
@@ -84,7 +84,7 @@ const ServerCardInline: React.FC<{
                 )} */}
               </div>
               <div className={"flex w-14 flex-col"}>
-                <p className="text-muted-foreground text-xs">{t("System")}</p>
+                <p className="text-muted-foreground text-xs">{t("system")}</p>
                 <div className="flex items-center font-semibold text-[10.5px]">
                   {/* {vmInfo.platform.includes("Windows")
                     ? "Windows"
@@ -93,27 +93,27 @@ const ServerCardInline: React.FC<{
               </div>
             </div>
             <div className={"flex w-20 flex-col"}>
-              <p className="text-muted-foreground text-xs">{t("Uptime")}</p>
+              <p className="text-muted-foreground text-xs">{t("uptime")}</p>
               <div className="flex items-center font-semibold text-xs">
                 {(metrics.uptime / 86400).toFixed(0)} {"Days"}
               </div>
             </div>
             <div className={"flex w-14 flex-col"}>
-              <p className="text-muted-foreground text-xs">{t("CPU")}</p>
+              <p className="text-muted-foreground text-xs">{t("cpu")}</p>
               <div className="flex items-center font-semibold text-xs">
                 {Number(metrics.cpuUsage).toFixed(2)}%
               </div>
               <ServerUsageBar value={metrics.cpuUsage} />
             </div>
             <div className={"flex w-14 flex-col"}>
-              <p className="text-muted-foreground text-xs">{t("Mem")}</p>
+              <p className="text-muted-foreground text-xs">{t("memory")}</p>
               <div className="flex items-center font-semibold text-xs">
                 {Number(metrics.memoryUsed).toFixed(2)}%
               </div>
               <ServerUsageBar value={metrics.memoryUsed} />
             </div>
             <div className={"flex w-14 flex-col"}>
-              <p className="text-muted-foreground text-xs">{t("STG")}</p>
+              <p className="text-muted-foreground text-xs">{t("disk")}</p>
               <div className="flex items-center font-semibold text-xs">
                 {(Number(metrics.diskUsed) / Number(metrics.diskTotal)).toFixed(
                   2,
@@ -123,7 +123,7 @@ const ServerCardInline: React.FC<{
               <ServerUsageBar value={metrics.diskUsed} />
             </div>
             <div className={"flex w-16 flex-col"}>
-              <p className="text-muted-foreground text-xs">{t("Upload")}</p>
+              <p className="text-muted-foreground text-xs">{t("upload")}</p>
               <div className="flex items-center font-semibold text-xs">
                 {Number(metrics.networkOut) >= 1024
                   ? `${(Number(metrics.networkOut) / 1024).toFixed(2)}G/s`
@@ -131,7 +131,7 @@ const ServerCardInline: React.FC<{
               </div>
             </div>
             <div className={"flex w-16 flex-col"}>
-              <p className="text-muted-foreground text-xs">{t("Download")}</p>
+              <p className="text-muted-foreground text-xs">{t("download")}</p>
               <div className="flex items-center font-semibold text-xs">
                 {Number(metrics.networkIn) >= 1024
                   ? `${(Number(metrics.networkIn) / 1024).toFixed(2)}G/s`
@@ -140,7 +140,7 @@ const ServerCardInline: React.FC<{
             </div>
             <div className={"flex w-20 flex-col"}>
               <p className="text-muted-foreground text-xs">
-                {t("TotalUpload")}
+                {t("totalUpload")}
               </p>
               <div className="flex items-center font-semibold text-xs">
                 {formatBytes(Number(metrics.networkOut))}
@@ -148,7 +148,7 @@ const ServerCardInline: React.FC<{
             </div>
             <div className={"flex w-20 flex-col"}>
               <p className="text-muted-foreground text-xs">
-                {t("TotalDownload")}
+                {t("totalDownload")}
               </p>
               <div className="flex items-center font-semibold text-xs">
                 {formatBytes(Number(metrics.networkIn))}

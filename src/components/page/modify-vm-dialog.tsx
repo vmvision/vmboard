@@ -37,63 +37,57 @@ import useSWR from "swr";
 import useSWRMutation from "swr/mutation";
 
 import apiClient, { fetchWrapper, mutationWrapper } from "@/lib/api-client";
+import { useTranslations } from "next-intl";
 
-const addVmToPageSchema = z.object({
-  vmId: z.string().min(1, "Please select a VM"),
-  nickname: z.string().optional(),
-  pageId: z.number(),
+const modifyVmToPageSchema = z.object({
+  nickname: z.string(),
 });
 
-type FormValues = z.infer<typeof addVmToPageSchema>;
+type FormValues = z.infer<typeof modifyVmToPageSchema>;
 
-export function AddVmDialog({
+export function ModifyVmDetailInPageDialog({
   children,
-  pageId,
+  vmId,
 }: {
   children?: React.ReactNode;
-  pageId: number;
+  vmId: number;
 }) {
+  const t = useTranslations("Private.Page.Detail");
+  const tAction = useTranslations("Private.Action");
+
   const router = useRouter();
   const [open, setOpen] = React.useState(false);
-  
-  const { data: vms, isLoading } = useSWR(
-    "/api/vm",
-    fetchWrapper(apiClient.vm.$get)
-  );
 
   const { trigger, isMutating } = useSWRMutation(
-    "/api/page/vm",
-    mutationWrapper(apiClient.page[":id"].vm.$post)
+    `/api/vm/${vmId}`,
+    mutationWrapper(apiClient.vm[":id"].$put),
   );
 
   const form = useForm<FormValues>({
-    resolver: zodResolver(addVmToPageSchema),
+    resolver: zodResolver(modifyVmToPageSchema),
     defaultValues: {
-      vmId: "",
       nickname: "",
-      pageId,
     },
   });
 
   async function onSubmit(values: FormValues) {
     try {
       await trigger({
-        param: {
-          id: values.pageId.toString(),
-        },
         json: {
-          vmId: Number.parseInt(values.vmId),
-          nickname: values.nickname,
+          nickname: values.nickname || "",
+        },
+        param: {
+          id: vmId.toString(),
         },
       });
 
-      toast.success("VM added to page successfully");
+      toast.success("VM nickname updated successfully");
       setOpen(false);
       form.reset();
       router.refresh();
     } catch (error) {
       toast.error(
-        error instanceof Error ? error.message : "Failed to add VM to page"
+        error instanceof Error ? error.message : "Failed to update VM nickname",
       );
     }
   }
@@ -103,58 +97,27 @@ export function AddVmDialog({
       {children && <DialogTrigger asChild>{children}</DialogTrigger>}
       <DialogContent className="sm:max-w-[425px]">
         <DialogHeader>
-          <DialogTitle>Add VM to Page</DialogTitle>
+          <DialogTitle>{t("updateVmInPage")}</DialogTitle>
           <DialogDescription>
-            Select a virtual machine to add to this page.
+            {t("updateVmInPageDescription")}
           </DialogDescription>
         </DialogHeader>
         <Form {...form}>
           <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
             <FormField
               control={form.control}
-              name="vmId"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Virtual Machine</FormLabel>
-                  <Select
-                    onValueChange={field.onChange}
-                    defaultValue={field.value}
-                    disabled={isLoading}
-                  >
-                    <FormControl>
-                      <SelectTrigger>
-                        <SelectValue placeholder="Select a VM" />
-                      </SelectTrigger>
-                    </FormControl>
-                    <SelectContent>
-                      {vms?.map((vm) => (
-                        <SelectItem key={vm.id} value={vm.id.toString()}>
-                          {vm.nickname || vm.id}
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
-                  <FormDescription>
-                    Choose a VM to add to this page.
-                  </FormDescription>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-            <FormField
-              control={form.control}
               name="nickname"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Display Name (Optional)</FormLabel>
+                  <FormLabel>{t("updateVmDisplayName")}</FormLabel>
                   <FormControl>
                     <Input
-                      placeholder="Custom name for this VM on this page"
+                      placeholder={t("updateVmDisplayNameDescription")}
                       {...field}
                     />
                   </FormControl>
                   <FormDescription>
-                    You can give this VM a custom display name for this page.
+                    {t("updateVmDisplayNameDescription")}
                   </FormDescription>
                   <FormMessage />
                 </FormItem>
@@ -167,14 +130,14 @@ export function AddVmDialog({
                 disabled={isMutating}
                 onClick={() => setOpen(false)}
               >
-                Cancel
+                {tAction("cancel")}
               </Button>
               <Button
                 type="submit"
-                disabled={isMutating || isLoading}
+                disabled={isMutating}
                 isLoading={isMutating}
               >
-                Add VM
+                {t("updateVmNickname")}
               </Button>
             </div>
           </form>

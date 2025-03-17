@@ -1,33 +1,78 @@
 {
-    "welcome": "欢迎使用 VMBoard",
-    "title": "我的应用", 
-    "settings": {
-      "title": "设置",
-      "description": "管理您的账户和偏好设置",
-      "settings": "设置",
-      "account": "我的账户"
+  "Public": {
+    "Link": {
+      "docs": "文档",
+      "page": "页面"
     },
-    "account": {
-      "title": "我的账户",
-      "description": "管理您的账户详情",
-      "account_details": "账户详情",
-      "name": "昵称",
-      "email": "邮箱",
-      "username": "用户名",
-      "created_at": "注册时间",
-      "role": "角色",
-      "email_verified": "邮箱已验证",
-      "banned": "已禁用",
-      "recent_activity": "最近活动",
-      "last_login": "最后登录",
-      "ip_address": "IP 地址",
-      "device": "设备",
-      "avatar": "头像",
-      "save": "保存更改",
-      "submitting": "提交中...",
-      "update_success": "更新成功",
-      "update_failed": "更新失败",
-      "optional": "可选",
-      "saving": "保存中..."
+    "Common": {
+      "unknownError": "发生未知错误"
+    },
+    "VM": {
+      "status": "状态",
+      "online": "在线",
+      "offline": "离线",
+      "uptime": "运行时间",
+      "os": "系统",
+      "arch": "架构",
+      "platform": "平台",
+      "version": "版本",
+      "system": "系统",
+      "swap": "交换",
+      "cpu": "CPU",
+      "memory": "内存",
+      "disk": "存储",
+      "network": "网络",
+      "process": "进程",
+      "tcp": "TCP",
+      "udp": "UDP",
+      "totalUpload": "总上传",
+      "totalDownload": "总下载",
+      "region": "地区"
+    },
+    "ThemeSwitcher": {
+      "light": "亮色",
+      "dark": "暗色",
+      "system": "系统"
+    }
+  },
+  "Private": {
+    "Action": {
+      "edit": "编辑",
+      "delete": "删除",
+      "cancel": "取消"
+    },
+    "Page": {
+      "Management": {
+        "title": "页面管理",
+        "emptyPage": "您还没有创建任何监控页面",
+        "addPage": "添加新页面",
+        "createFirstPage": "创建第一个页面",
+        "vmCount": "{count} 台虚拟机"
+      },
+      "Detail": {
+        "accessLink": "访问链接",
+        "customDomain": "自定义域名",
+        "createPage": "创建页面",
+        "createPageDescription": "创建一个新页面来展示您的虚拟机。填写以下详细信息。",
+        "title": "标题",
+        "titleDescription": "页面标题",
+        "handle": "唯一标识符",
+        "handleDescription": "一个唯一的标识符用于您的页面 URL (e.g., vmboard.io/p/my-vm-page).",
+        "hostname": "主机名",
+        "hostnameDescription": "一个可选的主机名用于您的页面 URL (e.g., my-vm.example.com).",
+        "description": "描述",
+        "descriptionDescription": "一个简短的描述您的页面。",
+        "editPage": "编辑页面",
+        "deletePage": "删除页面",
+        "vmList": "虚拟机列表",
+        "emptyVm": "该页面还没有添加任何虚拟机",
+        "addVm": "添加虚拟机",
+        "addFirstVm": "添加第一台虚拟机",
+        "updateVmInPage": "更新虚拟机",
+        "updateVmInPageDescription": "更新虚拟机在当前页面中的相关信息",
+        "updateVmDisplayName": "更新虚拟机昵称",
+        "updateVmDisplayNameDescription": "为该虚拟机设置一个自定义昵称"
+      }
     }
   }
+}

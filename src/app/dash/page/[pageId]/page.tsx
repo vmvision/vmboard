@@ -1,16 +1,22 @@
 "use client";
-import { useParams } from "next/navigation";
-import { use, useState } from "react";
+
+import { use } from "react";
 import useSWR from "swr";
 import apiClient, { fetchWrapper } from "@/lib/api-client";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Shell } from "@/components/shell";
-
+import { ModifyVmDetailInPageDialog } from "@/components/page/modify-vm-dialog";
+import { AddVmDialog } from "@/components/page/add-vm-dialog";
+import { useTranslations } from "next-intl";
 type Params = Promise<{ pageId: string }>;
 
 export default function PageDetail({ params }: { params: Params }) {
+  const t = useTranslations("Private.Page.Detail");
+  const tP = useTranslations("Public");
+  const tAction = useTranslations("Private.Action");
+
   const pageId = Number(use(params).pageId);
 
   const { data, error, isLoading } = useSWR(
@@ -28,7 +34,7 @@ export default function PageDetail({ params }: { params: Params }) {
         <div className="py-6 text-center">
           <p className="text-muted-foreground">无法加载页面信息</p>
           <p className="mt-2 text-muted-foreground text-sm">
-            {error?.message || "发生未知错误"}
+            {error?.message || tP("Common.unknownError")}
           </p>
         </div>
       </Shell>
@@ -44,25 +50,27 @@ export default function PageDetail({ params }: { params: Params }) {
             <p className="text-muted-foreground">{data.description}</p>
             {data.handle && (
               <p className="mt-1 text-muted-foreground text-sm">
-                访问链接: /{data.handle}
+                {t("accessLink")}: /{data.handle}
               </p>
             )}
             {data.hostname && (
               <p className="text-muted-foreground text-sm">
-                自定义域名: {data.hostname}
+                {t("customDomain")}: {data.hostname}
               </p>
             )}
           </div>
           <div className="flex gap-2">
-            <Button variant="outline">编辑页面</Button>
-            <Button variant="destructive">删除页面</Button>
+            <Button variant="outline">{t("editPage")}</Button>
+            <Button variant="destructive">{t("deletePage")}</Button>
           </div>
         </div>
 
         <div className="space-y-4">
           <div className="flex items-center justify-between">
-            <h2 className="font-semibold text-xl">虚拟机列表</h2>
-            <Button>添加虚拟机</Button>
+            <h2 className="font-semibold text-xl">{t("vmList")}</h2>
+            <AddVmDialog pageId={pageId}>
+              <Button>{t("addVm")}</Button>
+            </AddVmDialog>
           </div>
 
           {data.vms && data.vms.length > 0 ? (
@@ -77,19 +85,22 @@ export default function PageDetail({ params }: { params: Params }) {
                   <CardContent>
                     <div className="space-y-2">
                       <p className="text-muted-foreground text-sm">
-                        系统: {pageVm.vm.monitorInfo?.os || "未知"}{" "}
+                        {tP("VM.os")}: {pageVm.vm.monitorInfo?.os || "未知"}{" "}
                         {pageVm.vm.monitorInfo?.osVersion || ""}
                       </p>
                       <p className="text-muted-foreground text-sm">
-                        平台: {pageVm.vm.monitorInfo?.platform || "未知"}{" "}
+                        {tP("VM.platform")}:{" "}
+                        {pageVm.vm.monitorInfo?.platform || "未知"}{" "}
                         {pageVm.vm.monitorInfo?.platformVersion || ""}
                       </p>
                       <div className="mt-4 flex gap-2">
-                        <Button size="sm" variant="outline">
-                          编辑
-                        </Button>
+                        <ModifyVmDetailInPageDialog pageId={pageId} vmId={pageVm.vmId}>
+                          <Button size="sm" variant="outline">
+                            {tAction("edit")}
+                          </Button>
+                        </ModifyVmDetailInPageDialog>
                         <Button size="sm" variant="destructive">
-                          移除
+                          {tAction("delete")}
                         </Button>
                       </div>
                     </div>
@@ -100,9 +111,9 @@ export default function PageDetail({ params }: { params: Params }) {
           ) : (
             <div className="rounded-lg border py-6 text-center">
               <p className="text-muted-foreground">
-                该页面还没有添加任何虚拟机
+                {t("emptyVm")}
               </p>
-              <Button className="mx-auto mt-4">添加第一台虚拟机</Button>
+              <Button className="mx-auto mt-4">{t("addFirstVm")}</Button>
             </div>
           )}
         </div>

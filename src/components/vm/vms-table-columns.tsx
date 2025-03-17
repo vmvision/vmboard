@@ -3,7 +3,7 @@
 import { type VM, vm as vmTable, type VMWithMerchant } from "@/db/schema/vm";
 import type { DataTableRowAction } from "@/types";
 import type { ColumnDef } from "@tanstack/react-table";
-import { Ellipsis, PenLineIcon, TerminalIcon, TrashIcon } from "lucide-react";
+import { Ellipsis, PenLineIcon, SquareSquare, TerminalIcon, TrashIcon } from "lucide-react";
 import * as React from "react";
 import { toast } from "sonner";
 
@@ -228,6 +228,12 @@ export function getColumns({
               </Button>
             </DropdownMenuTrigger>
             <DropdownMenuContent align="end" className="w-40">
+            <DropdownMenuItem>
+                <Link href={`vm/${row.original.id}`} className="flex items-center">
+                  <SquareSquare className="size-4" aria-hidden="true" />
+                  <span className="ml-2">图表</span>
+                </Link>
+              </DropdownMenuItem>
               <Link
                 target="_blank"
                 href={`/dash/terminal?vmId=${row.original.id}`}

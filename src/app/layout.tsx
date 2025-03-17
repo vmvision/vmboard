@@ -9,9 +9,12 @@ import "@/styles/globals.css";
 import type { Metadata, Viewport } from "next";
 
 import { Toaster } from "@/components/ui/toaster";
+import NextTopLoader from "nextjs-toploader";
 import { fontMono, fontSans } from "@/lib/fonts";
 import { getLocale, getMessages } from "next-intl/server";
 import { NextIntlClientProvider } from "next-intl";
+import { pickPublic } from "@/i18n/pick";
+import type { Messages } from "global";
 
 export const metadata: Metadata = {
   metadataBase: new URL(siteConfig.url),
@@ -63,7 +66,8 @@ export default async function RootLayout({
   const locale = await getLocale();
   // Providing all messages to the client
   // side is the easiest way to get started
-  const messages = await getMessages();
+  const messages = (await getMessages()) as Messages;
+
   return (
     <html lang={locale} suppressHydrationWarning>
       <head />
@@ -74,7 +78,8 @@ export default async function RootLayout({
           fontMono.variable,
         )}
       >
-        <NextIntlClientProvider messages={messages}>
+        <NextTopLoader />
+        <NextIntlClientProvider messages={pickPublic(messages)}>
           <ThemeProvider
             attribute="class"
             defaultTheme="system"

@@ -30,7 +30,7 @@ interface ServerDetailProps {
 }
 
 export default function ServerDetail({ vmId }: ServerDetailProps) {
-  const t = useTranslations("ServerDetailClient");
+  const t = useTranslations("Public.VM");
   const router = useRouter();
 
   // const [hasHistory, setHasHistory] = useState(false);
@@ -113,12 +113,12 @@ export default function ServerDetail({ vmId }: ServerDetailProps) {
         <Card className="rounded-[10px] border-none bg-transparent shadow-none">
           <CardContent className="px-1.5 py-1">
             <section className="flex flex-col items-start gap-0.5">
-              <p className="text-muted-foreground text-xs">{t("Uptime")}</p>
+              <p className="text-muted-foreground text-xs">{t("uptime")}</p>
               <div className="text-xs">
                 {" "}
-                {Number(monitorInfo.uptime) / 86400 >= 1
+                {/* {Number(monitorInfo.uptime) / 86400 >= 1
                   ? `${(Number(monitorInfo.uptime) / 86400).toFixed(0)} ${t("Days")}`
-                  : `${(Number(monitorInfo.uptime) / 3600).toFixed(0)} ${t("Hours")}`}
+                  : `${(Number(monitorInfo.uptime) / 3600).toFixed(0)} ${t("Hours")}`} */}
               </div>
             </section>
           </CardContent>
@@ -127,7 +127,7 @@ export default function ServerDetail({ vmId }: ServerDetailProps) {
           <Card className="rounded-[10px] border-none bg-transparent shadow-none">
             <CardContent className="px-1.5 py-1">
               <section className="flex flex-col items-start gap-0.5">
-                <p className="text-muted-foreground text-xs">{t("Version")}</p>
+                <p className="text-muted-foreground text-xs">{t("version")}</p>
                 <div className="text-xs">{monitorInfo.version} </div>
               </section>
             </CardContent>
@@ -137,7 +137,7 @@ export default function ServerDetail({ vmId }: ServerDetailProps) {
           <Card className="rounded-[10px] border-none bg-transparent shadow-none">
             <CardContent className="px-1.5 py-1">
               <section className="flex flex-col items-start gap-0.5">
-                <p className="text-muted-foreground text-xs">{t("Arch")}</p>
+                <p className="text-muted-foreground text-xs">{t("arch")}</p>
                 <div className="text-xs">{monitorInfo.arch} </div>
               </section>
             </CardContent>
@@ -147,7 +147,7 @@ export default function ServerDetail({ vmId }: ServerDetailProps) {
         <Card className="rounded-[10px] border-none bg-transparent shadow-none">
           <CardContent className="px-1.5 py-1">
             <section className="flex flex-col items-start gap-0.5">
-              <p className="text-muted-foreground text-xs">{t("Mem")}</p>
+              <p className="text-muted-foreground text-xs">{t("memory")}</p>
               <div className="text-xs">{formatBytes(monitorInfo.memory)}</div>
             </section>
           </CardContent>
@@ -155,7 +155,7 @@ export default function ServerDetail({ vmId }: ServerDetailProps) {
         <Card className="rounded-[10px] border-none bg-transparent shadow-none">
           <CardContent className="px-1.5 py-1">
             <section className="flex flex-col items-start gap-0.5">
-              <p className="text-muted-foreground text-xs">{t("Disk")}</p>
+              <p className="text-muted-foreground text-xs">{t("disk")}</p>
               <div className="text-xs">{formatBytes(monitorInfo.disk)}</div>
             </section>
           </CardContent>
@@ -184,7 +184,7 @@ export default function ServerDetail({ vmId }: ServerDetailProps) {
           <Card className="rounded-[10px] border-none bg-transparent shadow-none">
             <CardContent className="px-1.5 py-1">
               <section className="flex flex-col items-start gap-0.5">
-                <p className="text-muted-foreground text-xs">{t("System")}</p>
+                <p className="text-muted-foreground text-xs">{t("system")}</p>
 
                 <div className="text-xs">
                   {" "}
@@ -198,7 +198,7 @@ export default function ServerDetail({ vmId }: ServerDetailProps) {
           <Card className="rounded-[10px] border-none bg-transparent shadow-none">
             <CardContent className="px-1.5 py-1">
               <section className="flex flex-col items-start gap-0.5">
-                <p className="text-muted-foreground text-xs">{t("CPU")}</p>
+                <p className="text-muted-foreground text-xs">{t("cpu")}</p>
 
                 <div className="text-xs"> {monitorInfo.cpu[0]}</div>
                 {/* <div className="text-xs"> {monitorInfo.cpu.join(", ")}</div> */}

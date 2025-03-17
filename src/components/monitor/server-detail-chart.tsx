@@ -33,7 +33,6 @@ interface ServerDetailChartClientProps {
 export default function ServerDetailChartClient({
   vmId,
 }: ServerDetailChartClientProps) {
-  const t = useTranslations("ServerDetailChartClient");
   const { getMetrics } = useMetricsData();
   const data = getMetrics(vmId);
 
@@ -68,6 +67,8 @@ interface ChartProps {
 }
 
 function CpuChart({ data }: ChartProps) {
+  const t = useTranslations("Public.VM");
+
   const current = data[data.length - 1] ||
     data[0] || {
       cpuUsage: 0,
@@ -84,7 +85,7 @@ function CpuChart({ data }: ChartProps) {
       <CardContent className="px-6 py-3">
         <section className="flex flex-col gap-1">
           <div className="flex items-center justify-between">
-            <p className="font-medium text-md">CPU</p>
+            <p className="font-medium text-md">{t("cpu")}</p>
             <section className="flex items-center gap-2">
               <p className="w-10 text-end font-medium text-xs">
                 {Number(current.cpuUsage).toFixed(0)}%
@@ -146,7 +147,8 @@ function CpuChart({ data }: ChartProps) {
 }
 
 function ProcessCountChart({ data }: ChartProps) {
-  const t = useTranslations("ServerDetailChartClient");
+  const t = useTranslations("Public.VM");
+
   const current = data[data.length - 1] ||
     data[0] || {
       processCount: 0,
@@ -163,7 +165,7 @@ function ProcessCountChart({ data }: ChartProps) {
       <CardContent className="px-6 py-3">
         <section className="flex flex-col gap-1">
           <div className="flex items-center justify-between">
-            <p className="font-medium text-md">{t("Process")}</p>
+            <p className="font-medium text-md">{t("process")}</p>
             <section className="flex items-center gap-2">
               <p className="w-10 text-end font-medium text-xs">
                 {current.processCount}
@@ -216,7 +218,8 @@ function ProcessCountChart({ data }: ChartProps) {
 }
 
 function MemoryChart({ data }: ChartProps) {
-  const t = useTranslations("ServerDetailChartClient");
+  const t = useTranslations("Public.VM");
+
   const current = data[data.length - 1] ||
     data[0] || {
       memoryUsed: 0,
@@ -242,7 +245,7 @@ function MemoryChart({ data }: ChartProps) {
           <div className="flex items-center justify-between">
             <section className="flex items-center gap-4">
               <div className="flex flex-col">
-                <p className=" text-muted-foreground text-xs">{t("Mem")}</p>
+                <p className=" text-muted-foreground text-xs">{t("memory")}</p>
                 <div className="flex items-center gap-2">
                   <AnimatedCircularProgressBar
                     className="size-3 text-[0px]"
@@ -257,7 +260,7 @@ function MemoryChart({ data }: ChartProps) {
                 </div>
               </div>
               <div className="flex flex-col">
-                <p className=" text-muted-foreground text-xs">{t("Swap")}</p>
+                <p className=" text-muted-foreground text-xs">{t("swap")}</p>
                 <div className="flex items-center gap-2">
                   <AnimatedCircularProgressBar
                     className="size-3 text-[0px]"
@@ -339,7 +342,8 @@ function MemoryChart({ data }: ChartProps) {
 }
 
 function DiskChart({ data }: ChartProps) {
-  const t = useTranslations("ServerDetailChartClient");
+  const t = useTranslations("Public.VM");
+
   const current = data[data.length - 1] ||
     data[0] || {
       diskUsed: 0,
@@ -360,7 +364,7 @@ function DiskChart({ data }: ChartProps) {
       <CardContent className="px-6 py-3">
         <section className="flex flex-col gap-1">
           <div className="flex items-center justify-between">
-            <p className="font-medium text-md">{t("Disk")}</p>
+            <p className="font-medium text-md">{t("disk")}</p>
             <section className="flex flex-col items-end gap-0.5">
               <section className="flex items-center gap-2">
                 <p className="w-10 text-end font-medium text-xs">
@@ -395,7 +399,7 @@ function DiskChart({ data }: ChartProps) {
             >
               <CartesianGrid vertical={false} />
               <XAxis
-                dataKey="timeStamp"
+                dataKey="time"
                 tickLine={false}
                 axisLine={false}
                 tickMargin={8}
@@ -428,7 +432,8 @@ function DiskChart({ data }: ChartProps) {
 }
 
 function NetworkChart({ data }: ChartProps) {
-  const t = useTranslations("ServerDetailChartClient");
+  const t = useTranslations("Public.VM");
+
   const current = data[data.length - 1] ||
     data[0] || {
       networkInSpeed: 0,
@@ -456,7 +461,7 @@ function NetworkChart({ data }: ChartProps) {
           <div className="flex items-center">
             <section className="flex items-center gap-4">
               <div className="flex w-20 flex-col">
-                <p className="text-muted-foreground text-xs">{t("Upload")}</p>
+                <p className="text-muted-foreground text-xs">{t("totalUpload")}</p>
                 <div className="flex items-center gap-1">
                   <span className="relative inline-flex size-1.5 rounded-full bg-[hsl(var(--chart-1))]" />
                   <p className="font-medium text-xs">
@@ -466,7 +471,7 @@ function NetworkChart({ data }: ChartProps) {
               </div>
               <div className="flex w-20 flex-col">
                 <p className=" text-muted-foreground text-xs">
-                  {t("Download")}
+                  {t("totalDownload")}
                 </p>
                 <div className="flex items-center gap-1">
                   <span className="relative inline-flex size-1.5 rounded-full bg-[hsl(var(--chart-4))]" />
@@ -536,6 +541,8 @@ function NetworkChart({ data }: ChartProps) {
 }
 
 function ConnectionsChart({ data }: ChartProps) {
+  const t = useTranslations("Public.VM");
+
   const current = data[data.length - 1] ||
     data[0] || {
       tcpConnections: 0,
@@ -558,7 +565,7 @@ function ConnectionsChart({ data }: ChartProps) {
           <div className="flex items-center">
             <section className="flex items-center gap-4">
               <div className="flex w-12 flex-col">
-                <p className="text-muted-foreground text-xs">TCP</p>
+                <p className="text-muted-foreground text-xs">{t("tcp")}</p>
                 <div className="flex items-center gap-1">
                   <span className="relative inline-flex size-1.5 rounded-full bg-[hsl(var(--chart-1))]" />
                   <p className="font-medium text-xs">
@@ -567,7 +574,7 @@ function ConnectionsChart({ data }: ChartProps) {
                 </div>
               </div>
               <div className="flex w-12 flex-col">
-                <p className=" text-muted-foreground text-xs">UDP</p>
+                <p className=" text-muted-foreground text-xs">{t("udp")}</p>
                 <div className="flex items-center gap-1">
                   <span className="relative inline-flex size-1.5 rounded-full bg-[hsl(var(--chart-4))]" />
                   <p className="font-medium text-xs">

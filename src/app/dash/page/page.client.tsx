@@ -2,19 +2,17 @@
 
 import useSWR from "swr";
 import apiClient, { fetchWrapper } from "@/lib/api-client";
-import { Shell } from "@/components/shell";
 import { Skeleton } from "@/components/ui/skeleton";
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
 import { CreatePageDialog } from "@/components/page/create-page-dialog";
 import { Button } from "@/components/ui/button";
 import { Link } from "next-view-transitions";
+import { useTranslations } from "next-intl";
+
 export function PageManagementData() {
+  const t = useTranslations("Private.Page.Management");
+  const tD = useTranslations("Private.Page.Detail");
+  const tAction = useTranslations("Private.Action");
+
   const { data, isLoading } = useSWR(
     ["/api/page", {}],
     fetchWrapper(apiClient.page.$get),
@@ -29,9 +27,9 @@ export function PageManagementData() {
     <div className="space-y-6">
       {data?.length === 0 ? (
         <div className="py-6 text-center">
-          <p className="text-muted-foreground">您还没有创建任何监控页面</p>
+          <p className="text-muted-foreground">{t("emptyPage")}</p>
           <CreatePageDialog>
-            <Button className="mx-auto mt-4">创建第一个页面</Button>
+            <Button className="mx-auto mt-4">{t("createFirstPage")}</Button>
           </CreatePageDialog>
         </div>
       ) : (
@@ -44,24 +42,26 @@ export function PageManagementData() {
                 </Link>
                 <div className="flex gap-2">
                   <Button variant="secondary" size="sm">
-                    编辑
+                    {tAction("edit")}
                   </Button>
                   <Button variant="destructive" size="sm">
-                    删除
+                    {tAction("delete")}
                   </Button>
                 </div>
               </div>
               <p className="mb-2 text-muted-foreground">
-                访问链接: /{page.handle}
+                {tD("accessLink")}: /{page.handle}
               </p>
               <div className="mt-3">
                 <p className="text-muted-foreground text-sm">
-                  {page.vmCount} 台虚拟机
+                  {t("vmCount", { count: page.vmCount })}
                 </p>
               </div>
             </div>
           ))}
-          <Button className="mt-2 w-full">添加新页面</Button>
+          <CreatePageDialog>
+            <Button className="mt-2 w-full">{t("addPage")}</Button>
+          </CreatePageDialog>
         </div>
       )}
     </div>
