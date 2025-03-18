@@ -12,15 +12,8 @@ import { ProfileLogout } from "./profile.client";
 import Link from "next/link";
 
 export default async function Profile() {
-  // 获取 headers 并转换为 Headers 类型
-  const readonlyHeaders = await headers();
-  const mutableHeaders = new Headers();
-  readonlyHeaders.forEach((value, key) => {
-    mutableHeaders.set(key, value);
-  });
-
   const session = await auth.api.getSession({
-    headers: mutableHeaders,
+    headers: await headers(),
   });
   if (!session) {
     return (

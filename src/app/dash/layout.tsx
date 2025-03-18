@@ -14,6 +14,7 @@ export default async function DashLayout({
     redirect("/auth");
   }
   const messages = await getMessages();
+  
   return (
     <NextIntlClientProvider messages={messages}>
       <main className="h-[calc(100vh-3.5rem-1px)] w-screen">{children}</main>

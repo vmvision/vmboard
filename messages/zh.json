@@ -39,7 +39,8 @@
     "Action": {
       "edit": "编辑",
       "delete": "删除",
-      "cancel": "取消"
+      "cancel": "取消",
+      "save": "保存"
     },
     "Page": {
       "Management": {
@@ -72,6 +73,28 @@
         "updateVmInPageDescription": "更新虚拟机在当前页面中的相关信息",
         "updateVmDisplayName": "更新虚拟机昵称",
         "updateVmDisplayNameDescription": "为该虚拟机设置一个自定义昵称"
+      }
+    },
+    "Setting":{
+      "title": "设置",
+      "description": "管理您的账户和偏好设置",
+      "Personal": {
+        "title": "个人设置",
+        "description": "管理您的账户和偏好设置",
+        "settings": "设置",
+        "Account":{
+           "title": "账户",
+           "description": "管理您的账户设置",
+           "name": "昵称",
+           "email": "邮箱"
+        }
+    
+      },
+      "Site": {
+        "title": "站点设置",
+        "description": "管理您的站点设置",
+        "settings": "设置",
+        "account": "账户"
       }
     }
   }

@@ -4,7 +4,6 @@ import db from "@/db";
 import { vm as vmTable, type VM } from "@/db/schema/vm";
 import { page as pageTable } from "@/db/schema/page";
 import { merchant as merchantTable } from "@/db/schema/merchant";
-import { user, session } from "@/db/schema"; // 导入 user 和 session 表
 import {
   and,
   asc,
@@ -225,33 +224,4 @@ export async function getPageData(handle: string) {
       tags: ["page"],
     },
   )();
-}
-
-// 新增：获取用户信息
-export async function getUser(userId: string) {
-  return await db
-    .select()
-    .from(user)
-    .where(eq(user.id, userId))
-    .limit(1)
-    .execute()
-    .then((res) => res[0] || null);
-}
-
-// 新增：获取最近会话
-export async function getLatestSession(userId: string) {
-  const sessionRecord = await db
-    .select({
-      ipAddress: session.ipAddress,
-      userAgent: session.userAgent,
-      createdAt: session.createdAt,
-    })
-    .from(session)
-    .where(eq(session.userId, userId))
-    .orderBy(desc(session.createdAt))
-    .limit(1)
-    .execute()
-    .then((res) => res[0] || null);
-
-  return sessionRecord;
 }

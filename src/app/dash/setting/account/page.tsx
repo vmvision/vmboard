@@ -1,128 +1,93 @@
-import { Shell } from "@/components/shell";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { auth } from "@/lib/auth";
-import { getUser, getLatestSession } from "@/app/_lib/queries";
-import { redirect } from "next/navigation";
-import { headers } from "next/headers";
-import { getTranslations } from "next-intl/server";
-import AccountForm from "./AccountForm";
+"use client";
 
-interface User {
-  id: string;
-  name: string;
-  email: string;
-  username: string | null;
-  createdAt: string;
-  role: string | null;
-  emailVerified: boolean;
-  banned: boolean | null;
-  banReason: string | null;
-  banExpires: string | null;
-  image: string | null;
-}
+import { useTranslations } from "next-intl";
+import { useForm } from "react-hook-form";
+import { Input } from "@/components/ui/input";
+import { Button } from "@/components/ui/button";
+import {
+  Form,
+  FormField,
+  FormLabel,
+  FormItem,
+  FormControl,
+  FormMessage,
+} from "@/components/ui/form";
+import type { User } from "better-auth";
+import { authClient } from "@/lib/auth-client";
 
-interface Session {
-  ipAddress: string | null;
-  userAgent: string | null;
-  createdAt: string;
-}
+type FormUser = Pick<User, "email" | "name">;
 
-export default async function AccountPage() {
-  const t = await getTranslations("account");
+export default function SettingAccountPage() {
+  const { data: session, isPending } = authClient.useSession();
 
-  try {
-    // 获取 headers 并转换为 Headers 类型
-    const readonlyHeaders = await headers();
-    const mutableHeaders = new Headers();
-    readonlyHeaders.forEach((value, key) => {
-      mutableHeaders.set(key, value);
-    });
-
-    // 获取会话
-    const session = await auth.api.getSession({ headers: mutableHeaders });
-    if (!session) {
-      redirect("/auth");
-    }
-
-    // 获取用户数据
-    const user = await getUser(session.user.id);
-    if (!user) {
-      redirect("/auth");
-    }
-
-    // 获取最近会话
-    const latestSession = await getLatestSession(session.user.id);
-
-    return (
-      <Shell>
-        <div className="space-y-2">
-          <h2 className="text-2xl font-bold">{t("title")}</h2>
-          <p className="text-muted-foreground">{t("description")}</p>
-        </div>
-        <Card>
-          <CardHeader>
-            <CardTitle>{t("account_details")}</CardTitle>
-          </CardHeader>
-          <CardContent className="space-y-4">
-            <AccountForm
-              user={{
-                id: user.id,
-                name: user.name,
-                username: user.username,
-              }}
-            />
-            <div className="space-y-2">
-              <p>{t("email")}: {user.email}</p>
-              <p>
-                {t("created_at")}:{" "}
-                {new Date(user.createdAt).toLocaleDateString()}
-              </p>
-              <p>{t("role")}: {user.role || "user"}</p>
-              <p>{t("email_verified")}: {user.emailVerified ? "Yes" : "No"}</p>
-              {user.banned && (
-                <p>
-                  {t("banned")}: {user.banReason || "No reason"}
-                  {user.banExpires &&
-                    ` (until ${new Date(user.banExpires).toLocaleString()})`}
-                </p>
-              )}
-              {user.image && (
-                <p>
-                  {t("avatar")}:{" "}
-                  <img src={user.image} alt="Avatar" width="50" />
-                </p>
-              )}
-            </div>
-          </CardContent>
-        </Card>
-        <Card className="mt-4">
-          <CardHeader>
-            <CardTitle>{t("recent_activity")}</CardTitle>
-          </CardHeader>
-          <CardContent className="space-y-2">
-            <p>
-              {t("last_login")}:{" "}
-              {latestSession?.createdAt
-                ? new Date(latestSession.createdAt).toLocaleString()
-                : "Never"}
-            </p>
-            <p>{t("ip_address")}: {latestSession?.ipAddress || "Unknown"}</p>
-            <p>{t("device")}: {latestSession?.userAgent || "Unknown"}</p>
-          </CardContent>
-        </Card>
-      </Shell>
-    );
-  } catch (error) {
-    console.error("Error in AccountPage:", error);
-    return (
-      <Shell>
-        <div className="space-y-2">
-          <h2 className="text-2xl font-bold">Error</h2>
-          <p className="text-muted-foreground">
-            Failed to load account page. Please try again later.
-          </p>
-        </div>
-      </Shell>
-    );
+  if (isPending || !session) {
+    return <div>Loading...</div>;
   }
+
+  return <AccountForm user={session.user} />;
 }
+const AccountForm: React.FC<{ user: User }> = ({ user }) => {
+  const t = useTranslations("Private.Setting.Personal.Account");
+  const tAction = useTranslations("Private.Action");
+  const form = useForm<FormUser>({
+    defaultValues: {
+      name: user.name,
+      email: user.email,
+    },
+  });
+
+  const onSubmit = async (data: FormUser) => {
+    await authClient.updateUser({
+      name: data.name,
+    });
+  };
+
+  return (
+    <Form {...form}>
+      <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
+        <FormField
+          control={form.control}
+          name="name"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel>{t("name")}</FormLabel>
+              <FormControl>
+                <Input {...field} />
+              </FormControl>
+              <FormMessage />
+            </FormItem>
+          )}
+          rules={{ required: "昵称不能为空" }}
+        />
+
+        <FormField
+          control={form.control}
+          name="email"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel>{t("email")}</FormLabel>
+              <FormControl>
+                <Input {...field} />
+              </FormControl>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
+
+        {form.formState.errors.root && (
+          <p className="text-red-500 text-sm">
+            {form.formState.errors.root.message}
+          </p>
+        )}
+
+        <Button
+          type="submit"
+          disabled={form.formState.isSubmitting}
+          isLoading={form.formState.isSubmitting}
+        >
+          {tAction("save")}
+        </Button>
+      </form>
+    </Form>
+  );
+};
