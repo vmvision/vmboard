@@ -102,3 +102,8 @@ export function calculatePercentage(
   const percentage = (Number(value) / Number(total)) * 100;
   return Number.isNaN(percentage) ? 0 : Number(percentage.toFixed(fixed));
 }
+
+export function capitalize(str: string) {
+  if (!str) return '';
+  return str.charAt(0).toUpperCase() + str.slice(1);
+}

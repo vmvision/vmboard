@@ -9,13 +9,18 @@ import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
 import { auth } from "@/lib/auth";
 import { headers } from "next/headers";
 import { ProfileLogout } from "./profile.client";
+import Link from "next/link";
 
 export default async function Profile() {
   const session = await auth.api.getSession({
     headers: await headers(),
   });
   if (!session) {
-    return null;
+    return (
+      <a href="/auth" className="text-foreground/60 hover:text-foreground">
+        Log In
+      </a>
+    );
   }
   const { user } = session;
 
@@ -29,8 +34,16 @@ export default async function Profile() {
         </Avatar>
       </DropdownMenuTrigger>
       <DropdownMenuContent>
-        <DropdownMenuItem>我的账户</DropdownMenuItem>
-        <DropdownMenuItem>设置</DropdownMenuItem>
+        <DropdownMenuItem asChild>
+          <Link href="/dash/setting/account" className="block w-full">
+            我的账户
+          </Link>
+        </DropdownMenuItem>
+        <DropdownMenuItem asChild>
+          <Link href="/dash/setting" className="block w-full">
+            设置
+          </Link>
+        </DropdownMenuItem>
         <DropdownMenuSeparator />
         <ProfileLogout session={session.session} />
       </DropdownMenuContent>

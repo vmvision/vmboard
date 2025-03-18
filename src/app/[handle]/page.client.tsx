@@ -27,7 +27,7 @@ const MonitorPage = ({ page, vms }: MonitorPageProps) => {
   const { metrics, addMetrics } = useMetricsData();
 
   const { isConnected, montoringVmIds } = useMonitor({
-    vmIds: page.vmIds,
+    vmIds: page.vmIds as number[],
     onVMMetrics: (vmId, metrics) => {
       addMetrics(vmId, metrics);
     },

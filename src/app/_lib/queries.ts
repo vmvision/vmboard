@@ -24,6 +24,7 @@ import { unstable_cache } from "@/lib/unstable-cache";
 import type { GetVMSchema } from "./validations";
 import { sshKeysTable } from "@/db/schema";
 
+// 现有查询函数（保持不变）
 export async function getVM(vmId: number) {
   const session = await getSessionOrThrow();
   return await unstable_cache(
@@ -196,7 +197,7 @@ export async function getPageData(handle: string) {
         where: eq(pageTable.handle, handle),
       });
       const vms = await db.query.vm.findMany({
-        where: inArray(vmTable.id, page?.vmIds ?? []),
+        where: page?.vmIds ? inArray(vmTable.id, page.vmIds as number[]) : undefined,
         columns: {
           id: true,
           nickname: true,
