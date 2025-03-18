@@ -58,6 +58,19 @@ export default function ServerDetail({ vmId }: ServerDetailProps) {
     ["/api/vm/:id/monitor", { param: { id: vmId } }],
     fetchWrapper(apiClient.vm[":id"].monitor.$get),
   );
+  
+  const {
+    data: { status },
+  } = useSWR(
+    ["/api/vm/:id/monitor/status", { param: { id: vmId } }],
+    fetchWrapper(apiClient.vm[":id"].monitor.status.$get),
+    {
+      refreshInterval: 3000,
+      fallbackData: {
+        status: false,
+      },
+    },
+  );
 
   // if (!serverData && !isLoading) {
   //   notFound();
@@ -96,17 +109,17 @@ export default function ServerDetail({ vmId }: ServerDetailProps) {
           <CardContent className="px-1.5 py-1">
             <section className="flex flex-col items-start gap-0.5">
               <p className="text-muted-foreground text-xs">{t("status")}</p>
-              {/* <Badge
+              <Badge
                 className={cn(
                   "-mt-[0.3px] w-fit rounded-[6px] px-1 py-0 text-[9px] dark:text-white",
                   {
-                    " bg-green-800": online,
-                    " bg-red-600": !online,
+                    " bg-green-800": status,
+                    " bg-red-600": !status,
                   },
                 )}
               >
-                {online ? t("Online") : t("Offline")}
-              </Badge> */}
+                {status ? t("online") : t("offline")}
+              </Badge>
             </section>
           </CardContent>
         </Card>
