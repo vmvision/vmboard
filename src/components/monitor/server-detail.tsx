@@ -22,6 +22,7 @@ import { notFound, useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import useSWR from "swr";
 import apiClient, { fetchWrapper } from "@/lib/api-client";
+import { vm } from "@/db/schema";
 
 countries.registerLocale(enLocale);
 
@@ -31,8 +32,10 @@ interface ServerDetailProps {
 
 export default function ServerDetail({ vmId }: ServerDetailProps) {
   const t = useTranslations("Public.VM");
+  const tT = useTranslations("Public.Time");
   const router = useRouter();
 
+  
   // const [hasHistory, setHasHistory] = useState(false);
 
   // useEffect(() => {
@@ -129,9 +132,9 @@ export default function ServerDetail({ vmId }: ServerDetailProps) {
               <p className="text-muted-foreground text-xs">{t("uptime")}</p>
               <div className="text-xs">
                 {" "}
-                {/* {Number(monitorInfo.uptime) / 86400 >= 1
-                  ? `${(Number(monitorInfo.uptime) / 86400).toFixed(0)} ${t("Days")}`
-                  : `${(Number(monitorInfo.uptime) / 3600).toFixed(0)} ${t("Hours")}`} */}
+                {Number(monitorInfo.uptime) / 86400 >= 1
+                  ? `${(Number(monitorInfo.uptime) / 86400).toFixed(0)} ${tT("day")}`
+                  : `${(Number(monitorInfo.uptime) / 3600).toFixed(0)} ${tT("hour")}`}
               </div>
             </section>
           </CardContent>

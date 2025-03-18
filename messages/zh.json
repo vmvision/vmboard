@@ -1,5 +1,9 @@
 {
   "Public": {
+    "Time": {
+      "day": "天",
+      "hour": "小时"
+    },
     "Link": {
       "docs": "文档",
       "page": "页面"
@@ -75,20 +79,19 @@
         "updateVmDisplayNameDescription": "为该虚拟机设置一个自定义昵称"
       }
     },
-    "Setting":{
+    "Setting": {
       "title": "设置",
       "description": "管理您的账户和偏好设置",
       "Personal": {
         "title": "个人设置",
         "description": "管理您的账户和偏好设置",
         "settings": "设置",
-        "Account":{
-           "title": "账户",
-           "description": "管理您的账户设置",
-           "name": "昵称",
-           "email": "邮箱"
+        "Account": {
+          "title": "账户",
+          "description": "管理您的账户设置",
+          "name": "昵称",
+          "email": "邮箱"
         }
-    
       },
       "Site": {
         "title": "站点设置",
