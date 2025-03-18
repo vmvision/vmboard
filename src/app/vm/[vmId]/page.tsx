@@ -46,6 +46,7 @@ const ServerPage: React.FC<PageProps> = ({ params }: PageProps) => {
       : null,
     fetchWrapper(apiClient.vm[":id"].monitor.metrics.$get),
     {
+      refreshInterval: 0,
       onSuccess: (data) => {
         addBatchMetrics(vmId, data);
         startMonitorVM([vmId]);

@@ -17,14 +17,26 @@ export function formatDate(
   }).format(new Date(date));
 }
 
-export function formatBytes(bytes: number | string, decimals = 2) {
-  bytes = Number(bytes);
+export function formatBytes(bytes: number | string, decimals = 2, short = false) {
+  if (typeof bytes === "string") {
+    bytes = Number(bytes);
+  }
 
   if (!+bytes) return "0 Bytes";
 
   const k = 1024;
   const dm = decimals < 0 ? 0 : decimals;
-  const sizes = [
+  const sizes = short ? [
+    "B",
+    "KB",
+    "MB",
+    "GB",
+    "TB",
+    "PB",
+    "EiB",
+    "ZiB",
+    "YiB",
+  ] : [
     "Bytes",
     "KiB",
     "MiB",
@@ -39,6 +51,10 @@ export function formatBytes(bytes: number | string, decimals = 2) {
   const i = Math.floor(Math.log(bytes) / Math.log(k));
 
   return `${Number.parseFloat((bytes / k ** i).toFixed(dm))} ${sizes[i]}`;
+}
+
+export function formatKiloBytes(bytes: number | string, decimals = 2, short = false) {
+  return formatBytes(Number(bytes) * 1024, decimals, short);
 }
 
 export function formatRelativeTime(timestamp: number): string {

@@ -1,4 +1,4 @@
-import { and, desc, eq } from "drizzle-orm";
+import { and, asc, desc, eq } from "drizzle-orm";
 import appFactory from "../factory";
 import { vm as vmsTable } from "@/db/schema/vm";
 import { zValidator } from "@hono/zod-validator";
@@ -120,7 +120,7 @@ const app = appFactory
         limit: 20,
         orderBy: desc(metricsTable.time),
       });
-      return c.json(metrics);
+      return c.json(metrics.reverse());
     },
   )
   //update vm nickname

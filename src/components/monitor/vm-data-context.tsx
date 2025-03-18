@@ -51,14 +51,14 @@ export const MetricsDataProvider: React.FC<{
 
   const addMetrics = (vmId: number, metrics: Metrics) => {
     setMetrics((prev) => {
-      const prevMetrics = prev[vmId] || [];
-      const lastMetrics = prevMetrics[prevMetrics.length - 1] || prevMetrics[0];
+      const prevMetricsArray = prev[vmId] || [];
+      const previousMetrics = prevMetricsArray[prevMetricsArray.length - 1] || prevMetricsArray[0];
 
-      if (prevMetrics.length < 1 || !lastMetrics) {
+      if (prevMetricsArray.length < 1 || !previousMetrics) {
         return {
           ...prev,
           [vmId]: [
-            ...prevMetrics,
+            ...prevMetricsArray,
             {
               ...metrics,
               memoryUsage:
@@ -76,13 +76,15 @@ export const MetricsDataProvider: React.FC<{
           ],
         };
       }
-      if (prevMetrics.length > maxLengthRef.current) {
-        prevMetrics.shift();
+
+      if (prevMetricsArray.length > maxLengthRef.current) {
+        prevMetricsArray.shift();
       }
+
       return {
         ...prev,
         [vmId]: [
-          ...prevMetrics,
+          ...prevMetricsArray,
           {
             ...metrics,
             memoryUsage:
@@ -92,15 +94,15 @@ export const MetricsDataProvider: React.FC<{
             diskUsage:
               (Number(metrics.diskUsed) / Number(metrics.diskTotal)) * 100,
             networkInSpeed:
-              (Number(metrics.networkIn) - Number(lastMetrics.networkIn)) /
+              (Number(metrics.networkIn) - Number(previousMetrics.networkIn)) /
               1024,
             networkOutSpeed:
-              (Number(metrics.networkOut) - Number(lastMetrics.networkOut)) /
+              (Number(metrics.networkOut) - Number(previousMetrics.networkOut)) /
               1024,
             diskReadSpeed:
-              (Number(metrics.diskRead) - Number(lastMetrics.diskRead)) / 1024,
+              (Number(metrics.diskRead) - Number(previousMetrics.diskRead)) / 1024,
             diskWriteSpeed:
-              (Number(metrics.diskWrite) - Number(lastMetrics.diskWrite)) /
+              (Number(metrics.diskWrite) - Number(previousMetrics.diskWrite)) /
               1024,
           },
         ],
@@ -109,9 +111,52 @@ export const MetricsDataProvider: React.FC<{
   };
 
   const addBatchMetrics = (vmId: number, metrics: Metrics[]) => {
-    for (const metric of metrics) {
-      addMetrics(vmId, metric);
-    }
+    setMetrics((prev) => {
+      const currentMetrics = prev[vmId] || [];
+
+      for (const [index, metric] of metrics.entries()) {
+        const previousMetrics =
+          index > 0
+            ? currentMetrics[index - 1]
+            : currentMetrics.length > 1
+              ? currentMetrics[currentMetrics.length - 1]
+              : currentMetrics[0];
+
+        const newMetric = {
+          ...metric,
+          memoryUsage:
+            (Number(metric.memoryUsed) / Number(metric.memoryTotal)) * 100,
+          swapUsage: (Number(metric.swapUsed) / Number(metric.swapTotal)) * 100,
+          diskUsage: (Number(metric.diskUsed) / Number(metric.diskTotal)) * 100,
+          networkInSpeed: previousMetrics
+            ? (Number(metric.networkIn) - Number(previousMetrics.networkIn)) /
+              1024
+            : 0,
+          networkOutSpeed: previousMetrics
+            ? (Number(metric.networkOut) - Number(previousMetrics.networkOut)) /
+              1024
+            : 0,
+          diskReadSpeed: previousMetrics
+            ? (Number(metric.diskRead) - Number(previousMetrics.diskRead)) /
+              1024
+            : 0,
+          diskWriteSpeed: previousMetrics
+            ? (Number(metric.diskWrite) - Number(previousMetrics.diskWrite)) /
+              1024
+            : 0,
+        };
+
+        currentMetrics.push(newMetric);
+        if (currentMetrics.length > maxLengthRef.current) {
+          currentMetrics.shift();
+        }
+      }
+
+      return {
+        ...prev,
+        [vmId]: currentMetrics,
+      };
+    });
   };
 
   return (

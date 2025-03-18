@@ -13,7 +13,7 @@ import { ServerDetailChartLoading } from "@/components/monitor/server-detail-loa
 import AnimatedCircularProgressBar from "@/components/ui/animated-circular-progress-bar";
 import { Card, CardContent } from "@/components/ui/card";
 import { type ChartConfig, ChartContainer } from "@/components/ui/chart";
-import { formatBytes, formatRelativeTime } from "@/lib/utils";
+import { formatBytes, formatKiloBytes, formatRelativeTime } from "@/lib/utils";
 import { useTranslations } from "next-intl";
 import {
   Area,
@@ -25,6 +25,7 @@ import {
   YAxis,
 } from "recharts";
 import { type DerivedMetrics, useMetricsData } from "./vm-data-context";
+import { useMemo } from "react";
 
 interface ServerDetailChartClientProps {
   vmId: number;
@@ -439,11 +440,14 @@ function NetworkChart({ data }: ChartProps) {
       networkInSpeed: 0,
       networkOutSpeed: 0,
     };
-  // let maxDownload = Math.max(...networkChartData.map((item) => item.download));
-  // maxDownload = Math.ceil(maxDownload);
-  // if (maxDownload < 1) {
-  //   maxDownload = 1;
-  // }
+
+  const maxSpeed = useMemo(() => {
+    const speeds = Math.max(
+      ...data.map((item) => item.networkInSpeed),
+      ...data.map((item) => item.networkOutSpeed),
+    );
+    return Math.max(speeds, 0);
+  }, [data]);
 
   const chartConfig = {
     networkInSpeed: {
@@ -461,11 +465,13 @@ function NetworkChart({ data }: ChartProps) {
           <div className="flex items-center">
             <section className="flex items-center gap-4">
               <div className="flex w-20 flex-col">
-                <p className="text-muted-foreground text-xs">{t("totalUpload")}</p>
+                <p className="text-muted-foreground text-xs">
+                  {t("totalUpload")}
+                </p>
                 <div className="flex items-center gap-1">
                   <span className="relative inline-flex size-1.5 rounded-full bg-[hsl(var(--chart-1))]" />
                   <p className="font-medium text-xs">
-                    {current.networkInSpeed.toFixed(2)} M/s
+                    {formatKiloBytes(current.networkInSpeed, 2, true)}/s
                   </p>
                 </div>
               </div>
@@ -476,7 +482,7 @@ function NetworkChart({ data }: ChartProps) {
                 <div className="flex items-center gap-1">
                   <span className="relative inline-flex size-1.5 rounded-full bg-[hsl(var(--chart-4))]" />
                   <p className="font-medium text-xs">
-                    {current.networkOutSpeed.toFixed(2)} M/s
+                    {formatKiloBytes(current.networkOutSpeed, 2, true)}/s
                   </p>
                 </div>
               </div>
@@ -513,8 +519,10 @@ function NetworkChart({ data }: ChartProps) {
                 type="number"
                 minTickGap={50}
                 interval="preserveStartEnd"
-                // domain={[1, maxDownload]}
-                tickFormatter={(value) => `${value.toFixed(0)}M/s`}
+                domain={[1, maxSpeed]}
+                tickFormatter={(value) =>
+                  `${formatKiloBytes(value, 0, true)}/s`
+                }
               />
               <Line
                 isAnimationActive={false}
