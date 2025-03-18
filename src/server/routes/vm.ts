@@ -1,9 +1,11 @@
-import { and, eq } from "drizzle-orm";
+import { and, desc, eq } from "drizzle-orm";
 import appFactory from "../factory";
 import { vm as vmsTable } from "@/db/schema/vm";
 import { zValidator } from "@hono/zod-validator";
 import { z } from "zod";
 import { broadcastToVms, checkVmSocket } from "../monitor/socket";
+import BizError, { BizCodeEnum } from "../error";
+import { metrics as metricsTable } from "@/db/schema/metrics";
 
 const app = appFactory
   .createApp()
@@ -37,7 +39,7 @@ const app = appFactory
       });
 
       if (!vm) {
-        throw new Error("VM not found");
+        throw new BizError(BizCodeEnum.VMNotFound);
       }
 
       return c.json({
@@ -65,7 +67,7 @@ const app = appFactory
       });
 
       if (!vm) {
-        throw new Error("VM not found");
+        throw new BizError(BizCodeEnum.VMNotFound);
       }
       if (!vm.monitorInfo) {
         broadcastToVms([vm.id], {
@@ -93,6 +95,32 @@ const app = appFactory
       return c.json({
         status: checkVmSocket(input.id),
       });
+    },
+  )
+  .get(
+    "/:id/monitor/metrics",
+    zValidator(
+      "param",
+      z.object({
+        id: z.coerce.number(),
+      }),
+    ),
+    async (c) => {
+      const input = c.req.valid("param");
+      const db = c.get("db");
+      const user = c.get("user");
+      const vm = await db.query.vm.findFirst({
+        where: and(eq(vmsTable.id, input.id), eq(vmsTable.userId, user.id)),
+      });
+      if (!vm) {
+        throw new BizError(BizCodeEnum.VMNotFound);
+      }
+      const metrics = await db.query.metrics.findMany({
+        where: eq(metricsTable.vmId, vm.id),
+        limit: 20,
+        orderBy: desc(metricsTable.time),
+      });
+      return c.json(metrics);
     },
   )
   //update vm nickname

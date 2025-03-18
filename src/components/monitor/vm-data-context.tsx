@@ -1,6 +1,6 @@
 import type { Metrics } from "@/db/schema/metrics";
 import type React from "react";
-import { createContext, useContext, useState } from "react";
+import { createContext, useContext, useRef, useState } from "react";
 
 export type DerivedMetrics = Metrics & {
   memoryUsage: number;
@@ -19,6 +19,7 @@ interface MetricsDataContextType {
   getMetrics: (vmId: number) => DerivedMetrics[];
   getLatestMetrics: (vmId: number) => DerivedMetrics | undefined;
   addMetrics: (vmId: number, metrics: Metrics) => void;
+  addBatchMetrics: (vmId: number, metrics: Metrics[]) => void;
 }
 
 const MetricsDataContext = createContext<MetricsDataContextType | null>(null);
@@ -31,9 +32,12 @@ export const useMetricsData = () => {
   return context;
 };
 
-export const MetricsDataProvider: React.FC<{ children: React.ReactNode }> = ({
-  children,
-}) => {
+export const MetricsDataProvider: React.FC<{
+  children: React.ReactNode;
+  maxLength?: number;
+}> = ({ children, maxLength = 20 }) => {
+  const maxLengthRef = useRef(maxLength);
+
   const [metrics, setMetrics] = useState<MetricsData>({});
 
   const getMetrics = (vmId: number) => {
@@ -72,7 +76,9 @@ export const MetricsDataProvider: React.FC<{ children: React.ReactNode }> = ({
           ],
         };
       }
-
+      if (prevMetrics.length > maxLengthRef.current) {
+        prevMetrics.shift();
+      }
       return {
         ...prev,
         [vmId]: [
@@ -102,9 +108,21 @@ export const MetricsDataProvider: React.FC<{ children: React.ReactNode }> = ({
     });
   };
 
+  const addBatchMetrics = (vmId: number, metrics: Metrics[]) => {
+    for (const metric of metrics) {
+      addMetrics(vmId, metric);
+    }
+  };
+
   return (
     <MetricsDataContext.Provider
-      value={{ metrics, getMetrics, getLatestMetrics, addMetrics }}
+      value={{
+        metrics,
+        getMetrics,
+        getLatestMetrics,
+        addMetrics,
+        addBatchMetrics,
+      }}
     >
       {children}
     </MetricsDataContext.Provider>

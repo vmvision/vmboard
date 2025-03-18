@@ -3,7 +3,9 @@ import { pgTable } from "../utils";
 import { vm } from "./vm";
 
 export const metrics = pgTable("metrics", {
-  time: timestamp("time", { withTimezone: true }).defaultNow().notNull(),
+  time: timestamp("time", { mode: "string", withTimezone: true })
+    .defaultNow()
+    .notNull(),
   vmId: integer("vm_id")
     .references(() => vm.id, {
       onDelete: "cascade",
