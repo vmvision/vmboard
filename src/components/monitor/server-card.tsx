@@ -27,7 +27,7 @@ const ServerCard: React.FC<{
   vmId: number;
   nickname: string;
 }> = ({ vmId, nickname }) => {
-  const t = useTranslations("ServerCard");
+  const t = useTranslations("Public.VM");
   const { getLatestMetrics } = useMetricsData();
   const metrics = getLatestMetrics(vmId);
   const online = !!metrics;
@@ -93,7 +93,7 @@ const ServerCard: React.FC<{
                   )} */}
                 </div>
                 <div className={"flex w-14 flex-col"}>
-                  <p className="text-muted-foreground text-xs">{t("System")}</p>
+                  <p className="text-muted-foreground text-xs">{t("system")}</p>
                   <div className="flex items-center font-semibold text-[10.5px]">
                     {/* {vmInfo.platform.includes("Windows")
                       ? "Windows"
@@ -103,34 +103,34 @@ const ServerCard: React.FC<{
               </div>
             )}
             <div className={"flex w-14 flex-col"}>
-              <p className="text-muted-foreground text-xs">{t("CPU")}</p>
+              <p className="text-muted-foreground text-xs">{t("cpu")}</p>
               <div className="flex items-center font-semibold text-xs">
                 {Number(metrics.cpuUsage).toFixed(2)}%
               </div>
               <ServerUsageBar value={metrics?.cpuUsage} />
             </div>
             <div className={"flex w-14 flex-col"}>
-              <p className="text-muted-foreground text-xs">{t("Mem")}</p>
+              <p className="text-muted-foreground text-xs">{t("memory")}</p>
               <div className="flex items-center font-semibold text-xs">
                 {Number(metrics.memoryUsage).toFixed(2)}%
               </div>
               <ServerUsageBar value={metrics.memoryUsage} />
             </div>
             <div className={"flex w-14 flex-col"}>
-              <p className="text-muted-foreground text-xs">{t("STG")}</p>
+              <p className="text-muted-foreground text-xs">{t("disk")}</p>
               <div className="flex items-center font-semibold text-xs">
                 {calculatePercentage(metrics.diskUsed, metrics.diskTotal, 2)}%
               </div>
               <ServerUsageBar value={metrics.diskUsed} />
             </div>
             <div className={"flex w-14 flex-col"}>
-              <p className="text-muted-foreground text-xs">{t("Upload")}</p>
+              <p className="text-muted-foreground text-xs">{t("upload")}</p>
               <div className="flex items-center font-semibold text-xs">
                 {metrics.networkOutSpeed.toFixed(2)}M/s
               </div>
             </div>
             <div className={"flex w-14 flex-col"}>
-              <p className="text-muted-foreground text-xs">{t("Download")}</p>
+              <p className="text-muted-foreground text-xs">{t("download")}</p>
               <div className="flex items-center font-semibold text-xs">
                 {metrics.networkInSpeed.toFixed(2)}M/s
               </div>
@@ -142,13 +142,13 @@ const ServerCard: React.FC<{
                 variant="secondary"
                 className="flex-1 items-center justify-center text-nowrap rounded-[8px] border-muted-50 text-[11px] shadow-md shadow-neutral-200/30 dark:shadow-none"
               >
-                {t("Upload")}:{formatBytes(metrics.networkOutSpeed)}
+                {t("totalUpload")}:{formatBytes(metrics.networkOutSpeed)}
               </Badge>
               <Badge
                 variant="outline"
                 className="flex-1 items-center justify-center text-nowrap rounded-[8px] text-[11px] shadow-md shadow-neutral-200/30 dark:shadow-none"
               >
-                {t("Download")}:{formatBytes(metrics.networkInSpeed)}
+                {t("totalDownload")}:{formatBytes(metrics.networkInSpeed)}
               </Badge>
             </section>
           )}

@@ -29,6 +29,8 @@
       "process": "进程",
       "tcp": "TCP",
       "udp": "UDP",
+      "upload": "上传",
+      "download": "下载",
       "totalUpload": "总上传",
       "totalDownload": "总下载",
       "region": "地区"

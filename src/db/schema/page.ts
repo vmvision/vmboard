@@ -45,7 +45,7 @@ export const pageRelations = relations(page, ({ many, one }) => ({
     fields: [page.userId],
     references: [user.id],
   }),
-  vms: many(pageVM),
+  pageVMs: many(pageVM),
 }));
 
 export type Page = typeof page.$inferSelect;

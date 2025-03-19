@@ -10,24 +10,23 @@ import { ServerList } from "@/components/monitor/server-list-card";
 import type { VM } from "@/db/schema/vm";
 
 export type MonitorVM = Pick<VM, "id" | "nickname"> & {
-  monitorInfo: {
-    os?: string;
-    osVersion?: string;
-    platform?: string;
-    platformVersion?: string;
-  };
+  os?: string;
+  osVersion?: string;
+  platform?: string;
+  platformVersion?: string;
 };
 
 type MonitorPageProps = {
-  page: Page;
-  vms: MonitorVM[];
+  page: Pick<Page, "id" | "title" | "description"> & {
+    vms: MonitorVM[];
+  };
 };
 
-const MonitorPage = ({ page, vms }: MonitorPageProps) => {
+const MonitorPage = ({ page }: MonitorPageProps) => {
   const { metrics, addMetrics } = useMetricsData();
 
   const { isConnected, montoringVmIds } = useMonitor({
-    vmIds: page.vmIds as number[],
+    vmIds: page.vms.map((vm) => vm.id),
     onVMMetrics: (vmId, metrics) => {
       addMetrics(vmId, metrics);
     },
@@ -38,7 +37,7 @@ const MonitorPage = ({ page, vms }: MonitorPageProps) => {
 
   return (
     <div className="container mx-auto mt-16">
-      <ServerList servers={vms} />
+      <ServerList servers={page.vms} />
     </div>
   );
 };
