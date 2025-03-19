@@ -1,5 +1,9 @@
 {
   "Public": {
+    "Auth": {
+      "passkey": "使用物理密钥登录",
+      "oauth": "使用 {provider} 登录"
+    },
     "Time": {
       "day": "天",
       "hour": "小时"

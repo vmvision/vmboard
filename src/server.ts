@@ -1,3 +1,4 @@
+import { env } from "./env";
 import http from "node:http";
 
 import next from "next";
@@ -28,7 +29,12 @@ void app.prepare().then(async () => {
 
     server.listen(PORT);
 
-    await (await import("./queues")).default();
+    // if (env.ENABLE_ALERT_QUEUE) {
+    //   if (!env.REDIS_URL) {
+    //     throw new Error("REDIS_URL is not set which is required for alert queue");
+    //   }
+    //   await (await import("./queues")).default();
+    // }
   } catch (e) {
     console.error("[VMBoard] failed to start with error:", e);
   }
