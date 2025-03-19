@@ -3,10 +3,9 @@ import http from "node:http";
 
 import next from "next";
 import packageJson from "../package.json";
-import { runMigrate } from "./db/migrate";
 
 if (env.NODE_ENV === "production") {
-  runMigrate();
+  import("./db/migrate").then(({ runMigrate }) => runMigrate(false));
 }
 
 const PORT = Number.parseInt(process.env.PORT || "3000", 10);
