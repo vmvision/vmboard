@@ -98,7 +98,18 @@ export default function AuthPage() {
   };
 
   const onOAuthSubmit = async (provider: "github") => {
-    const res = await authClient.signIn.social({ provider });
+    const turnstileToken = env.NEXT_PUBLIC_CF_TURNSTILE_SITE_KEY
+      ? cfTurnstilRef.current?.getResponse()
+      : undefined;
+
+    const res = await authClient.signIn.social({
+      provider,
+      fetchOptions: {
+        headers: {
+          "x-captcha-response": turnstileToken as string,
+        },
+      },
+    });
     if (!res) return toast.error("OAuth 登录异常");
     const { error } = res;
     if (error) {
@@ -177,7 +188,7 @@ export default function AuthPage() {
           </form>
         </Form>
         <Separator className="my-4" />
-        <div className="mt-4">
+        <div className="mt-4 space-y-4">
           <Button
             onClick={handlePasskeySignIn}
             variant="outline"
