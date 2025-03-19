@@ -10,7 +10,7 @@
 "use client";
 
 import { ServerDetailChartLoading } from "@/components/monitor/server-detail-loading";
-import AnimatedCircularProgressBar from "@/components/ui/animated-circular-progress-bar";
+import AnimatedCircularProgressBar from "@/components/derive-ui/animated-circular-progress-bar";
 import { Card, CardContent } from "@/components/ui/card";
 import { type ChartConfig, ChartContainer } from "@/components/ui/chart";
 import { formatBytes, formatKiloBytes, formatRelativeTime } from "@/lib/utils";

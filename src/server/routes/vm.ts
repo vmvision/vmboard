@@ -20,6 +20,26 @@ const app = appFactory
 
     return c.json(vms);
   })
+  // get all server status
+  .get("/status", async (c) => {
+    const db = c.get("db");
+    const user = c.get("user");
+    const vms = await db.query.vm.findMany({
+      where: eq(vmsTable.userId, user.id),
+      columns: {
+        id: true,
+      },
+    });
+    const status = vms.map((vm) => ({
+      id: vm.id,
+      status: checkVmSocket(vm.id),
+    }));
+    return c.json({
+      total: vms.length,
+      online: status.filter((s) => s.status).length,
+      offline: status.filter((s) => !s.status).length,
+    });
+  })
   //get vm by id
   .get(
     "/:id",

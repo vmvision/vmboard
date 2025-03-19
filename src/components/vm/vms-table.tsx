@@ -112,8 +112,7 @@ export function VMsTable({ promises }: TasksTableProps) {
   ];
 
   const enableAdvancedTable = featureFlags.includes("advancedTable");
-  const enableFloatingBar = featureFlags.includes("floatingBar");
-
+  
   const { table } = useDataTable({
     data,
     columns,
@@ -133,9 +132,7 @@ export function VMsTable({ promises }: TasksTableProps) {
     <>
       <DataTable
         table={table}
-        floatingBar={
-          enableFloatingBar ? <VMsTableFloatingBar table={table} /> : null
-        }
+        floatingBar={<VMsTableFloatingBar table={table} />}
       >
         {enableAdvancedTable ? (
           <DataTableAdvancedToolbar

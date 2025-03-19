@@ -26,14 +26,6 @@ import {
   FormMessage,
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
-import useSWR from "swr";
 import useSWRMutation from "swr/mutation";
 
 import apiClient, { fetchWrapper, mutationWrapper } from "@/lib/api-client";
