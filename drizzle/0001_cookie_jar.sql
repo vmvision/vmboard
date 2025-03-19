@@ -1,1 +1,0 @@
-ALTER TABLE "merchant" ADD COLUMN "cookie_jar" jsonb;
