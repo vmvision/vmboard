@@ -7,9 +7,11 @@
   "type": "module",
   "scripts": {
     "clean": "rimraf --glob **/node_modules **/dist **/.next pnpm-lock.yaml **/.tsbuildinfo",
-    "build": "next build",
+    "build": "npm run build-server && npm run build-next",
+    "build-server": "tsx esbuild.config.ts",
+    "build-next": "next build",
     "dev": "tsx watch src/server.ts",
-    "dev:next": "next dev",
+    "dev-next": "next dev",
     "start": "next start",
     "lint": "biome check .",
     "lint:fix": "biome check . --write",
