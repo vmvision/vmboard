@@ -12,7 +12,7 @@
     "build-next": "next build",
     "dev": "tsx watch src/server.ts",
     "dev-next": "next dev",
-    "start": "next start",
+    "start": "node dist/server.mjs",
     "lint": "biome check .",
     "lint:fix": "biome check . --write",
     "typecheck": "tsc --noEmit",
