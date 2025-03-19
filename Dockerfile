@@ -7,8 +7,6 @@ FROM base AS build
 COPY . /app
 WORKDIR /app
 
-RUN apt-get update && apt-get install -y python3 make g++ git python3-pip pkg-config libsecret-1-dev && rm -rf /var/lib/apt/lists/*
-
 # Install dependencies
 RUN --mount=type=cache,id=pnpm,target=/pnpm/store pnpm install --frozen-lockfile
 
@@ -21,8 +19,6 @@ WORKDIR /app
 
 # Set production
 ENV NODE_ENV=production
-
-RUN apt-get update && apt-get install -y curl unzip apache2-utils iproute2 && rm -rf /var/lib/apt/lists/*
 
 # Copy only the necessary files
 COPY --from=build /app/.next ./.next
