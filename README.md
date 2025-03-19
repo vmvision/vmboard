@@ -10,32 +10,13 @@
 - [vmapi](https://github.com/AprilNEA/vmapi)
 - [shadcn-table](https://github.com/sadmann7/shadcn-table)
 
-## License
-```
-Copyright (C) 2025 by AprilNEA <github@sku.moe>
 
-This program is free software: you can redistribute it and/or modify
-it under the terms of the GNU General Public License as published by
-the Free Software Foundation, either version 3 of the License, or
-(at your option) any later version.
+## Licensing
 
-This program is distributed in the hope that it will be useful,
-but WITHOUT ANY WARRANTY; without even the implied warranty of
-MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-GNU General Public License for more details.
+This project is primarily licensed under the [Functional Source License 1.1 (FSL-1.1)](./LICENSE.md),
+with a transition to [Apache License 2.0](./LICENSE-APACHE) after two years].
 
-You should have received a copy of the GNU General Public License
-along with this program. If not, see <http://www.gnu.org/licenses/>.
+However, this project includes some code licensed under the Apache License 2.0:
+- [hamster1963/nezha-dash](https://github.com/hamster1963/nezha-dash) - Copyright 2025 hamster1963
 
-This project includes code derived from the **nezha-dash** project,
-which was originally licensed under the **Apache License 2.0**.
-
-Per the requirements of the **Apache License 2.0**, the original license
-has been preserved and can be found in the file `LICENSE-APACHE` in
-this repository.
-
-All modifications and new code are licensed under the **GNU General Public License v3.0 (GPLv3)**.
-
-In addition, no derivative work may use the name or imply association
-with this application without prior consent.
-```
+The full text of the Apache License 2.0 can be found in the LICENSE-APACHE file.
