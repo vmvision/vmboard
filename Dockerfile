@@ -20,6 +20,8 @@ WORKDIR /app
 # Set production
 ENV NODE_ENV=production
 
+RUN apt-get update && apt-get install -y curl && rm -rf /var/lib/apt/lists/*
+
 # Copy only the necessary files
 COPY --from=build /app/.next ./.next
 COPY --from=build /app/dist ./dist
