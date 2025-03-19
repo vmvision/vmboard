@@ -10,6 +10,7 @@ import { Shell } from "@/components/shell";
 import { ModifyVmDetailInPageDialog } from "@/components/page/modify-vm-dialog";
 import { AddVmDialog } from "@/components/page/add-vm-dialog";
 import { useTranslations } from "next-intl";
+import { Markdown } from "@/components/markdown";
 type Params = Promise<{ pageId: string }>;
 
 export default function PageDetail({ params }: { params: Params }) {
@@ -47,7 +48,6 @@ export default function PageDetail({ params }: { params: Params }) {
         <div className="flex items-center justify-between">
           <div>
             <h1 className="font-bold text-2xl">{data.title}</h1>
-            <p className="text-muted-foreground">{data.description}</p>
             {data.handle && (
               <p className="mt-1 text-muted-foreground text-sm">
                 {t("accessLink")}: /{data.handle}
@@ -58,6 +58,7 @@ export default function PageDetail({ params }: { params: Params }) {
                 {t("customDomain")}: {data.hostname}
               </p>
             )}
+            <Markdown content={data.description} />
           </div>
           <div className="flex gap-2">
             <Button variant="outline">{t("editPage")}</Button>
@@ -73,9 +74,9 @@ export default function PageDetail({ params }: { params: Params }) {
             </AddVmDialog>
           </div>
 
-          {data.vms && data.vms.length > 0 ? (
+          {data.pageVMs && data.pageVMs.length > 0 ? (
             <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
-              {data.vms.map((pageVm) => (
+              {data.pageVMs.map((pageVm) => (
                 <Card key={pageVm.vmId}>
                   <CardHeader className="pb-2">
                     <CardTitle className="text-lg">
