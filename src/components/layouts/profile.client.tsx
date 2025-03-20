@@ -17,10 +17,10 @@ export const ProfileLogout: React.FC<{ session: Session }> = ({ session }) => {
       {
         onSuccess: () => {
           router.refresh();
-          toast.success("注销成功");
+          toast.success("退出登录成功");
         },
         onError: () => {
-          toast.error("注销失败");
+          toast.error("退出登录失败");
         },
       },
     );
@@ -28,7 +28,7 @@ export const ProfileLogout: React.FC<{ session: Session }> = ({ session }) => {
 
   return (
     <DropdownMenuItem onClick={logout}>
-      注销
+      退出登录
     </DropdownMenuItem>
   );
 };
