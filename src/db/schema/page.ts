@@ -26,6 +26,7 @@ export const page = pgTable(
 
     title: text("title").default("VMboard").notNull(),
     description: text("description").default("").notNull(),
+    vmIds: jsonb("vm_ids").default([]).notNull(),
 
     createdAt: timestamp("created_at", { withTimezone: true })
       .notNull()
