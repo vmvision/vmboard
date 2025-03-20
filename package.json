@@ -66,6 +66,7 @@
     "cmdk": "^1.0.4",
     "country-flag-icons": "^1.5.18",
     "date-fns": "^4.1.0",
+    "dotenv": "^16.4.7",
     "drizzle-orm": "^0.39.1",
     "drizzle-zod": "^0.7.0",
     "export-to-csv": "^1.4.0",

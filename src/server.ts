@@ -1,23 +1,21 @@
-import { env } from "./env";
+import "dotenv/config";
+import { env } from "./env.js";
 import http from "node:http";
 
 import next from "next";
 import packageJson from "../package.json";
 
-if (env.NODE_ENV === "production") {
-  import("./db/migrate").then(({ runMigrate }) => runMigrate(false));
-}
-
-const PORT = Number.parseInt(process.env.PORT || "3000", 10);
-const dev = process.env.NODE_ENV !== "production";
-const app = next({ dev });
+const app = next({ dev: env.NODE_ENV !== "production" });
 const handle = app.getRequestHandler();
-
 /**
- * Pro
+ * Prepare the app and start the server
  */
 void app.prepare().then(async () => {
   try {
+    if (env.NODE_ENV === "production") {
+      import("./db/migrate").then(({ runMigrate }) => runMigrate(false));
+    }
+
     const server = http.createServer((req, res) => {
       handle(req, res);
     });
@@ -27,11 +25,11 @@ void app.prepare().then(async () => {
 
     server.on("listening", () => {
       console.log(
-        `[VMBoard] v${packageJson.version} running on http://localhost:${PORT}`,
+        `[VMBoard] v${packageJson.version} running on http://localhost:${env.PORT}`,
       );
     });
 
-    server.listen(PORT);
+    server.listen(env.PORT);
 
     // if (env.ENABLE_ALERT_QUEUE) {
     //   if (!env.REDIS_URL) {

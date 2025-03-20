@@ -10,6 +10,7 @@ export const env = createEnv({
     NODE_ENV: z
       .enum(["development", "test", "production"])
       .default("development"),
+    PORT: z.coerce.number().default(3000),
 
     // RSC
     BASE_URL: z.string().url().default("http://localhost:3000"),
