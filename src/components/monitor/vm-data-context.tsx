@@ -1,6 +1,6 @@
 import type { Metrics } from "@/db/schema/metrics";
 import type React from "react";
-import { createContext, useContext, useState } from "react";
+import { createContext, useContext, useRef, useState } from "react";
 
 export type DerivedMetrics = Metrics & {
   memoryUsage: number;
@@ -19,6 +19,7 @@ interface MetricsDataContextType {
   getMetrics: (vmId: number) => DerivedMetrics[];
   getLatestMetrics: (vmId: number) => DerivedMetrics | undefined;
   addMetrics: (vmId: number, metrics: Metrics) => void;
+  addBatchMetrics: (vmId: number, metrics: Metrics[]) => void;
 }
 
 const MetricsDataContext = createContext<MetricsDataContextType | null>(null);
@@ -31,9 +32,12 @@ export const useMetricsData = () => {
   return context;
 };
 
-export const MetricsDataProvider: React.FC<{ children: React.ReactNode }> = ({
-  children,
-}) => {
+export const MetricsDataProvider: React.FC<{
+  children: React.ReactNode;
+  maxLength?: number;
+}> = ({ children, maxLength = 20 }) => {
+  const maxLengthRef = useRef(maxLength);
+
   const [metrics, setMetrics] = useState<MetricsData>({});
 
   const getMetrics = (vmId: number) => {
@@ -47,14 +51,14 @@ export const MetricsDataProvider: React.FC<{ children: React.ReactNode }> = ({
 
   const addMetrics = (vmId: number, metrics: Metrics) => {
     setMetrics((prev) => {
-      const prevMetrics = prev[vmId] || [];
-      const lastMetrics = prevMetrics[prevMetrics.length - 1] || prevMetrics[0];
+      const prevMetricsArray = prev[vmId] || [];
+      const previousMetrics = prevMetricsArray[prevMetricsArray.length - 1] || prevMetricsArray[0];
 
-      if (prevMetrics.length < 1 || !lastMetrics) {
+      if (prevMetricsArray.length < 1 || !previousMetrics) {
         return {
           ...prev,
           [vmId]: [
-            ...prevMetrics,
+            ...prevMetricsArray,
             {
               ...metrics,
               memoryUsage:
@@ -73,10 +77,14 @@ export const MetricsDataProvider: React.FC<{ children: React.ReactNode }> = ({
         };
       }
 
+      if (prevMetricsArray.length > maxLengthRef.current) {
+        prevMetricsArray.shift();
+      }
+
       return {
         ...prev,
         [vmId]: [
-          ...prevMetrics,
+          ...prevMetricsArray,
           {
             ...metrics,
             memoryUsage:
@@ -86,15 +94,15 @@ export const MetricsDataProvider: React.FC<{ children: React.ReactNode }> = ({
             diskUsage:
               (Number(metrics.diskUsed) / Number(metrics.diskTotal)) * 100,
             networkInSpeed:
-              (Number(metrics.networkIn) - Number(lastMetrics.networkIn)) /
+              (Number(metrics.networkIn) - Number(previousMetrics.networkIn)) /
               1024,
             networkOutSpeed:
-              (Number(metrics.networkOut) - Number(lastMetrics.networkOut)) /
+              (Number(metrics.networkOut) - Number(previousMetrics.networkOut)) /
               1024,
             diskReadSpeed:
-              (Number(metrics.diskRead) - Number(lastMetrics.diskRead)) / 1024,
+              (Number(metrics.diskRead) - Number(previousMetrics.diskRead)) / 1024,
             diskWriteSpeed:
-              (Number(metrics.diskWrite) - Number(lastMetrics.diskWrite)) /
+              (Number(metrics.diskWrite) - Number(previousMetrics.diskWrite)) /
               1024,
           },
         ],
@@ -102,9 +110,64 @@ export const MetricsDataProvider: React.FC<{ children: React.ReactNode }> = ({
     });
   };
 
+  const addBatchMetrics = (vmId: number, metrics: Metrics[]) => {
+    setMetrics((prev) => {
+      const currentMetrics = prev[vmId] || [];
+
+      for (const [index, metric] of metrics.entries()) {
+        const previousMetrics =
+          index > 0
+            ? currentMetrics[index - 1]
+            : currentMetrics.length > 1
+              ? currentMetrics[currentMetrics.length - 1]
+              : currentMetrics[0];
+
+        const newMetric = {
+          ...metric,
+          memoryUsage:
+            (Number(metric.memoryUsed) / Number(metric.memoryTotal)) * 100,
+          swapUsage: (Number(metric.swapUsed) / Number(metric.swapTotal)) * 100,
+          diskUsage: (Number(metric.diskUsed) / Number(metric.diskTotal)) * 100,
+          networkInSpeed: previousMetrics
+            ? (Number(metric.networkIn) - Number(previousMetrics.networkIn)) /
+              1024
+            : 0,
+          networkOutSpeed: previousMetrics
+            ? (Number(metric.networkOut) - Number(previousMetrics.networkOut)) /
+              1024
+            : 0,
+          diskReadSpeed: previousMetrics
+            ? (Number(metric.diskRead) - Number(previousMetrics.diskRead)) /
+              1024
+            : 0,
+          diskWriteSpeed: previousMetrics
+            ? (Number(metric.diskWrite) - Number(previousMetrics.diskWrite)) /
+              1024
+            : 0,
+        };
+
+        currentMetrics.push(newMetric);
+        if (currentMetrics.length > maxLengthRef.current) {
+          currentMetrics.shift();
+        }
+      }
+
+      return {
+        ...prev,
+        [vmId]: currentMetrics,
+      };
+    });
+  };
+
   return (
     <MetricsDataContext.Provider
-      value={{ metrics, getMetrics, getLatestMetrics, addMetrics }}
+      value={{
+        metrics,
+        getMetrics,
+        getLatestMetrics,
+        addMetrics,
+        addBatchMetrics,
+      }}
     >
       {children}
     </MetricsDataContext.Provider>

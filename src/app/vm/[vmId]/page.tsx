@@ -16,6 +16,8 @@ import {
 import ServerDetail from "@/components/monitor/server-detail";
 import { Separator } from "@/components/ui/separator";
 import ServerDetailChartClient from "@/components/monitor/server-detail-chart";
+import apiClient, { fetchWrapper } from "@/lib/api-client";
+import useSWR from "swr";
 
 type PageProps = {
   params: Promise<{ vmId: string }>;
@@ -25,18 +27,32 @@ type PageProps = {
 
 const ServerPage: React.FC<PageProps> = ({ params }: PageProps) => {
   const vmId = Number(use(params).vmId);
-  const { addMetrics } = useMetricsData();
+  const { addMetrics, addBatchMetrics } = useMetricsData();
 
-  useMonitor({
-    vmIds: [vmId],
+  const { isConnected, startMonitorVM } = useMonitor({
+    // vmIds: [vmId],
     onVMMetrics: (vmId, metrics) => {
-      console.log(metrics);
+      // console.log(metrics);
       addMetrics(vmId, metrics);
     },
     onError: (error) => {
       console.error(error);
     },
   });
+
+  useSWR(
+    isConnected
+      ? ["/api/vm/:id/monitor/metrics", { param: { id: vmId } }]
+      : null,
+    fetchWrapper(apiClient.vm[":id"].monitor.metrics.$get),
+    {
+      refreshInterval: 0,
+      onSuccess: (data) => {
+        addBatchMetrics(vmId, data);
+        startMonitorVM([vmId]);
+      },
+    },
+  );
 
   // const tabs: TabType[] = ["Detail", "Network"];
   // const [currentTab, setCurrentTab] = useState<TabType>(tabs[0]);

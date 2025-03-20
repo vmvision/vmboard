@@ -8,30 +8,36 @@ import {
 } from "@/components/ui/card";
 import { PageManagementData } from "./page.client";
 import type { Metadata } from "next";
+import { getTranslations } from "next-intl/server";
 
-export const metadata: Metadata = {
-  title: "页面管理",
-  description: "创建和管理您的虚拟机监控页面展示",
-};
+export async function generateMetadata(): Promise<Metadata> {
+  const t = await getTranslations("Private.Page.Management");
+  
+  return {
+    title: t("title"),
+    description: t("description"),
+  };
+}
 
-export default function Page() {
+export default async function Page() {
+  const t = await getTranslations("Private.Page.Management");
+
   return (
     <Shell>
       <div className="flex items-center justify-between space-y-2">
         <div>
-          <h2 className="font-bold text-2xl tracking-tight">页面管理</h2>
+          <h2 className="font-bold text-2xl tracking-tight">{t("title")}</h2>
           <p className="text-muted-foreground">
-            创建和管理您的虚拟机监控页面展示
+            {t("description")}
           </p>
         </div>
       </div>
       <div className="mt-4 grid gap-4">
         <Card>
           <CardHeader>
-            <CardTitle>您的监控页面</CardTitle>
+            <CardTitle>{t("subTitle")}</CardTitle>
             <CardDescription>
-              您可以为不同的用途创建多个监控页面，每个页面可以有自己的 VM
-              集合和布局
+              {t("description2")}
             </CardDescription>
           </CardHeader>
           <CardContent>

@@ -1,9 +1,11 @@
-import { and, eq } from "drizzle-orm";
+import { and, asc, desc, eq } from "drizzle-orm";
 import appFactory from "../factory";
 import { vm as vmsTable } from "@/db/schema/vm";
 import { zValidator } from "@hono/zod-validator";
 import { z } from "zod";
 import { broadcastToVms, checkVmSocket } from "../monitor/socket";
+import BizError, { BizCodeEnum } from "../error";
+import { metrics as metricsTable } from "@/db/schema/metrics";
 
 const app = appFactory
   .createApp()
@@ -17,6 +19,26 @@ const app = appFactory
     });
 
     return c.json(vms);
+  })
+  // get all server status
+  .get("/status", async (c) => {
+    const db = c.get("db");
+    const user = c.get("user");
+    const vms = await db.query.vm.findMany({
+      where: eq(vmsTable.userId, user.id),
+      columns: {
+        id: true,
+      },
+    });
+    const status = vms.map((vm) => ({
+      id: vm.id,
+      status: checkVmSocket(vm.id),
+    }));
+    return c.json({
+      total: vms.length,
+      online: status.filter((s) => s.status).length,
+      offline: status.filter((s) => !s.status).length,
+    });
   })
   //get vm by id
   .get(
@@ -37,7 +59,7 @@ const app = appFactory
       });
 
       if (!vm) {
-        throw new Error("VM not found");
+        throw new BizError(BizCodeEnum.VMNotFound);
       }
 
       return c.json({
@@ -65,7 +87,7 @@ const app = appFactory
       });
 
       if (!vm) {
-        throw new Error("VM not found");
+        throw new BizError(BizCodeEnum.VMNotFound);
       }
       if (!vm.monitorInfo) {
         broadcastToVms([vm.id], {
@@ -93,6 +115,32 @@ const app = appFactory
       return c.json({
         status: checkVmSocket(input.id),
       });
+    },
+  )
+  .get(
+    "/:id/monitor/metrics",
+    zValidator(
+      "param",
+      z.object({
+        id: z.coerce.number(),
+      }),
+    ),
+    async (c) => {
+      const input = c.req.valid("param");
+      const db = c.get("db");
+      const user = c.get("user");
+      const vm = await db.query.vm.findFirst({
+        where: and(eq(vmsTable.id, input.id), eq(vmsTable.userId, user.id)),
+      });
+      if (!vm) {
+        throw new BizError(BizCodeEnum.VMNotFound);
+      }
+      const metrics = await db.query.metrics.findMany({
+        where: eq(metricsTable.vmId, vm.id),
+        limit: 20,
+        orderBy: desc(metricsTable.time),
+      });
+      return c.json(metrics.reverse());
     },
   )
   //update vm nickname

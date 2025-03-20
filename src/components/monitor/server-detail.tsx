@@ -22,6 +22,7 @@ import { notFound, useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import useSWR from "swr";
 import apiClient, { fetchWrapper } from "@/lib/api-client";
+import { vm } from "@/db/schema";
 
 countries.registerLocale(enLocale);
 
@@ -31,8 +32,10 @@ interface ServerDetailProps {
 
 export default function ServerDetail({ vmId }: ServerDetailProps) {
   const t = useTranslations("Public.VM");
+  const tT = useTranslations("Public.Time");
   const router = useRouter();
 
+  
   // const [hasHistory, setHasHistory] = useState(false);
 
   // useEffect(() => {
@@ -57,6 +60,19 @@ export default function ServerDetail({ vmId }: ServerDetailProps) {
   const vmInfo = useSWR(
     ["/api/vm/:id/monitor", { param: { id: vmId } }],
     fetchWrapper(apiClient.vm[":id"].monitor.$get),
+  );
+  
+  const {
+    data: { status },
+  } = useSWR(
+    ["/api/vm/:id/monitor/status", { param: { id: vmId } }],
+    fetchWrapper(apiClient.vm[":id"].monitor.status.$get),
+    {
+      refreshInterval: 3000,
+      fallbackData: {
+        status: false,
+      },
+    },
   );
 
   // if (!serverData && !isLoading) {
@@ -96,17 +112,17 @@ export default function ServerDetail({ vmId }: ServerDetailProps) {
           <CardContent className="px-1.5 py-1">
             <section className="flex flex-col items-start gap-0.5">
               <p className="text-muted-foreground text-xs">{t("status")}</p>
-              {/* <Badge
+              <Badge
                 className={cn(
                   "-mt-[0.3px] w-fit rounded-[6px] px-1 py-0 text-[9px] dark:text-white",
                   {
-                    " bg-green-800": online,
-                    " bg-red-600": !online,
+                    " bg-green-800": status,
+                    " bg-red-600": !status,
                   },
                 )}
               >
-                {online ? t("Online") : t("Offline")}
-              </Badge> */}
+                {status ? t("online") : t("offline")}
+              </Badge>
             </section>
           </CardContent>
         </Card>
@@ -116,9 +132,9 @@ export default function ServerDetail({ vmId }: ServerDetailProps) {
               <p className="text-muted-foreground text-xs">{t("uptime")}</p>
               <div className="text-xs">
                 {" "}
-                {/* {Number(monitorInfo.uptime) / 86400 >= 1
-                  ? `${(Number(monitorInfo.uptime) / 86400).toFixed(0)} ${t("Days")}`
-                  : `${(Number(monitorInfo.uptime) / 3600).toFixed(0)} ${t("Hours")}`} */}
+                {Number(monitorInfo.uptime) / 86400 >= 1
+                  ? `${(Number(monitorInfo.uptime) / 86400).toFixed(0)} ${tT("day")}`
+                  : `${(Number(monitorInfo.uptime) / 3600).toFixed(0)} ${tT("hour")}`}
               </div>
             </section>
           </CardContent>

@@ -1,7 +1,8 @@
 "use client";
 
 import { useForm } from "react-hook-form";
-
+import { Turnstile } from "@marsidev/react-turnstile";
+import type { TurnstileInstance } from "@marsidev/react-turnstile";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import {
@@ -17,7 +18,9 @@ import { useTransitionRouter } from "next-view-transitions";
 import { authClient } from "@/lib/auth-client";
 import { toast } from "sonner";
 import { Separator } from "@/components/ui/separator";
-import { useState } from "react";
+import { useRef, useState } from "react";
+import { env } from "@/env";
+import { useLocale, useTranslations } from "next-intl";
 
 interface IAuth {
   email: string;
@@ -25,6 +28,10 @@ interface IAuth {
 }
 
 export default function AuthPage() {
+  const t = useTranslations("Public.Auth");
+  const locale = useLocale();
+  const cfTurnstilRef = useRef<TurnstileInstance | null>(null);
+
   const router = useTransitionRouter();
   const [isSignUp, setIsSignUp] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
@@ -37,14 +44,18 @@ export default function AuthPage() {
   });
 
   const onSubmit = async (values: IAuth) => {
+    const turnstileToken = env.NEXT_PUBLIC_CF_TURNSTILE_SITE_KEY
+      ? cfTurnstilRef.current?.getResponse()
+      : undefined;
     isSignUp
-      ? await authClient.signUp.email(
-          {
-            email: values.email,
-            password: values.password,
-            name: values.email,
-          },
-          {
+      ? await authClient.signUp.email({
+          email: values.email,
+          password: values.password,
+          name: values.email,
+          fetchOptions: {
+            headers: {
+              "x-captcha-response": turnstileToken as string,
+            },
             onRequest: () => {
               setIsLoading(true);
             },
@@ -60,13 +71,14 @@ export default function AuthPage() {
               console.error(ctx);
             },
           },
-        )
-      : await authClient.signIn.email(
-          {
-            email: values.email,
-            password: values.password,
-          },
-          {
+        })
+      : await authClient.signIn.email({
+          email: values.email,
+          password: values.password,
+          fetchOptions: {
+            headers: {
+              "x-captcha-response": turnstileToken as string,
+            },
             onRequest: () => {
               setIsLoading(true);
             },
@@ -82,7 +94,27 @@ export default function AuthPage() {
               console.error(ctx);
             },
           },
-        );
+        });
+  };
+
+  const onOAuthSubmit = async (provider: "github") => {
+    const turnstileToken = env.NEXT_PUBLIC_CF_TURNSTILE_SITE_KEY
+      ? cfTurnstilRef.current?.getResponse()
+      : undefined;
+
+    const res = await authClient.signIn.social({
+      provider,
+      fetchOptions: {
+        headers: {
+          "x-captcha-response": turnstileToken as string,
+        },
+      },
+    });
+    if (!res) return toast.error("OAuth 登录异常");
+    const { error } = res;
+    if (error) {
+      toast.error(error.message);
+    }
   };
 
   const handlePasskeySignIn = async () => {
@@ -133,6 +165,18 @@ export default function AuthPage() {
                 </FormItem>
               )}
             />
+            {env.NEXT_PUBLIC_CF_TURNSTILE_SITE_KEY && (
+              <div className="mx-auto w-full">
+                <Turnstile
+                  ref={cfTurnstilRef}
+                  options={{
+                    language: locale,
+                    size: "flexible",
+                  }}
+                  siteKey={env.NEXT_PUBLIC_CF_TURNSTILE_SITE_KEY}
+                />
+              </div>
+            )}
             <Button
               type="submit"
               className="w-full"
@@ -144,15 +188,24 @@ export default function AuthPage() {
           </form>
         </Form>
         <Separator className="my-4" />
-        <div className="mt-4">
+        <div className="mt-4 space-y-4">
           <Button
             onClick={handlePasskeySignIn}
             variant="outline"
             className="w-full"
             data-umami-event="passkey-signin"
           >
-            使用 Passkey 登录
+            {t("passkey")}
           </Button>
+          {env.NEXT_PUBLIC_ALLOW_OAUTH.includes("github") && (
+            <Button
+              variant="outline"
+              className="w-full"
+              onClick={() => onOAuthSubmit("github")}
+            >
+              {t("oauth", { provider: "GitHub" })}
+            </Button>
+          )}
         </div>
         <div className="mt-4 flex items-center justify-center gap-1 text-center text-sm">
           {isSignUp ? "已有账号？" : "没有账号？"}

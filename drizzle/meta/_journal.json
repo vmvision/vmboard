@@ -12,22 +12,8 @@
     {
       "idx": 1,
       "version": "7",
-      "when": 1740289428113,
-      "tag": "0001_cookie_jar",
-      "breakpoints": true
-    },
-    {
-      "idx": 2,
-      "version": "7",
-      "when": 1740304153340,
-      "tag": "0002_ssh_key",
-      "breakpoints": true
-    },
-    {
-      "idx": 3,
-      "version": "7",
-      "when": 1741691539717,
-      "tag": "0003_metrics",
+      "when": 1742387310282,
+      "tag": "0001_init",
       "breakpoints": true
     }
   ]

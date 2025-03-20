@@ -30,9 +30,9 @@ export async function SiteHeader() {
             {t("docs")}
           </Link>
           <Link
-            href="https://vmboard.app"
-            target="_blank"
-            rel="noopener noreferrer"
+            href="/dash/page"
+            // target="_blank"
+            // rel="noopener noreferrer"
             className="text-foreground/60 transition-colors hover:text-foreground"
           >
             {t("page")}

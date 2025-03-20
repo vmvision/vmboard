@@ -4,7 +4,7 @@ try {
   esbuild
     .build({
       entryPoints: {
-        server: "src/index.ts",
+        server: "src/server.ts",
       },
       bundle: true,
       platform: "node",
@@ -14,7 +14,7 @@ try {
       minify: true,
       sourcemap: true,
       outdir: "dist",
-      tsconfig: "tsconfig.build.json",
+      tsconfig: "tsconfig.json",
       packages: "external",
     })
     .catch(() => {

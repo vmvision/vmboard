@@ -10,10 +10,25 @@ export const env = createEnv({
     NODE_ENV: z
       .enum(["development", "test", "production"])
       .default("development"),
+
     // RSC
     BASE_URL: z.string().url().default("http://localhost:3000"),
+
     // API
     DATABASE_URL: z.string().url(),
+    REDIS_URL: z.string().url().optional(),
+
+    // switch
+    ENABLE_ALERT_QUEUE: z.boolean().default(false),
+    ENABLE_EMAIL_VERIFICATION: z.boolean().default(false),
+
+    // secret
+    RESEND_API_KEY: z.string().optional(),
+
+    GITHUB_CLIENT_ID: z.string().optional(),
+    GITHUB_CLIENT_SECRET: z.string().optional(),
+
+    CF_TURNSTILE_SECRET_KEY: z.string().optional(),
   },
 
   /**
@@ -22,6 +37,10 @@ export const env = createEnv({
    * `NEXT_PUBLIC_`.
    */
   client: {
+    // Feature
+    NEXT_PUBLIC_ALLOW_OAUTH: z.string().transform((val) => val?.split(",")).default(""),
+    NEXT_PUBLIC_CF_TURNSTILE_SITE_KEY: z.string().optional(),
+
     // Monitor styles
     NEXT_PUBLIC_SHOW_IP_INFO: z.boolean().default(true),
     NEXT_PUBLIC_SHOW_FLAG: z.boolean().default(true),
@@ -35,9 +54,27 @@ export const env = createEnv({
    * middlewares) or client-side so we need to destruct manually.
    */
   runtimeEnv: {
-    DATABASE_URL: process.env.DATABASE_URL,
-    BASE_URL: process.env.BASE_URL,
     NODE_ENV: process.env.NODE_ENV,
+
+    BASE_URL: process.env.BASE_URL,
+    DATABASE_URL: process.env.DATABASE_URL,
+    REDIS_URL: process.env.REDIS_URL,
+
+    // switch
+    ENABLE_ALERT_QUEUE: process.env.ENABLE_ALERT_QUEUE,
+    ENABLE_EMAIL_VERIFICATION: process.env.ENABLE_EMAIL_VERIFICATION,
+
+    GITHUB_CLIENT_ID: process.env.GITHUB_CLIENT_ID,
+    GITHUB_CLIENT_SECRET: process.env.GITHUB_CLIENT_SECRET,
+
+    // secret
+    RESEND_API_KEY: process.env.RESEND_API_KEY,
+    CF_TURNSTILE_SECRET_KEY: process.env.CF_TURNSTILE_SECRET_KEY,
+
+    NEXT_PUBLIC_ALLOW_OAUTH: process.env.NEXT_PUBLIC_ALLOW_OAUTH,
+    NEXT_PUBLIC_CF_TURNSTILE_SITE_KEY:
+      process.env.NEXT_PUBLIC_CF_TURNSTILE_SITE_KEY,
+
     NEXT_PUBLIC_FORCE_USE_SVG_FLAG: process.env.NEXT_PUBLIC_FORCE_USE_SVG_FLAG,
     NEXT_PUBLIC_SHOW_IP_INFO: process.env.NEXT_PUBLIC_SHOW_IP_INFO,
     NEXT_PUBLIC_SHOW_FLAG: process.env.NEXT_PUBLIC_SHOW_FLAG,

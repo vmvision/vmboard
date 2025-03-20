@@ -51,7 +51,7 @@ const app = appFactory
       const page = await db.query.page.findFirst({
         where: eq(pageTable.id, input.id),
         with: {
-          vms: {
+          pageVMs: {
             with: {
               vm: true,
             },

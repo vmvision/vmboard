@@ -1,7 +1,12 @@
+import { env } from "./env";
 import http from "node:http";
 
 import next from "next";
 import packageJson from "../package.json";
+
+if (env.NODE_ENV === "production") {
+  import("./db/migrate").then(({ runMigrate }) => runMigrate(false));
+}
 
 const PORT = Number.parseInt(process.env.PORT || "3000", 10);
 const dev = process.env.NODE_ENV !== "production";
@@ -28,7 +33,12 @@ void app.prepare().then(async () => {
 
     server.listen(PORT);
 
-    await (await import("./queues")).default();
+    // if (env.ENABLE_ALERT_QUEUE) {
+    //   if (!env.REDIS_URL) {
+    //     throw new Error("REDIS_URL is not set which is required for alert queue");
+    //   }
+    //   await (await import("./queues")).default();
+    // }
   } catch (e) {
     console.error("[VMBoard] failed to start with error:", e);
   }

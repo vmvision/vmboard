@@ -1,11 +1,25 @@
 {
   "Public": {
+    "Auth": {
+      "passkey": "使用物理密钥登录",
+      "oauth": "使用 {provider} 登录"
+    },
+    "Time": {
+      "day": "天",
+      "hour": "小时"
+    },
     "Link": {
       "docs": "文档",
       "page": "页面"
     },
     "Common": {
       "unknownError": "发生未知错误"
+    },
+    "Overview": {
+      "totalServers": "总服务器",
+      "onlineServers": "在线服务器",
+      "offlineServers": "离线服务器",
+      "errorServers": "错误服务器"
     },
     "VM": {
       "status": "状态",
@@ -25,6 +39,8 @@
       "process": "进程",
       "tcp": "TCP",
       "udp": "UDP",
+      "upload": "上传",
+      "download": "下载",
       "totalUpload": "总上传",
       "totalDownload": "总下载",
       "region": "地区"
@@ -42,9 +58,20 @@
       "cancel": "取消",
       "save": "保存"
     },
+    "Onboard": {
+      "title": "欢迎使用 VMBoard",
+      "description": "请按照以下步骤完成您的设置",
+      "step1": {
+        "title": "添加第一台虚拟机",
+        "description": "请输入您的邮箱地址"
+      }
+    },
     "Page": {
       "Management": {
         "title": "页面管理",
+        "description": "管理您的页面设置和虚拟机列表",
+        "subTitle": "您的监控页面",
+        "description2": "您可以为不同的用途创建多个监控页面，每个页面可以有自己的 VM 集合和布局",
         "emptyPage": "您还没有创建任何监控页面",
         "addPage": "添加新页面",
         "createFirstPage": "创建第一个页面",
@@ -72,23 +99,24 @@
         "updateVmInPage": "更新虚拟机",
         "updateVmInPageDescription": "更新虚拟机在当前页面中的相关信息",
         "updateVmDisplayName": "更新虚拟机昵称",
-        "updateVmDisplayNameDescription": "为该虚拟机设置一个自定义昵称"
+        "updateVmDisplayNameDescription": "为该虚拟机设置一个自定义昵称",
+        "updateVmNickname": "更新昵称",
+        "updateVmNicknameDescription": "为该虚拟机设置一个自定义昵称"
       }
     },
-    "Setting":{
+    "Setting": {
       "title": "设置",
       "description": "管理您的账户和偏好设置",
       "Personal": {
         "title": "个人设置",
         "description": "管理您的账户和偏好设置",
         "settings": "设置",
-        "Account":{
-           "title": "账户",
-           "description": "管理您的账户设置",
-           "name": "昵称",
-           "email": "邮箱"
+        "Account": {
+          "title": "账户",
+          "description": "管理您的账户设置",
+          "name": "昵称",
+          "email": "邮箱"
         }
-    
       },
       "Site": {
         "title": "站点设置",

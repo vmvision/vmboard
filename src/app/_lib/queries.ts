@@ -195,26 +195,41 @@ export async function getPageData(handle: string) {
     async () => {
       const page = await db.query.page.findFirst({
         where: eq(pageTable.handle, handle),
-      });
-      const vms = await db.query.vm.findMany({
-        where: page?.vmIds ? inArray(vmTable.id, page.vmIds as number[]) : undefined,
         columns: {
           id: true,
-          nickname: true,
-          monitorInfo: true,
+          title: true,
+          description: true,
+          // createdAt: true,
+          // updatedAt: true,
+        },
+        with: {
+          pageVMs: {
+            with: {
+              vm: {
+                columns: {
+                  id: true,
+                  nickname: true,
+                  monitorInfo: true,
+                },
+              },
+            },
+          },
         },
       });
+      if (!page) {
+        return null;
+      }
       return {
-        page,
-        vms: vms.map((vm) => ({
-          id: vm.id,
-          nickname: vm.nickname,
-          monitorInfo: {
-            os: vm.monitorInfo?.os,
-            osVersion: vm.monitorInfo?.osVersion,
-            platform: vm.monitorInfo?.platform,
-            platformVersion: vm.monitorInfo?.platformVersion,
-          },
+        id: page.id,
+        title: page.title,
+        description: page.description,
+        vms: page.pageVMs.map((pageVM) => ({
+          id: pageVM.vm.id,
+          nickname: pageVM.nickname || pageVM.vm.nickname,
+          os: pageVM.vm.monitorInfo?.os,
+          osVersion: pageVM.vm.monitorInfo?.osVersion,
+          platform: pageVM.vm.monitorInfo?.platform,
+          platformVersion: pageVM.vm.monitorInfo?.platformVersion,
         })),
       };
     },
