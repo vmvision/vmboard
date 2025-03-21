@@ -53,3 +53,4 @@ export default function MonitorPageWrapper(props: MonitorPageProps) {
     </MetricsDataProvider>
   );
 }
+

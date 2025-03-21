@@ -2,26 +2,45 @@ import MonitorPageWrapper from "./page.client";
 import { notFound } from "next/navigation";
 import { headers } from "next/headers";
 import rscClient from "@/lib/rsc-client";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 
 type Params = Promise<{ handle: string }>;
+
+const NotFound = () => {
+  return (
+    <Card className="mx-auto mt-16 w-96">
+      <CardHeader>
+        <CardTitle>Page not found</CardTitle>
+      </CardHeader>
+      <CardContent>
+        <p>The page you are looking for does not exist.</p>
+      </CardContent>
+    </Card>
+  );
+};
 
 export default async function Page({ params }: { params: Params }) {
   const hostname = new URL(
     `http://${(await headers()).get("host") ?? "localhost"}`,
   ).hostname;
   const handle = (await params).handle;
-  const page = await rscClient.page.bind
-    .$get({
-      query: {
-        handle,
-        hostname: hostname !== "localhost" ? hostname : undefined,
-      },
-    })
-    .then((res) => res.json());
 
-  if (!page) {
-    notFound();
+  const res = await rscClient.page.bind.$get({
+    query: {
+      handle,
+      hostname: hostname !== "localhost" ? hostname : undefined,
+    },
+  });
+
+  if (res.status === 404) {
+    return <NotFound />;
   }
+
+  if (!res.ok) {
+    throw new Error(res.statusText);
+  }
+
+  const page = await res.json();
 
   return <MonitorPageWrapper page={page} />;
 }
