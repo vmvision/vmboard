@@ -10,6 +10,7 @@ export const env = createEnv({
     NODE_ENV: z
       .enum(["development", "test", "production"])
       .default("development"),
+    HOSTNAME: z.string().default("0.0.0.0"),
     PORT: z.coerce.number().default(3000),
 
     // RSC
@@ -28,7 +29,10 @@ export const env = createEnv({
 
     GITHUB_CLIENT_ID: z.string().optional(),
     GITHUB_CLIENT_SECRET: z.string().optional(),
-
+    
+    CF_EMAIL: z.string().optional(),
+    CF_API_KEY: z.string().optional(),
+    CF_ZONE_ID: z.string().optional(),
     CF_TURNSTILE_SECRET_KEY: z.string().optional(),
   },
 
@@ -56,7 +60,9 @@ export const env = createEnv({
    */
   runtimeEnv: {
     NODE_ENV: process.env.NODE_ENV,
-
+    HOSTNAME: process.env.HOSTNAME,
+    PORT: process.env.PORT,
+    
     BASE_URL: process.env.BASE_URL,
     DATABASE_URL: process.env.DATABASE_URL,
     REDIS_URL: process.env.REDIS_URL,
@@ -69,6 +75,9 @@ export const env = createEnv({
     GITHUB_CLIENT_SECRET: process.env.GITHUB_CLIENT_SECRET,
 
     // secret
+    CF_EMAIL: process.env.CF_EMAIL,
+    CF_API_KEY: process.env.CF_API_KEY,
+
     RESEND_API_KEY: process.env.RESEND_API_KEY,
     CF_TURNSTILE_SECRET_KEY: process.env.CF_TURNSTILE_SECRET_KEY,
 

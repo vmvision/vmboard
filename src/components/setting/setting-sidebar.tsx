@@ -15,12 +15,12 @@ import {
 import { Link } from "next-view-transitions";
 import { useTranslations } from "next-intl";
 import { usePathname } from "next/navigation";
+import { capitalize } from "@/lib/utils";
 
 // Menu items.
 const userItems = [
   {
-    title: "账户设置",
-    url: "/dash/setting/account",
+    id: "account",
     icon: Home,
   },
   // {
@@ -48,8 +48,15 @@ const userItems = [
 // Menu items.
 const siteItems = [
   {
-    title: "站点设置",
-    url: "/dash/setting/site",
+    id: "general",
+    icon: Home,
+  },
+  {
+    id: "api",
+    icon: Home,
+  },
+  {
+    id: "notification",
     icon: Home,
   },
 ];
@@ -65,16 +72,19 @@ export function SettingSidebar() {
           <SidebarGroupLabel>{t("Personal.title")}</SidebarGroupLabel>
           <SidebarGroupContent>
             <SidebarMenu>
-              {userItems.map((item) => (
-                <SidebarMenuItem key={item.title}>
-                  <SidebarMenuButton asChild isActive={pathname === item.url}>
-                    <Link href={item.url}>
-                      <item.icon />
-                      <span>{item.title}</span>
-                    </Link>
-                  </SidebarMenuButton>
-                </SidebarMenuItem>
-              ))}
+              {userItems.map((item) => {
+                const path = `/dash/setting/personal/${item.id}`;
+                return (
+                  <SidebarMenuItem key={path}>
+                    <SidebarMenuButton asChild isActive={pathname === path}>
+                      <Link href={path}>
+                        <item.icon />
+                        <span>{t(`Personal.${capitalize(item.id)}.title`)}</span>
+                      </Link>
+                    </SidebarMenuButton>
+                  </SidebarMenuItem>
+                );
+              })}
             </SidebarMenu>
           </SidebarGroupContent>
         </SidebarGroup>
@@ -82,16 +92,19 @@ export function SettingSidebar() {
           <SidebarGroupLabel>{t("Site.title")}</SidebarGroupLabel>
           <SidebarGroupContent>
             <SidebarMenu>
-              {siteItems.map((item) => (
-                <SidebarMenuItem key={item.title}>
-                  <SidebarMenuButton asChild isActive={pathname === item.url}>
-                    <Link href={item.url}>
-                      <item.icon />
-                      <span>{item.title}</span>
-                    </Link>
-                  </SidebarMenuButton>
-                </SidebarMenuItem>
-              ))}
+              {siteItems.map((item) => {
+                const path = `/dash/setting/site/${item.id}`;
+                return (
+                  <SidebarMenuItem key={item.id}>
+                    <SidebarMenuButton asChild isActive={pathname === path}>
+                      <Link href={path}>
+                        <item.icon />
+                        <span>{t(`Site.${capitalize(item.id)}.title`)}</span>
+                      </Link>
+                    </SidebarMenuButton>
+                  </SidebarMenuItem>
+                );
+              })}
             </SidebarMenu>
           </SidebarGroupContent>
         </SidebarGroup>

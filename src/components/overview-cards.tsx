@@ -9,18 +9,28 @@ import { cn, formatBytes } from "@/lib/utils";
 //   ArrowUpCircleIcon,
 // } from "@heroicons/react/20/solid";
 import { useTranslations } from "next-intl";
-import React from "react";
+import type React from "react";
 import useSWR from "swr";
 import apiClient, { fetchWrapper } from "@/lib/api-client";
 
-const ServerOverview = () => {
+const ServerOverview: React.FC<{
+  type: "vm" | "page";
+  pageId?: number;
+}> = ({ type, pageId }) => {
   const t = useTranslations("Public.Overview");
   const tVM = useTranslations("Public.VM");
 
   const { data, error, isLoading } = useSWR(
-    "/api/vm/status",
-    fetchWrapper(apiClient.vm.status.$get),
+    type === "vm"
+      ? ["/api/vm/status"]
+      : ["/api/page/status", { param: { id: pageId } }],
+    fetchWrapper(
+      type === "vm"
+        ? apiClient.vm.status.$get
+        : apiClient.page[":id"].status.$get,
+    ),
   );
+
   const status = "online";
   const filter = true;
   // const { data, error, isLoading } = useServerData();

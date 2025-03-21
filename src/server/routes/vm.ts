@@ -6,11 +6,12 @@ import { z } from "zod";
 import { broadcastToVms, checkVmSocket } from "../monitor/socket";
 import BizError, { BizCodeEnum } from "../error";
 import { metrics as metricsTable } from "@/db/schema/metrics";
+import { roleGuard } from "../middleware/auth";
 
 const app = appFactory
   .createApp()
   //get all vms
-  .get("/", async (c) => {
+  .get("/", roleGuard(["user", "admin"]), async (c) => {
     const db = c.get("db");
     const user = c.get("user");
 
@@ -21,7 +22,7 @@ const app = appFactory
     return c.json(vms);
   })
   // get all server status
-  .get("/status", async (c) => {
+  .get("/status", roleGuard(["user", "admin"]), async (c) => {
     const db = c.get("db");
     const user = c.get("user");
     const vms = await db.query.vm.findMany({
@@ -43,6 +44,7 @@ const app = appFactory
   //get vm by id
   .get(
     "/:id",
+    roleGuard(["user", "admin"]),
     zValidator(
       "param",
       z.object({

@@ -29,10 +29,20 @@ export default function SettingLayout({
         description: "Unknown",
       };
     }
-    const part = capitalize(pathname.split("/").pop() ?? "");
+    // Get the last two parts of the path
+    const parts = pathname.split("/");
+    const lastPart = capitalize(parts[parts.length - 1] ?? "");
+    
+    const secondLastPart = capitalize(parts[parts.length - 2] ?? "");
+    if (secondLastPart === "Setting") {
+      return {
+        title: t(`${lastPart}.title`),
+        description: t(`${lastPart}.description`),
+      };
+    }
     return {
-      title: t(`Personal.${part}.title`),
-      description: t(`Personal.${part}.description`),
+      title: t(`${secondLastPart}.${lastPart}.title`),
+      description: t(`${secondLastPart}.${lastPart}.description`),
     };
   }, [t, pathname]);
 

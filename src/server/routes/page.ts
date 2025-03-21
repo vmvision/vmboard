@@ -23,6 +23,7 @@ import Cloudflare from "cloudflare";
 import { env } from "@/env";
 import { describeRoute } from "hono-openapi";
 import { checkVmSocket } from "../monitor/socket";
+import { roleGuard } from "../middleware/auth";
 
 const cfClient = new Cloudflare({
   apiEmail: env.CF_EMAIL,
@@ -32,7 +33,7 @@ const cfClient = new Cloudflare({
 const app = appFactory
   .createApp()
   // Get all pages for the current user
-  .get("/", async (c) => {
+  .get("/", roleGuard(["user"]), async (c) => {
     const user = c.get("user");
 
     const rows = await db
@@ -154,6 +155,7 @@ const app = appFactory
   // Get a specific page by handle
   .get(
     "/:id",
+    roleGuard(["user"]),
     zValidator(
       "param",
       z.object({
