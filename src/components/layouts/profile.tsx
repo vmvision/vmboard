@@ -9,17 +9,23 @@ import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
 import { auth } from "@/lib/auth";
 import { headers } from "next/headers";
 import { ProfileLogout } from "./profile.client";
-import Link from "next/link";
-
+import { Link } from "next-view-transitions";
+import { Button } from "../ui/button";
+import { getTranslations } from "next-intl/server";
 export default async function Profile() {
+  const t = await getTranslations("Public.Auth");
+  const tP = await getTranslations("Private.Profile");
+
   const session = await auth.api.getSession({
     headers: await headers(),
   });
   if (!session) {
     return (
-      <a href="/auth" className="text-foreground/60 hover:text-foreground">
-        Log In
-      </a>
+      <Link href="/auth" className="text-foreground/60 hover:text-foreground">
+        <Button className="ml-2" size="sm">
+          {t("login")}
+        </Button>
+      </Link>
     );
   }
   const { user } = session;
@@ -30,18 +36,18 @@ export default async function Profile() {
         <Avatar className="ml-2 size-8 cursor-pointer">
           {user.image && <AvatarImage src={user?.image} alt={user?.name} />}
           <AvatarFallback>{user?.email.slice(0, 2)}</AvatarFallback>
-          <span className="sr-only">菜单</span>
+          <span className="sr-only">{tP("menu")}</span>
         </Avatar>
       </DropdownMenuTrigger>
       <DropdownMenuContent>
         <DropdownMenuItem asChild>
           <Link href="/dash/setting/account" className="block w-full">
-            我的账户
+            {tP("account")}
           </Link>
         </DropdownMenuItem>
         <DropdownMenuItem asChild>
           <Link href="/dash/setting" className="block w-full">
-            设置
+            {tP("setting")}
           </Link>
         </DropdownMenuItem>
         <DropdownMenuSeparator />

@@ -1,6 +1,10 @@
 {
   "Public": {
     "Auth": {
+      "login": "登录",
+      "logout": "注销",
+      "logoutSuccess": "注销成功",
+      "logoutFailed": "注销失败",
       "passkey": "使用物理密钥登录",
       "oauth": "使用 {provider} 登录"
     },
@@ -61,10 +65,23 @@
     "Onboard": {
       "title": "欢迎使用 VMBoard",
       "description": "请按照以下步骤完成您的设置",
-      "step1": {
-        "title": "添加第一台虚拟机",
+      "firstVM": {
+        "title": "添加虚拟机",
         "description": "请输入您的邮箱地址"
+      },
+      "customHandle": {
+        "title": "自定义页面",
+        "description": "请输入您的页面标识符"
+      },
+      "customDomain": {
+        "title": "自定义域名",
+        "description": "请输入您的域名"
       }
+    },
+    "Profile": {
+      "menu": "菜单",
+      "account": "我的账户",
+      "setting": "设置"
     },
     "Page": {
       "Management": {
@@ -121,8 +138,18 @@
       "Site": {
         "title": "站点设置",
         "description": "管理您的站点设置",
-        "settings": "设置",
-        "account": "账户"
+        "General": {
+          "title": "通用设置",
+          "description": "管理您的站点设置"
+        },
+        "Api": {
+          "title": "API 设置",
+          "description": "管理您的 API 设置"
+        },
+        "Notification": {
+          "title": "通知设置",
+          "description": "管理您的通知设置"
+        }
       }
     }
   }
