@@ -17,11 +17,11 @@ export async function middleware(request: NextRequest) {
     }
   }
 
-  if (pathname.startsWith("/vm")) {
-    return NextResponse.rewrite(
-      new URL("/vm", `http://${env.HOSTNAME}:${env.PORT}`),
-    );
-  }
+  // if (pathname.startsWith("/vm")) {
+  //   return NextResponse.rewrite(
+  //     new URL("/vm", `http://${env.HOSTNAME}:${env.PORT}`),
+  //   );
+  // }
 
   if (pathname.startsWith("/dash")) {
     const sessionCookie = getSessionCookie(request);
@@ -35,5 +35,5 @@ export async function middleware(request: NextRequest) {
 }
 
 export const config = {
-  matcher: ["/", "/vm/:path*", "/dash", "/dash/:path*"],
+  matcher: ["/", "/dash", "/dash/:path*"],
 };
