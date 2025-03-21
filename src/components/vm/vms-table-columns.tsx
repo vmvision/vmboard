@@ -3,7 +3,13 @@
 import { type VM, vm as vmTable, type VMWithMerchant } from "@/db/schema/vm";
 import type { DataTableRowAction } from "@/types";
 import type { ColumnDef } from "@tanstack/react-table";
-import { Ellipsis, PenLineIcon, SquareSquare, TerminalIcon, TrashIcon } from "lucide-react";
+import {
+  Ellipsis,
+  PenLineIcon,
+  SquareSquare,
+  TerminalIcon,
+  TrashIcon,
+} from "lucide-react";
 import * as React from "react";
 import { toast } from "sonner";
 
@@ -35,7 +41,7 @@ import {
 } from "../../app/_lib/utils";
 import type { Merchant } from "@/db/schema";
 import Link from "next/link";
-
+import { useTranslations } from "next-intl";
 interface GetColumnsProps {
   setRowAction: React.Dispatch<
     React.SetStateAction<DataTableRowAction<VMWithMerchant> | null>
@@ -45,6 +51,8 @@ interface GetColumnsProps {
 export function getColumns({
   setRowAction,
 }: GetColumnsProps): ColumnDef<VMWithMerchant>[] {
+  const t = useTranslations();
+
   return [
     {
       id: "select",
@@ -83,7 +91,7 @@ export function getColumns({
     {
       accessorKey: "merchant",
       header: ({ column }) => (
-        <DataTableColumnHeader column={column} title="商户" />
+        <DataTableColumnHeader column={column} title={t("Private.Merchant.name")} />
       ),
       cell: ({ row }) => {
         const merchant: Merchant = row.getValue("merchant");
@@ -100,7 +108,7 @@ export function getColumns({
     {
       accessorKey: "nickname",
       header: ({ column }) => (
-        <DataTableColumnHeader column={column} title="昵称" />
+        <DataTableColumnHeader column={column} title={t("Private.Merchant.nickname")} />
       ),
       cell: ({ row }) => {
         // const label = tasks.label.enumValues.find(
@@ -120,7 +128,7 @@ export function getColumns({
     {
       id: "location",
       header: ({ column }) => (
-        <DataTableColumnHeader column={column} title="地区" />
+        <DataTableColumnHeader column={column} title={t("Public.VM.region")} />
       ),
       cell: ({ row }) => {
         const metadata = row.original.metadata;
@@ -142,7 +150,7 @@ export function getColumns({
     {
       accessorKey: "status",
       header: ({ column }) => (
-        <DataTableColumnHeader column={column} title="状态" />
+        <DataTableColumnHeader column={column} title={t("Public.VM.status")} />
       ),
       cell: ({ row }) => {
         const status = vmTable.status.enumValues.find(
@@ -175,7 +183,7 @@ export function getColumns({
     {
       accessorKey: "ipAddress",
       header: ({ column }) => (
-        <DataTableColumnHeader column={column} title="IP地址" />
+        <DataTableColumnHeader column={column} title={t("Public.VM.ipAddress")} />
       ),
       cell: ({ row }) => {
         console.log(row.original);
@@ -185,7 +193,7 @@ export function getColumns({
     {
       id: "trafficUsed",
       header: ({ column }) => (
-        <DataTableColumnHeader column={column} title="流量使用" />
+        <DataTableColumnHeader column={column} title={t("Public.VM.trafficUsed")} />
       ),
       cell: ({ row }) => {
         const metadata = row.original.metadata;
@@ -196,7 +204,7 @@ export function getColumns({
     {
       id: "trafficLimit",
       header: ({ column }) => (
-        <DataTableColumnHeader column={column} title="流量限制" />
+        <DataTableColumnHeader column={column} title={t("Public.VM.trafficLimit")} />
       ),
       cell: ({ row }) => {
         const metadata = row.original.metadata;
@@ -207,7 +215,7 @@ export function getColumns({
     {
       accessorKey: "createdAt",
       header: ({ column }) => (
-        <DataTableColumnHeader column={column} title="创建时间" />
+        <DataTableColumnHeader column={column} title={t("Public.VM.createdAt")} />
       ),
       cell: ({ cell }) => formatDate(cell.getValue() as Date),
     },
@@ -220,7 +228,7 @@ export function getColumns({
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
               <Button
-                aria-label="Open menu"
+                aria-label={t("Private.Action.menu")}
                 variant="ghost"
                 className="flex size-8 p-0 data-[state=open]:bg-muted"
               >
@@ -228,8 +236,11 @@ export function getColumns({
               </Button>
             </DropdownMenuTrigger>
             <DropdownMenuContent align="end" className="w-40">
-            <DropdownMenuItem>
-                <Link href={`vm/${row.original.id}`} className="flex items-center">
+              <DropdownMenuItem>
+                <Link
+                  href={`/vm/${row.original.id}`}
+                  className="flex items-center"
+                >
                   <SquareSquare className="size-4" aria-hidden="true" />
                   <span className="ml-2">图表</span>
                 </Link>
@@ -240,7 +251,7 @@ export function getColumns({
               >
                 <DropdownMenuItem>
                   <TerminalIcon className="size-4" aria-hidden="true" />
-                  终端
+                  {t("Private.VM.terminal")}
                   <DropdownMenuShortcut>⌘T</DropdownMenuShortcut>
                 </DropdownMenuItem>
               </Link>
@@ -248,7 +259,7 @@ export function getColumns({
                 onSelect={() => setRowAction({ row, type: "update" })}
               >
                 <PenLineIcon className="size-4" aria-hidden="true" />
-                编辑
+                {t("Private.Action.edit")}
                 <DropdownMenuShortcut>⌘E</DropdownMenuShortcut>
               </DropdownMenuItem>
               {/*<DropdownMenuSub>
@@ -290,7 +301,7 @@ export function getColumns({
                 onSelect={() => setRowAction({ row, type: "delete" })}
               >
                 <TrashIcon className="size-4" aria-hidden="true" />
-                删除
+                {t("Private.Action.delete")}
                 <DropdownMenuShortcut>⌘⌫</DropdownMenuShortcut>
               </DropdownMenuItem>
             </DropdownMenuContent>

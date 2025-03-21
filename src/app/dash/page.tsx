@@ -34,7 +34,7 @@ export default async function IndexPage(props: IndexPageProps) {
 
   return (
     <Shell className="gap-2">
-      <ServerOverview />
+      <ServerOverview type="vm" />
       {/* <FeatureFlagsProvider> */}
       {/* <React.Suspense fallback={<Skeleton className="h-7 w-52" />}>
           <DateRangePicker
