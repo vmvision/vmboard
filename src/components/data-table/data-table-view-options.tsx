@@ -38,8 +38,8 @@ export function DataTableViewOptions<TData>({
           variant="outline"
           role="combobox"
           size="sm"
-          className="ml-auto hidden h-8 gap-2 focus:outline-none focus:ring-1 focus:ring-ring focus-visible:ring-0 lg:flex"
-          style={{ transform: 'translateX(0.2rem)' }}
+          className="ml-auto hidden h-8 gap-2 focus:outline-none focus:ring-1 focus:ring-ring focus-visible:ring-0 lg:flex "
+          style={{ transform: 'translateX(0.25rem)' }}
         >
           <Settings2 className="size-4" />
           视图
@@ -48,7 +48,7 @@ export function DataTableViewOptions<TData>({
       </PopoverTrigger>
       <PopoverContent
         align="end"
-        className="w-44 p-0"
+        className="w-46 p-0"
         onCloseAutoFocus={() => triggerRef.current?.focus()}
       >
         <Command>

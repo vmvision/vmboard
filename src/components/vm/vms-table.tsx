@@ -64,6 +64,7 @@ export function VMsTable({ promises }: TasksTableProps) {
       id: "nickname",
       label: "昵称",
       placeholder: "筛选昵称",
+
     },
     {
       id: "status",
@@ -139,6 +140,7 @@ export function VMsTable({ promises }: TasksTableProps) {
             table={table}
             filterFields={advancedFilterFields}
             shallow={false}
+            
           >
             <VMsTableToolbarActions table={table} />
           </DataTableAdvancedToolbar>
