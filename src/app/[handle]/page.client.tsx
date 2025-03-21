@@ -8,6 +8,10 @@ import {
 import type { Page } from "@/db/schema/page";
 import { ServerList } from "@/components/monitor/server-list-card";
 import type { VM } from "@/db/schema/vm";
+import type { Client } from "@/server/hc";
+import type { InferResponseType } from "hono";
+import ServerOverview from "@/components/overview-cards";
+import { Separator } from "@/components/ui/separator";
 
 export type MonitorVM = Pick<VM, "id" | "nickname"> & {
   os?: string;
@@ -17,9 +21,7 @@ export type MonitorVM = Pick<VM, "id" | "nickname"> & {
 };
 
 type MonitorPageProps = {
-  page: Pick<Page, "id" | "title" | "description"> & {
-    vms: MonitorVM[];
-  };
+  page: InferResponseType<Client["page"]["bind"]["$get"]>;
 };
 
 const MonitorPage = ({ page }: MonitorPageProps) => {
@@ -37,6 +39,8 @@ const MonitorPage = ({ page }: MonitorPageProps) => {
 
   return (
     <div className="container mx-auto mt-16">
+      <ServerOverview type="page" pageId={page.id} />
+      <Separator className="mx-4 my-8" />
       <ServerList servers={page.vms} />
     </div>
   );

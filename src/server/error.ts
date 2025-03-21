@@ -44,6 +44,7 @@ export const BizCodeEnum = {
   // Page
   PageNotFound: "PAGE_NOT_FOUND",
   HandleAlreadyExists: "HANDLE_ALREADY_EXISTS",
+  HostnameNotFound: "HOSTNAME_NOT_FOUND",
   HostnameAlreadyExists: "HOSTNAME_ALREADY_EXISTS",
 } as const;
 
@@ -59,5 +60,6 @@ export const BizErrorEnum: Record<
   // Page
   [BizCodeEnum.PageNotFound]: [404, "Page not found"],
   [BizCodeEnum.HandleAlreadyExists]: [400, "Handle already exists"],
+  [BizCodeEnum.HostnameNotFound]: [404, "Hostname not found"],
   [BizCodeEnum.HostnameAlreadyExists]: [400, "Hostname already exists"],
 } as const;

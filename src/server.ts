@@ -1,4 +1,6 @@
 import "dotenv/config";
+import "zod-openapi/extend";
+
 import { env } from "./env.js";
 import http from "node:http";
 
@@ -25,11 +27,11 @@ void app.prepare().then(async () => {
 
     server.on("listening", () => {
       console.log(
-        `[VMBoard] v${packageJson.version} running on http://localhost:${env.PORT}`,
+        `[VMBoard] v${packageJson.version} running on http://${env.HOSTNAME}:${env.PORT}`,
       );
     });
 
-    server.listen(env.PORT);
+    server.listen(env.PORT, env.HOSTNAME);
 
     // if (env.ENABLE_ALERT_QUEUE) {
     //   if (!env.REDIS_URL) {

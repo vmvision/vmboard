@@ -2,7 +2,7 @@ import "server-only";
 
 import db from "@/db";
 import { vm as vmTable, type VM } from "@/db/schema/vm";
-import { page as pageTable } from "@/db/schema/page";
+import { pageBind, page as pageTable } from "@/db/schema/page";
 import { merchant as merchantTable } from "@/db/schema/merchant";
 import {
   and,
@@ -190,53 +190,61 @@ export async function getSSHKey() {
   )();
 }
 
-export async function getPageData(handle: string) {
-  return await unstable_cache(
-    async () => {
-      const page = await db.query.page.findFirst({
-        where: eq(pageTable.handle, handle),
-        columns: {
-          id: true,
-          title: true,
-          description: true,
-          // createdAt: true,
-          // updatedAt: true,
-        },
-        with: {
-          pageVMs: {
-            with: {
-              vm: {
-                columns: {
-                  id: true,
-                  nickname: true,
-                  monitorInfo: true,
-                },
-              },
-            },
-          },
-        },
-      });
-      if (!page) {
-        return null;
-      }
-      return {
-        id: page.id,
-        title: page.title,
-        description: page.description,
-        vms: page.pageVMs.map((pageVM) => ({
-          id: pageVM.vm.id,
-          nickname: pageVM.nickname || pageVM.vm.nickname,
-          os: pageVM.vm.monitorInfo?.os,
-          osVersion: pageVM.vm.monitorInfo?.osVersion,
-          platform: pageVM.vm.monitorInfo?.platform,
-          platformVersion: pageVM.vm.monitorInfo?.platformVersion,
-        })),
-      };
-    },
-    [handle],
-    {
-      revalidate: 3600,
-      tags: ["page"],
-    },
-  )();
-}
+// export async function getPageData(handle: string, hostname: string | null) {
+//   return await unstable_cache(
+//     async () => {
+//       const page = await db.query.page.findFirst({
+//         where: and(
+//           eq(pageBind.handle, handle),
+//           // eq(pageBind.hostname, hostname),
+//         ),
+//         columns: {
+//           id: true,
+//           title: true,
+//           description: true,
+//           // createdAt: true,
+//           // updatedAt: true,
+//         },
+//         with: {
+//           pageBind: {
+//             with: {
+//               hostname: true,
+//             },
+//           },
+//           pageVMs: {
+//             with: {
+//               vm: {
+//                 columns: {
+//                   id: true,
+//                   nickname: true,
+//                   monitorInfo: true,
+//                 },
+//               },
+//             },
+//           },
+//         },
+//       });
+//       if (!page) {
+//         return null;
+//       }
+//       return {
+//         id: page.id,
+//         title: page.title,
+//         description: page.description,
+//         vms: page.pageVMs.map((pageVM) => ({
+//           id: pageVM.vm.id,
+//           nickname: pageVM.nickname || pageVM.vm.nickname,
+//           os: pageVM.vm.monitorInfo?.os,
+//           osVersion: pageVM.vm.monitorInfo?.osVersion,
+//           platform: pageVM.vm.monitorInfo?.platform,
+//           platformVersion: pageVM.vm.monitorInfo?.platformVersion,
+//         })),
+//       };
+//     },
+//     [handle],
+//     {
+//       revalidate: 3600,
+//       tags: ["page"],
+//     },
+//   )();
+// }
