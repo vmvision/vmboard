@@ -3,6 +3,8 @@ import { notFound } from "next/navigation";
 import { headers } from "next/headers";
 import rscClient from "@/lib/rsc-client";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { env } from "@/env";
+import { getHostname } from "./data";
 
 type Params = Promise<{ handle: string }>;
 
@@ -20,15 +22,13 @@ const NotFound = () => {
 };
 
 export default async function Page({ params }: { params: Params }) {
-  const hostname = new URL(
-    `http://${(await headers()).get("host") ?? "localhost"}`,
-  ).hostname;
+  const hostname = (await getHostname()) ?? undefined;
   const handle = (await params).handle;
 
   const res = await rscClient.page.bind.$get({
     query: {
       handle,
-      hostname: hostname !== "localhost" ? hostname : undefined,
+      hostname: hostname,
     },
   });
 
