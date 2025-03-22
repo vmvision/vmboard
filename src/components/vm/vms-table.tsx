@@ -112,7 +112,7 @@ export function VMsTable({ promises }: TasksTableProps) {
   ];
 
   const enableAdvancedTable = featureFlags.includes("advancedTable");
-  
+
   const { table } = useDataTable({
     data,
     columns,

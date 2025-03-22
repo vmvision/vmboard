@@ -39,7 +39,7 @@ export function DataTableViewOptions<TData>({
           role="combobox"
           size="sm"
           className="ml-auto hidden h-8 gap-2 focus:outline-none focus:ring-1 focus:ring-ring focus-visible:ring-0 lg:flex"
-          style={{ transform: 'translateX(0.2rem)' }}
+          style={{ transform: "translateX(0.25rem)" }}
         >
           <Settings2 className="size-4" />
           视图

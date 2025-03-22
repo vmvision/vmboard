@@ -62,6 +62,7 @@ export function DataTableToolbar<TData>({
         "flex w-full items-center justify-between gap-2 overflow-auto p-1",
         className,
       )}
+      style={{ transform: "translateX(-0.2rem)" }}
       {...props}
     >
       <div className="flex flex-1 items-center gap-2">

@@ -213,7 +213,7 @@ export function DataTableFilterList<TData>({
                 size="sm"
                 aria-label={`${filterField.label} filter value`}
                 aria-controls={`${inputId}-listbox`}
-                className="h-8 w-full justify-start gap-2 rounded px-1.5 text-left text-muted-foreground hover:text-muted-foreground "
+                className="h-8 w-full justify-start gap-2 rounded px-1.5 text-left text-muted-foreground hover:text-muted-foreground"
               >
                 {filter.value && typeof filter.value === "string" ? (
                   <Badge
@@ -263,7 +263,7 @@ export function DataTableFilterList<TData>({
                       )}
                       <span>{option.label}</span>
                       {option.count && (
-                        <span className="ml-auto flex size-4 items-center justify-center font-mono text-xs ">
+                        <span className="ml-auto flex size-4 items-center justify-center font-mono text-xs">
                           {option.count}
                         </span>
                       )}
@@ -611,7 +611,7 @@ export function DataTableFilterList<TData>({
                             role="combobox"
                             aria-label="Select filter field"
                             aria-controls={fieldListboxId}
-                            className="h-8 w-32 justify-between gap-2 rounded focus:outline-none focus:ring-1 focus:ring-ring focus-visible:ring-0 "
+                            className="h-8 w-32 justify-between gap-2 rounded focus:outline-none focus:ring-1 focus:ring-ring focus-visible:ring-0"
                           >
                             <span className="truncate">
                               {filterFields.find(

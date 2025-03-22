@@ -156,7 +156,7 @@ export function DataTableSortList<TData>({
           <Button
             variant="outline"
             size="sm"
-            className="gap-2 "
+            className="gap-2"
             aria-label="Open sorting"
             aria-controls={`${id}-sort-dialog`}
           >
