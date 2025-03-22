@@ -13,5 +13,15 @@
       "url": "https://json.schemastore.org/package",
       "schema": true
     }
-  ]
+  ],
+  "i18n-ally":{
+    "localesPaths":[
+    "messages",
+    "src/i18n"
+    ],
+    "keystyle": "nested",
+    // "annotations": false,
+    "sourceLanguage": "zh",
+    "displayLanguage": "zh"
+  }
 }
