@@ -15,7 +15,7 @@ const handle = app.getRequestHandler();
 void app.prepare().then(async () => {
   try {
     if (env.NODE_ENV === "production") {
-      import("./db/migrate").then(({ runMigrate }) => runMigrate(false));
+      import("./db/migrate").then(({ runMigrate }) => runMigrate());
     }
 
     const server = http.createServer((req, res) => {
