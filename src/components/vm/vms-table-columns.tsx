@@ -108,7 +108,7 @@ export function getColumns({
     {
       accessorKey: "nickname",
       header: ({ column }) => (
-        <DataTableColumnHeader column={column} title={t("Private.Merchant.nickname")} />
+        <DataTableColumnHeader column={column} title={t("Private.VM.nickname")} />
       ),
       cell: ({ row }) => {
         // const label = tasks.label.enumValues.find(
@@ -222,7 +222,7 @@ export function getColumns({
     {
       id: "actions",
       cell: function Cell({ row }) {
-        const [isUpdatePending, startUpdateTransition] = React.useTransition();
+        // const [isUpdatePending, startUpdateTransition] = React.useTransition();
 
         return (
           <DropdownMenu>

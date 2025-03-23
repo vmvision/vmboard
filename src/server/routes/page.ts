@@ -9,26 +9,18 @@ import {
   updatePageSchema,
   updatePageVMSchema,
 } from "@/db/schema/page";
-import { vm as vmTable } from "@/db/schema/vm";
 import {
   pageVM as pageVMTable,
   hostname as hostnameTable,
 } from "@/db/schema/page";
 import { pageBind as pageBindTable } from "@/db/schema/page";
-import { and, count, eq, inArray } from "drizzle-orm";
+import { and, count, eq } from "drizzle-orm";
 import { zValidator } from "@hono/zod-validator";
 import appFactory from "../factory";
 import BizError, { BizCodeEnum } from "../error";
-import Cloudflare from "cloudflare";
-import { env } from "@/env";
 import { describeRoute } from "hono-openapi";
 import { checkVmSocket } from "../monitor/socket";
 import { roleGuard } from "../middleware/auth";
-
-const cfClient = new Cloudflare({
-  apiEmail: env.CF_EMAIL,
-  apiKey: env.CF_API_KEY,
-});
 
 const app = appFactory
   .createApp()
@@ -97,7 +89,7 @@ const app = appFactory
       z
         .object({
           handle: z.string(),
-          hostname: z.string(),
+          hostname: z.string().nullable(),
         })
         .partial(),
     ),

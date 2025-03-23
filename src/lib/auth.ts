@@ -7,8 +7,9 @@ import { env } from "@/env";
 import { expo } from "@better-auth/expo";
 
 const trustedOrigins = [];
-trustedOrigins.push(env.BASE_URL);
-
+if (env.BASE_URL) {
+  trustedOrigins.push(env.BASE_URL);
+}
 export const auth = betterAuth({
   trustedOrigins,
   database: drizzleAdapter(db, {
@@ -42,6 +43,11 @@ export const auth = betterAuth({
       enabled: !!(env.GITHUB_CLIENT_ID && env.GITHUB_CLIENT_SECRET),
       clientId: env.GITHUB_CLIENT_ID as string,
       clientSecret: env.GITHUB_CLIENT_SECRET as string,
+    },
+    google: {
+      enabled: !!(env.GOOGLE_CLIENT_ID && env.GOOGLE_CLIENT_SECRET),
+      clientId: env.GOOGLE_CLIENT_ID as string,
+      clientSecret: env.GOOGLE_CLIENT_SECRET as string,
     },
   },
 });
