@@ -278,17 +278,6 @@ const app = appFactory
         throw new BizError(BizCodeEnum.PageNotFound);
       }
 
-      // Check if hostname already exists (if provided and changed)
-      if (body.hostname && body.hostname !== existingPage.hostname) {
-        const existingHostname = await db.query.page.findFirst({
-          where: eq(pageTable.hostname, body.hostname),
-        });
-
-        if (existingHostname) {
-          throw new BizError(BizCodeEnum.HostnameAlreadyExists);
-        }
-      }
-
       const updatedPage = await db
         .update(pageTable)
         .set({
@@ -297,8 +286,6 @@ const app = appFactory
             body.description !== undefined
               ? body.description
               : existingPage.description,
-          hostname:
-            body.hostname !== undefined ? body.hostname : existingPage.hostname,
           updatedAt: new Date(),
         })
         .where(eq(pageTable.id, input.id))

@@ -97,7 +97,6 @@
     "react-markdown": "^10.1.0",
     "recharts": "^2.15.1",
     "server-only": "^0.0.1",
-    "socket.io": "^4.8.1",
     "sonner": "^2.0.0",
     "ssh2": "^1.16.0",
     "swr": "^2.3.2",

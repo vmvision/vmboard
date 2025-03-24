@@ -1,6 +1,6 @@
 import type http from "node:http";
 import { vm as vmTable } from "@/db/schema/vm";
-import { and, desc, eq, inArray, or } from "drizzle-orm";
+import { desc, eq, inArray } from "drizzle-orm";
 import { WebSocket, WebSocketServer } from "ws";
 import db from "@/db";
 import { metrics as metricsTable } from "@/db/schema/metrics";
@@ -190,7 +190,6 @@ export const setupMonitorWebSocketServer = (
             }
             case "vm_info": {
               const data = message.data;
-              console.log(data);
               await db
                 .update(vmTable)
                 .set({
@@ -224,21 +223,19 @@ export const setupMonitorWebSocketServer = (
             const vmIds =
               "vmIds" in message.data
                 ? message.data.vmIds
-                : "pageHandle" in message.data
+                : "pageId" in message.data
                   ? ((
                       await db.query.page.findFirst({
-                        where:
-                          message.data.pageHandle === "default"
-                            ? or(
-                                and(
-                                  eq(pageTable.handle, "default"),
-                                  eq(pageTable.hostname, hostname),
-                                ),
-                                eq(pageTable.handle, "default"),
-                              )
-                            : eq(pageTable.handle, message.data.pageHandle),
+                        where: eq(pageTable.id, message.data.pageId),
+                        with: {
+                          pageVMs: {
+                            with: {
+                              vm: true,
+                            },
+                          },
+                        },
                       })
-                    )?.vmIds ?? [])
+                    )?.pageVMs?.map((pageVM) => pageVM.vm.id) ?? [])
                   : [];
             for (const vmId of vmIds) {
               addVMListener(vmId, userWs);

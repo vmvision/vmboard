@@ -4,10 +4,7 @@ export interface StartMonitorEvent {
   type: "startMonitor";
   data:
     | {
-        hostname: string;
-      }
-    | {
-        pageHandle: string;
+        pageId: number;
       }
     | {
         vmIds: number[];
