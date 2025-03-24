@@ -50,7 +50,6 @@ const ServerOverview = () => {
         className={cn(
           "group cursor-pointer transition-all hover:border-blue-500",
         )}
-        style={{ transform: "translateX(0.2rem)" }}
       >
         <span className="relative flex h-2 w-2">
           <span className="relative inline-flex h-2 w-2 rounded-full bg-blue-500" />
@@ -94,7 +93,6 @@ const ServerOverview = () => {
             "border-transparent ring-2 ring-purple-500": filter === true,
           },
         )}
-        style={{ transform: "translateX(-0.35rem)" }}
       >
         <section className="flex flex-row flex-wrap items-start gap-1 pr-0">
           {/* <p className="text-nowrap font-medium text-[12px] text-blue-800 dark:text-blue-400">

@@ -38,11 +38,11 @@ export function DataTable<TData>({
 }: DataTableProps<TData>) {
   return (
     <div
-      className={cn("w-full space-y-2", className)} //距离上一栏的高度距离
+      className={cn("w-full space-y-2.5 overflow-x-auto", className)} //距离上一栏的高度距离
       {...props}
     >
       {children}
-      <div className="mx-1 overflow-hidden rounded-md border">
+      <div className="overflow-hidden rounded-md border">
         <Table>
           <TableHeader>
             {table.getHeaderGroups().map((headerGroup) => (
