@@ -23,6 +23,12 @@ export default function SettingLayout({
   const t = useTranslations("Private.Setting");
   const pathname = usePathname();
   const { title, description } = useMemo(() => {
+    if (pathname === "/dash/setting") {
+      return {
+        title: t("title"),
+        description: t("description"),
+      };
+    }
     if (!pathname.startsWith("/dash/setting")) {
       return {
         title: "Unknown",

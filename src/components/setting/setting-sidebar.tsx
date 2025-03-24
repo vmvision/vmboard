@@ -1,6 +1,5 @@
 "use client";
 
-import { Calendar, Home, Inbox, Search, Settings } from "lucide-react";
 
 import {
   Sidebar,
@@ -17,49 +16,8 @@ import { useTranslations } from "next-intl";
 import { usePathname } from "next/navigation";
 import { capitalize } from "@/lib/utils";
 
-// Menu items.
-const userItems = [
-  {
-    id: "account",
-    icon: Home,
-  },
-  // {
-  //   title: "Inbox",
-  //   url: "#",
-  //   icon: Inbox,
-  // },
-  // {
-  //   title: "Calendar",
-  //   url: "#",
-  //   icon: Calendar,
-  // },
-  // {
-  //   title: "Search",
-  //   url: "#",
-  //   icon: Search,
-  // },
-  // {
-  //   title: "Settings",
-  //   url: "#",
-  //   icon: Settings,
-  // },
-];
+import { siteItems, userItems } from "./items";
 
-// Menu items.
-const siteItems = [
-  {
-    id: "general",
-    icon: Home,
-  },
-  {
-    id: "api",
-    icon: Home,
-  },
-  {
-    id: "notification",
-    icon: Home,
-  },
-];
 
 export function SettingSidebar() {
   const t = useTranslations("Private.Setting");
