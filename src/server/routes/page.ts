@@ -13,13 +13,14 @@ import {
   pageVM as pageVMTable,
   hostname as hostnameTable,
 } from "@/db/schema/page";
+import { metrics as metricsTable } from "@/db/schema/metrics";
 import { pageBind as pageBindTable } from "@/db/schema/page";
-import { and, count, eq } from "drizzle-orm";
+import { and, count, eq, inArray, sql } from "drizzle-orm";
 import { zValidator } from "@hono/zod-validator";
 import appFactory from "../factory";
 import BizError, { BizCodeEnum } from "../error";
 import { describeRoute } from "hono-openapi";
-import { checkVmSocket } from "../monitor/socket";
+import { vmManager } from "../wss/manager/vm-manager";
 import { roleGuard } from "../middleware/auth";
 
 const app = appFactory
@@ -204,13 +205,85 @@ const app = appFactory
 
       const status = page.pageVMs.map((vm) => ({
         id: vm.vmId,
-        status: checkVmSocket(vm.vmId),
+        status: vmManager.checkSocket(vm.vmId),
       }));
       return c.json({
         total: page.pageVMs.length,
         online: status.filter((s) => s.status).length,
         offline: status.filter((s) => !s.status).length,
       });
+    },
+  )
+  .get(
+    "/:id/status/network",
+    zValidator(
+      "param",
+      z.object({
+        id: z.coerce.number(),
+      }),
+    ),
+    async (c) => {
+      const input = c.req.valid("param");
+
+      const page = await db.query.page.findFirst({
+        where: eq(pageTable.id, input.id),
+        with: {
+          pageVMs: {
+            columns: {
+              vmId: true,
+            },
+          },
+        },
+      });
+
+      if (!page) {
+        throw new BizError(BizCodeEnum.PageNotFound);
+      }
+
+      const status = page.pageVMs.map((vm) => vm.vmId);
+
+      const rankedMetrics = db
+        .select({
+          vmId: metricsTable.vmId,
+          time: metricsTable.time,
+          networkIn: metricsTable.networkIn,
+          networkOut: metricsTable.networkOut,
+          rn: sql`ROW_NUMBER() OVER (PARTITION BY ${metricsTable.vmId} ORDER BY ${metricsTable.time} DESC)`.as(
+            "rn",
+          ),
+        })
+        .from(metricsTable);
+      const result = await db
+        .select({
+          vmId: sql`r1.vm_id`,
+          currentIn: sql`r1.network_in`,
+          currentOut: sql`r1.network_out`,
+          previousIn: sql`r2.network_in`,
+          previousOut: sql`r2.network_out`,
+          timeDiffSeconds: sql`EXTRACT(EPOCH FROM (r1.time - r2.time))`,
+          networkInRate: sql`(r1.network_in - r2.network_in) / 
+        NULLIF(EXTRACT(EPOCH FROM (r1.time - r2.time)), 0)`,
+          networkOutRate: sql`(r1.network_out - r2.network_out) / 
+        NULLIF(EXTRACT(EPOCH FROM (r1.time - r2.time)), 0)`,
+        })
+        .from(rankedMetrics.as("r1"))
+        .leftJoin(
+          rankedMetrics.as("r2"),
+          and(eq(sql`r1.vm_id`, sql`r2.vm_id`), eq(sql`r2.rn`, 2)),
+        )
+        .where(eq(sql`r1.rn`, 1));
+      // const metrics = await db.query.metricsTable.findMany({
+      //   where: and(
+      //     inArray(metricsTable.vmId, status),
+      //     eq(metricsTable.createdAt, new Date()),
+      //   ),
+      //   orderBy: desc(metricsTable.createdAt),
+      // });
+      // return c.json({
+      //   total: page.pageVMs.length,
+      //   online: status.filter((s) => s.status).length,
+      //   offline: status.filter((s) => !s.status).length,
+      // });
     },
   )
   // Create a new page

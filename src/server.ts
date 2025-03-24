@@ -9,6 +9,7 @@ import packageJson from "../package.json";
 
 const app = next({ dev: env.NODE_ENV !== "production" });
 const handle = app.getRequestHandler();
+
 /**
  * Prepare the app and start the server
  */
@@ -22,8 +23,16 @@ void app.prepare().then(async () => {
       handle(req, res);
     });
 
-    (await import("./server/monitor")).setupMonitorWebSocketServer(server);
-    (await import("./server/terminal")).setupTerminalWebSocketServer(server);
+    (await import("./server/wss/master.js")).setupMasterWebSocketServer(server);
+    console.log("[WSS] Master Setup Complete");
+    (await import("./server/wss/monitor.js")).setupMonitorWebSocketServer(
+      server,
+    );
+    console.log("[WSS] Monitor Setup Complete");
+    (await import("./server/wss/terminal.js")).setupTerminalWebSocketServer(
+      server,
+    );
+    console.log("[WSS] Terminal Setup Complete");
 
     server.on("listening", () => {
       console.log(

@@ -16,6 +16,7 @@ export const env = createEnv({
     INTERNAL_URL: z.string().url().default("http://localhost:3000"),
     // Database
     DATABASE_URL: z.string().url(),
+    
     // Auth
     ENABLE_EMAIL_VERIFICATION: z.boolean().default(false),
     RESEND_API_KEY: z.string().optional(),
@@ -35,12 +36,7 @@ export const env = createEnv({
     // Auth
     NEXT_PUBLIC_ALLOW_OAUTH: z.string().transform((val) => val?.split(",")).default(""),
     NEXT_PUBLIC_CF_TURNSTILE_SITE_KEY: z.string().optional(),
-    // Monitor styles
-    NEXT_PUBLIC_SHOW_IP_INFO: z.boolean().default(true),
-    NEXT_PUBLIC_SHOW_FLAG: z.boolean().default(true),
-    NEXT_PUBLIC_SHOW_NETWORK_TRANSFER: z.boolean().default(true),
-    NEXT_PUBLIC_FORCE_USE_SVG_FLAG: z.boolean().default(false),
-    NEXT_PUBLIC_FIXED_TOP_SERVER_NAME: z.boolean().default(true),
+
   },
 
   /**
@@ -51,8 +47,10 @@ export const env = createEnv({
     NODE_ENV: process.env.NODE_ENV,
     HOSTNAME: process.env.HOSTNAME,
     PORT: process.env.PORT,
+    BASE_URL: process.env.BASE_URL,
     INTERNAL_URL: process.env.INTERNAL_URL,
     DATABASE_URL: process.env.DATABASE_URL,
+
     ENABLE_EMAIL_VERIFICATION: process.env.ENABLE_EMAIL_VERIFICATION,
     RESEND_API_KEY: process.env.RESEND_API_KEY,
     NEXT_PUBLIC_ALLOW_OAUTH: process.env.NEXT_PUBLIC_ALLOW_OAUTH,
@@ -63,13 +61,6 @@ export const env = createEnv({
     NEXT_PUBLIC_CF_TURNSTILE_SITE_KEY:
       process.env.NEXT_PUBLIC_CF_TURNSTILE_SITE_KEY,
     CF_TURNSTILE_SECRET_KEY: process.env.CF_TURNSTILE_SECRET_KEY,
-
-    NEXT_PUBLIC_FORCE_USE_SVG_FLAG: process.env.NEXT_PUBLIC_FORCE_USE_SVG_FLAG,
-    NEXT_PUBLIC_SHOW_IP_INFO: process.env.NEXT_PUBLIC_SHOW_IP_INFO,
-    NEXT_PUBLIC_SHOW_FLAG: process.env.NEXT_PUBLIC_SHOW_FLAG,
-    NEXT_PUBLIC_SHOW_NETWORK_TRANSFER: process.env.NEXT_PUBLIC_SHOW_NET_TRANSFER,
-    NEXT_PUBLIC_FIXED_TOP_SERVER_NAME:
-      process.env.NEXT_PUBLIC_FIXED_TOP_SERVER_NAME,
   },
   /**
    * Run `build` or `dev` with `SKIP_ENV_VALIDATION` to skip env validation. This is especially

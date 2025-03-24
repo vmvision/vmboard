@@ -3,7 +3,7 @@ import appFactory from "../factory";
 import { vm as vmsTable } from "@/db/schema/vm";
 import { zValidator } from "@hono/zod-validator";
 import { z } from "zod";
-import { broadcastToVms, checkVmSocket } from "../monitor/socket";
+import { vmManager } from "../wss/manager/vm-manager";
 import BizError, { BizCodeEnum } from "../error";
 import { metrics as metricsTable } from "@/db/schema/metrics";
 import { roleGuard } from "../middleware/auth";
@@ -33,7 +33,7 @@ const app = appFactory
     });
     const status = vms.map((vm) => ({
       id: vm.id,
-      status: checkVmSocket(vm.id),
+      status: vmManager.checkSocket(vm.id),
     }));
     return c.json({
       total: vms.length,
@@ -92,7 +92,7 @@ const app = appFactory
         throw new BizError(BizCodeEnum.VMNotFound);
       }
       if (!vm.monitorInfo) {
-        broadcastToVms([vm.id], {
+        vmManager.broadcast(vm.id, {
           type: "get_info",
           data: {},
         });
@@ -115,7 +115,7 @@ const app = appFactory
     async (c) => {
       const input = c.req.valid("param");
       return c.json({
-        status: checkVmSocket(input.id),
+        status: vmManager.checkSocket(input.id),
       });
     },
   )

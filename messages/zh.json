@@ -44,6 +44,7 @@
       "process": "进程",
       "tcp": "TCP",
       "udp": "UDP",
+      "load": "负载",
       "upload": "上传",
       "download": "下载",
       "totalUpload": "总上传",
