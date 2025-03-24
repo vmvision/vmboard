@@ -23,6 +23,7 @@ import { useEffect, useState } from "react";
 import useSWR from "swr";
 import apiClient, { fetchWrapper } from "@/lib/api-client";
 import { vm } from "@/db/schema";
+import { useMetricsData } from "./vm-data-context";
 
 countries.registerLocale(enLocale);
 
@@ -34,7 +35,8 @@ export default function ServerDetail({ vmId }: ServerDetailProps) {
   const t = useTranslations("Public.VM");
   const tT = useTranslations("Public.Time");
   const router = useRouter();
-
+  const { getLatestMetrics } = useMetricsData();
+  const data = getLatestMetrics(vmId);
   
   // const [hasHistory, setHasHistory] = useState(false);
 
@@ -233,15 +235,15 @@ export default function ServerDetail({ vmId }: ServerDetailProps) {
           </Card>
         )} */}
       </section>
-      {/* <section className="mt-1 flex flex-wrap gap-2">
+      <section className="mt-1 flex flex-wrap gap-2">
         <Card className="rounded-[10px] border-none bg-transparent shadow-none">
           <CardContent className="px-1.5 py-1">
             <section className="flex flex-col items-start gap-0.5">
-              <p className="text-muted-foreground text-xs">{t("Load")}</p>
+              <p className="text-muted-foreground text-xs">{t("load")}</p>
               <div className="text-xs">
-                {monitorInfo.loadAvg.one || "0.00"} /{" "}
-                {monitorInfo.loadAvg.five || "0.00"} /{" "}
-                {monitorInfo.loadAvg.fifteen || "0.00"}
+                {data?.load1 || "0.00"} /{" "}
+                {data?.load5 || "0.00"} /{" "}
+                {data?.load15 || "0.00"}
               </div>
             </section>
           </CardContent>
@@ -249,9 +251,9 @@ export default function ServerDetail({ vmId }: ServerDetailProps) {
         <Card className="rounded-[10px] border-none bg-transparent shadow-none">
           <CardContent className="px-1.5 py-1">
             <section className="flex flex-col items-start gap-0.5">
-              <p className="text-muted-foreground text-xs">{t("Upload")}</p>
-              {net_out_transfer ? (
-                <div className="text-xs"> {formatBytes(net_out_transfer)} </div>
+              <p className="text-muted-foreground text-xs">{t("totalUpload")}</p>
+              {data?.networkOut ? (
+                <div className="text-xs"> {formatBytes(data.networkOut)} </div>
               ) : (
                 <div className="text-xs">Unknown</div>
               )}
@@ -261,16 +263,16 @@ export default function ServerDetail({ vmId }: ServerDetailProps) {
         <Card className="rounded-[10px] border-none bg-transparent shadow-none">
           <CardContent className="px-1.5 py-1">
             <section className="flex flex-col items-start gap-0.5">
-              <p className="text-muted-foreground text-xs">{t("Download")}</p>
-              {net_in_transfer ? (
-                <div className="text-xs"> {formatBytes(net_in_transfer)} </div>
+              <p className="text-muted-foreground text-xs">{t("totalDownload")}</p>
+              {data?.networkIn ? (
+                <div className="text-xs"> {formatBytes(data.networkIn)} </div>
               ) : (
                 <div className="text-xs">Unknown</div>
               )}
             </section>
           </CardContent>
         </Card>
-      </section> */}
+      </section>
       {/* <section className="mt-1 flex flex-wrap gap-2">
         <Card className="rounded-[10px] border-none bg-transparent shadow-none">
           <CardContent className="px-1.5 py-1">

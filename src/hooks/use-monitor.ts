@@ -97,7 +97,7 @@ export default function useMonitor({
   // biome-ignore lint/correctness/useExhaustiveDependencies: should not changed
   useEffect(() => {
     const newWs = new WebSocket(
-      `${window.location.protocol === "https:" ? "wss:" : "ws:"}//${window.location.host}/wss/monitor/user`,
+      `${window.location.protocol === "https:" ? "wss:" : "ws:"}//${window.location.host}/wss/monitor`,
     );
 
     newWs.onopen = () => {

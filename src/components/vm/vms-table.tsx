@@ -22,7 +22,7 @@ import type {
 import { getStatusIcon } from "../../app/_lib/utils";
 import { DeleteVMsDialog } from "./delete-vms-dialog";
 import { useFeatureFlags } from "./feature-flags-provider";
-import { getColumns } from "./vms-table-columns";
+import { useColumns } from "./vms-table-columns";
 import { VMsTableFloatingBar } from "./vms-table-floating-bar";
 import { VMsTableToolbarActions } from "./vms-table-toolbar-actions";
 import { UpdateVMSheet } from "./update-vm-sheet";
@@ -46,7 +46,7 @@ export function VMsTable({ promises }: TasksTableProps) {
   const [rowAction, setRowAction] =
     React.useState<DataTableRowAction<VM> | null>(null);
 
-  const columns = React.useMemo(() => getColumns({ setRowAction }), []);
+  const columns = useColumns({ setRowAction });
 
   /**
    * This component can render either a faceted filter or a search filter based on the `options` prop.
@@ -112,7 +112,7 @@ export function VMsTable({ promises }: TasksTableProps) {
   ];
 
   const enableAdvancedTable = featureFlags.includes("advancedTable");
-  
+
   const { table } = useDataTable({
     data,
     columns,

@@ -81,6 +81,7 @@ function CpuChart({ data }: ChartProps) {
     },
   } satisfies ChartConfig;
 
+  // console.log(data);
   return (
     <Card>
       <CardContent className="px-6 py-3">
@@ -503,7 +504,7 @@ function NetworkChart({ data }: ChartProps) {
             >
               <CartesianGrid vertical={false} />
               <XAxis
-                dataKey="timeStamp"
+                dataKey="time"
                 tickLine={false}
                 axisLine={false}
                 tickMargin={8}

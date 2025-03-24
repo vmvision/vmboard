@@ -16,6 +16,7 @@ import type { ConnectConfig } from "ssh2";
 import bigintJsonb from "../bigint-jsonb";
 import { relations } from "drizzle-orm";
 import { pageVM } from "./page";
+import { metrics } from "./metrics";
 
 export interface SSHInfo extends ConnectConfig {
   sshKeyId?: number;
@@ -80,6 +81,7 @@ export const vmRelations = relations(vm, ({ one, many }) => ({
     references: [merchant.id],
   }),
   pages: many(pageVM),
+  metrics: many(metrics),
 }));
 
 export type VM = typeof vm.$inferSelect;

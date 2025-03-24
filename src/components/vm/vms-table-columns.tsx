@@ -42,227 +42,256 @@ import {
 import type { Merchant } from "@/db/schema";
 import Link from "next/link";
 import { useTranslations } from "next-intl";
+import { useMemo } from "react";
+
 interface GetColumnsProps {
   setRowAction: React.Dispatch<
     React.SetStateAction<DataTableRowAction<VMWithMerchant> | null>
   >;
 }
 
-export function getColumns({
+export function useColumns({
   setRowAction,
 }: GetColumnsProps): ColumnDef<VMWithMerchant>[] {
   const t = useTranslations();
 
-  return [
-    {
-      id: "select",
-      header: ({ table }) => (
-        <Checkbox
-          checked={
-            table.getIsAllPageRowsSelected() ||
-            (table.getIsSomePageRowsSelected() && "indeterminate")
-          }
-          onCheckedChange={(value) => table.toggleAllPageRowsSelected(!!value)}
-          aria-label="Select all"
-          className="translate-y-0.5"
-        />
-      ),
-      cell: ({ row }) => (
-        <Checkbox
-          checked={row.getIsSelected()}
-          onCheckedChange={(value) => row.toggleSelected(!!value)}
-          aria-label="Select row"
-          className="translate-y-0.5"
-        />
-      ),
-      size: 40,
-      enableSorting: false,
-      enableHiding: false,
-    },
-    {
-      accessorKey: "id",
-      header: ({ column }) => (
-        <DataTableColumnHeader column={column} title="ID" />
-      ),
-      size: 40,
-      enableSorting: false,
-      enableHiding: false,
-    },
-    {
-      accessorKey: "merchant",
-      header: ({ column }) => (
-        <DataTableColumnHeader column={column} title={t("Private.Merchant.name")} />
-      ),
-      cell: ({ row }) => {
-        const merchant: Merchant = row.getValue("merchant");
-        if (!merchant) return null;
-        const Icon = getMerchantIcon(merchant.merchant);
-        return (
-          <div className="flex items-center gap-2">
-            <Icon className="h-4" aria-hidden="true" />
-            {/* {merchant.nickname} */}
-          </div>
-        );
+  return useMemo(
+    () => [
+      {
+        id: "select",
+        header: ({ table }) => (
+          <Checkbox
+            checked={
+              table.getIsAllPageRowsSelected() ||
+              (table.getIsSomePageRowsSelected() && "indeterminate")
+            }
+            onCheckedChange={(value) =>
+              table.toggleAllPageRowsSelected(!!value)
+            }
+            aria-label="Select all"
+            className="translate-y-0.5"
+          />
+        ),
+        cell: ({ row }) => (
+          <Checkbox
+            checked={row.getIsSelected()}
+            onCheckedChange={(value) => row.toggleSelected(!!value)}
+            aria-label="Select row"
+            className="translate-y-0.5"
+          />
+        ),
+        size: 40,
+        enableSorting: false,
+        enableHiding: false,
       },
-    },
-    {
-      accessorKey: "nickname",
-      header: ({ column }) => (
-        <DataTableColumnHeader column={column} title={t("Private.VM.nickname")} />
-      ),
-      cell: ({ row }) => {
-        // const label = tasks.label.enumValues.find(
-        //   (label) => label === row.original.label,
-        // );
-
-        return (
-          <div className="flex space-x-2">
-            {/* {label && <Badge variant="outline">{label}</Badge>} */}
-            <span className="max-w-[31.25rem] truncate font-medium">
-              {row.getValue("nickname")}
-            </span>
-          </div>
-        );
+      {
+        accessorKey: "id",
+        header: ({ column }) => (
+          <DataTableColumnHeader column={column} title="ID" />
+        ),
+        size: 40,
+        enableSorting: false,
+        enableHiding: false,
       },
-    },
-    {
-      id: "location",
-      header: ({ column }) => (
-        <DataTableColumnHeader column={column} title={t("Public.VM.region")} />
-      ),
-      cell: ({ row }) => {
-        const metadata = row.original.metadata;
-        if (!metadata) return null;
-        if (row.original.merchant.merchant === "dmit") {
-          const Icon = getDMITLocationIcon(
-            metadata.location as "HKG" | "LAX" | "TYO",
-          );
+      {
+        accessorKey: "merchant",
+        header: ({ column }) => (
+          <DataTableColumnHeader
+            column={column}
+            title={t("Private.Merchant.name")}
+          />
+        ),
+        cell: ({ row }) => {
+          const merchant: Merchant = row.getValue("merchant");
+          if (!merchant) return null;
+          const Icon = getMerchantIcon(merchant.merchant);
           return (
             <div className="flex items-center gap-2">
-              <Icon className="h-5" aria-hidden="true" />
-              {metadata.location}
+              <Icon className="h-4" aria-hidden="true" />
+              {/* {merchant.nickname} */}
             </div>
           );
-        }
-        return <div className="w-20">{metadata.location}</div>;
+        },
       },
-    },
-    {
-      accessorKey: "status",
-      header: ({ column }) => (
-        <DataTableColumnHeader column={column} title={t("Public.VM.status")} />
-      ),
-      cell: ({ row }) => {
-        const status = vmTable.status.enumValues.find(
-          (status) => status === row.original.status,
-        );
+      {
+        accessorKey: "nickname",
+        header: ({ column }) => (
+          <DataTableColumnHeader
+            column={column}
+            title={t("Private.VM.nickname")}
+          />
+        ),
+        cell: ({ row }) => {
+          // const label = tasks.label.enumValues.find(
+          //   (label) => label === row.original.label,
+          // );
 
-        if (!status) return null;
+          return (
+            <div className="flex space-x-2">
+              {/* {label && <Badge variant="outline">{label}</Badge>} */}
+              <span className="max-w-[31.25rem] truncate font-medium">
+                {row.getValue("nickname")}
+              </span>
+            </div>
+          );
+        },
+      },
+      {
+        id: "location",
+        header: ({ column }) => (
+          <DataTableColumnHeader
+            column={column}
+            title={t("Public.VM.region")}
+          />
+        ),
+        cell: ({ row }) => {
+          const metadata = row.original.metadata;
+          if (!metadata) return null;
+          if (row.original.merchant.merchant === "dmit") {
+            const Icon = getDMITLocationIcon(
+              metadata.location as "HKG" | "LAX" | "TYO",
+            );
+            return (
+              <div className="flex items-center gap-2">
+                <Icon className="h-5" aria-hidden="true" />
+                {metadata.location}
+              </div>
+            );
+          }
+          return <div className="w-20">{metadata.location}</div>;
+        },
+      },
+      {
+        accessorKey: "status",
+        header: ({ column }) => (
+          <DataTableColumnHeader
+            column={column}
+            title={t("Public.VM.status")}
+          />
+        ),
+        cell: ({ row }) => {
+          const status = vmTable.status.enumValues.find(
+            (status) => status === row.original.status,
+          );
 
-        const Icon = getStatusIcon(status);
+          if (!status) return null;
 
-        return (
-          <div className="flex w-[6.25rem] items-center">
-            <Icon
-              className={cn("mr-2 size-4 text-muted-foreground", {
-                "text-red-500": status === "error",
-                "text-green-600": status === "running",
-                "text-yellow-500": status === "stopped",
-                "text-blue-500": status === "expired",
-              })}
-              aria-hidden="true"
-            />
-            <span className="capitalize">{status}</span>
-          </div>
-        );
-      },
-      filterFn: (row, id, value) => {
-        return Array.isArray(value) && value.includes(row.getValue(id));
-      },
-    },
-    {
-      accessorKey: "ipAddress",
-      header: ({ column }) => (
-        <DataTableColumnHeader column={column} title={t("Public.VM.ipAddress")} />
-      ),
-      cell: ({ row }) => {
-        console.log(row.original);
-        return <div className="w-20">{row.getValue("ipAddress")}</div>;
-      },
-    },
-    {
-      id: "trafficUsed",
-      header: ({ column }) => (
-        <DataTableColumnHeader column={column} title={t("Public.VM.trafficUsed")} />
-      ),
-      cell: ({ row }) => {
-        const metadata = row.original.metadata;
-        if (!metadata) return null;
-        return <div className="w-20">{metadata.trafficUsed}</div>;
-      },
-    },
-    {
-      id: "trafficLimit",
-      header: ({ column }) => (
-        <DataTableColumnHeader column={column} title={t("Public.VM.trafficLimit")} />
-      ),
-      cell: ({ row }) => {
-        const metadata = row.original.metadata;
-        if (!metadata) return null;
-        return <div className="w-20">{metadata.trafficTotal}</div>;
-      },
-    },
-    {
-      accessorKey: "createdAt",
-      header: ({ column }) => (
-        <DataTableColumnHeader column={column} title={t("Public.VM.createdAt")} />
-      ),
-      cell: ({ cell }) => formatDate(cell.getValue() as Date),
-    },
-    {
-      id: "actions",
-      cell: function Cell({ row }) {
-        // const [isUpdatePending, startUpdateTransition] = React.useTransition();
+          const Icon = getStatusIcon(status);
 
-        return (
-          <DropdownMenu>
-            <DropdownMenuTrigger asChild>
-              <Button
-                aria-label={t("Private.Action.menu")}
-                variant="ghost"
-                className="flex size-8 p-0 data-[state=open]:bg-muted"
-              >
-                <Ellipsis className="size-4" aria-hidden="true" />
-              </Button>
-            </DropdownMenuTrigger>
-            <DropdownMenuContent align="end" className="w-40">
-              <DropdownMenuItem>
-                <Link
-                  href={`/vm/${row.original.id}`}
-                  className="flex items-center"
+          return (
+            <div className="flex w-[6.25rem] items-center">
+              <Icon
+                className={cn("mr-2 size-4 text-muted-foreground", {
+                  "text-red-500": status === "error",
+                  "text-green-600": status === "running",
+                  "text-yellow-500": status === "stopped",
+                  "text-blue-500": status === "expired",
+                })}
+                aria-hidden="true"
+              />
+              <span className="capitalize">{status}</span>
+            </div>
+          );
+        },
+        filterFn: (row, id, value) => {
+          return Array.isArray(value) && value.includes(row.getValue(id));
+        },
+      },
+      {
+        accessorKey: "ipAddress",
+        header: ({ column }) => (
+          <DataTableColumnHeader
+            column={column}
+            title={t("Public.VM.ipAddress")}
+          />
+        ),
+        cell: ({ row }) => {
+          console.log(row.original);
+          return <div className="w-20">{row.getValue("ipAddress")}</div>;
+        },
+      },
+      {
+        id: "trafficUsed",
+        header: ({ column }) => (
+          <DataTableColumnHeader
+            column={column}
+            title={t("Public.VM.trafficUsed")}
+          />
+        ),
+        cell: ({ row }) => {
+          const metadata = row.original.metadata;
+          if (!metadata) return null;
+          return <div className="w-20">{metadata.trafficUsed}</div>;
+        },
+      },
+      {
+        id: "trafficLimit",
+        header: ({ column }) => (
+          <DataTableColumnHeader
+            column={column}
+            title={t("Public.VM.trafficLimit")}
+          />
+        ),
+        cell: ({ row }) => {
+          const metadata = row.original.metadata;
+          if (!metadata) return null;
+          return <div className="w-20">{metadata.trafficTotal}</div>;
+        },
+      },
+      {
+        accessorKey: "createdAt",
+        header: ({ column }) => (
+          <DataTableColumnHeader
+            column={column}
+            title={t("Public.VM.createdAt")}
+          />
+        ),
+        cell: ({ cell }) => formatDate(cell.getValue() as Date),
+      },
+      {
+        id: "actions",
+        cell: function Cell({ row }) {
+          // const [isUpdatePending, startUpdateTransition] = React.useTransition();
+
+          return (
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <Button
+                  aria-label={t("Private.Action.menu")}
+                  variant="ghost"
+                  className="flex size-8 p-0 data-[state=open]:bg-muted"
                 >
-                  <SquareSquare className="size-4" aria-hidden="true" />
-                  <span className="ml-2">图表</span>
-                </Link>
-              </DropdownMenuItem>
-              <Link
-                target="_blank"
-                href={`/dash/terminal?vmId=${row.original.id}`}
-              >
+                  <Ellipsis className="size-4" aria-hidden="true" />
+                </Button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align="end" className="w-40">
                 <DropdownMenuItem>
-                  <TerminalIcon className="size-4" aria-hidden="true" />
-                  {t("Private.VM.terminal")}
-                  <DropdownMenuShortcut>⌘T</DropdownMenuShortcut>
+                  <Link
+                    href={`/vm/${row.original.id}`}
+                    className="flex items-center"
+                  >
+                    <SquareSquare className="size-4" aria-hidden="true" />
+                    <span className="ml-2">图表</span>
+                  </Link>
                 </DropdownMenuItem>
-              </Link>
-              <DropdownMenuItem
-                onSelect={() => setRowAction({ row, type: "update" })}
-              >
-                <PenLineIcon className="size-4" aria-hidden="true" />
-                {t("Private.Action.edit")}
-                <DropdownMenuShortcut>⌘E</DropdownMenuShortcut>
-              </DropdownMenuItem>
-              {/*<DropdownMenuSub>
+                <Link
+                  target="_blank"
+                  href={`/dash/terminal?vmId=${row.original.id}`}
+                >
+                  <DropdownMenuItem>
+                    <TerminalIcon className="size-4" aria-hidden="true" />
+                    {t("Private.VM.terminal")}
+                    <DropdownMenuShortcut>⌘T</DropdownMenuShortcut>
+                  </DropdownMenuItem>
+                </Link>
+                <DropdownMenuItem
+                  onSelect={() => setRowAction({ row, type: "update" })}
+                >
+                  <PenLineIcon className="size-4" aria-hidden="true" />
+                  {t("Private.Action.edit")}
+                  <DropdownMenuShortcut>⌘E</DropdownMenuShortcut>
+                </DropdownMenuItem>
+                {/*<DropdownMenuSub>
                  <DropdownMenuSubTrigger>Labels</DropdownMenuSubTrigger>
                 <DropdownMenuSubContent>
                   <DropdownMenuRadioGroup
@@ -297,18 +326,20 @@ export function getColumns({
                 </DropdownMenuSubContent>
               </DropdownMenuSub>
               <DropdownMenuSeparator /> */}
-              <DropdownMenuItem
-                onSelect={() => setRowAction({ row, type: "delete" })}
-              >
-                <TrashIcon className="size-4" aria-hidden="true" />
-                {t("Private.Action.delete")}
-                <DropdownMenuShortcut>⌘⌫</DropdownMenuShortcut>
-              </DropdownMenuItem>
-            </DropdownMenuContent>
-          </DropdownMenu>
-        );
+                <DropdownMenuItem
+                  onSelect={() => setRowAction({ row, type: "delete" })}
+                >
+                  <TrashIcon className="size-4" aria-hidden="true" />
+                  {t("Private.Action.delete")}
+                  <DropdownMenuShortcut>⌘⌫</DropdownMenuShortcut>
+                </DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
+          );
+        },
+        size: 40,
       },
-      size: 40,
-    },
-  ];
+    ],
+    [t, setRowAction],
+  );
 }

@@ -17,7 +17,11 @@ export function formatDate(
   }).format(new Date(date));
 }
 
-export function formatBytes(bytes: number | string, decimals = 2, short = false) {
+export function formatBytes(
+  bytes: number | string,
+  decimals = 2,
+  short = false,
+) {
   if (typeof bytes === "string") {
     bytes = Number(bytes);
   }
@@ -26,40 +30,30 @@ export function formatBytes(bytes: number | string, decimals = 2, short = false)
 
   const k = 1024;
   const dm = decimals < 0 ? 0 : decimals;
-  const sizes = short ? [
-    "B",
-    "KB",
-    "MB",
-    "GB",
-    "TB",
-    "PB",
-    "EiB",
-    "ZiB",
-    "YiB",
-  ] : [
-    "Bytes",
-    "KiB",
-    "MiB",
-    "GiB",
-    "TiB",
-    "PiB",
-    "EiB",
-    "ZiB",
-    "YiB",
-  ];
+  const sizes = short
+    ? ["B", "KB", "MB", "GB", "TB", "PB", "EiB", "ZiB", "YiB"]
+    : ["Bytes", "KiB", "MiB", "GiB", "TiB", "PiB", "EiB", "ZiB", "YiB"];
 
   const i = Math.floor(Math.log(bytes) / Math.log(k));
 
   return `${Number.parseFloat((bytes / k ** i).toFixed(dm))} ${sizes[i]}`;
 }
 
-export function formatKiloBytes(bytes: number | string, decimals = 2, short = false) {
+export function formatKiloBytes(
+  bytes: number | string,
+  decimals = 2,
+  short = false,
+) {
   return formatBytes(Number(bytes) * 1024, decimals, short);
 }
 
-export function formatRelativeTime(timestamp: number): string {
+export function formatRelativeTime(timestamp: string | number): string {
+  if (typeof timestamp === "string") {
+    timestamp = new Date(timestamp).getTime();
+  }
   const now = Date.now();
   const diff = now - timestamp;
+
   const hours = Math.floor(diff / (1000 * 60 * 60));
   const minutes = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
   const seconds = Math.floor((diff % (1000 * 60)) / 1000);
@@ -120,6 +114,6 @@ export function calculatePercentage(
 }
 
 export function capitalize(str: string) {
-  if (!str) return '';
+  if (!str) return "";
   return str.charAt(0).toUpperCase() + str.slice(1);
 }
