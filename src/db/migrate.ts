@@ -14,7 +14,7 @@ export async function runMigrate() {
   console.log(`✅ Migrations completed in ${end - start}ms`);
 }
 
-if ("main" in import.meta) {
+if (process.env.RUN_MIGRATE === "1") {
   runMigrate()
     .then(() => {
       console.log("✅ Migration completed, exiting...");

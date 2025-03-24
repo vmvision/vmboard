@@ -21,7 +21,7 @@
     "db:generate": "dotenv drizzle-kit generate",
     "db:introspect": "dotenv drizzle-kit introspect",
     "db:push": "dotenv drizzle-kit push",
-    "db:migrate": "dotenv tsx src/db/migrate.ts",
+    "db:migrate": "RUN_MIGRATE=1 dotenv tsx src/db/migrate.ts",
     "db:drop-migration": "drizzle-kit drop",
     "db:seed": "dotenv tsx src/db/seed.ts",
     "db:studio": "dotenv drizzle-kit studio"
@@ -102,6 +102,7 @@
     "swr": "^2.3.2",
     "tailwind-merge": "^3.0.1",
     "tailwindcss-animate": "^1.0.7",
+    "uuid": "^11.1.0",
     "vaul": "^1.1.2",
     "vmapi": "^0.0.10",
     "ws": "^8.18.1",
