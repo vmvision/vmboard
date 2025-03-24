@@ -38,11 +38,11 @@ export function DataTable<TData>({
 }: DataTableProps<TData>) {
   return (
     <div
-      className={cn("w-full space-y-2.5 overflow-auto", className)}
+      className={cn("w-full space-y-2", className)} //距离上一栏的高度距离
       {...props}
     >
       {children}
-      <div className="overflow-hidden rounded-md border">
+      <div className="mx-1 overflow-hidden rounded-md border">
         <Table>
           <TableHeader>
             {table.getHeaderGroups().map((headerGroup) => (
@@ -94,7 +94,7 @@ export function DataTable<TData>({
               <TableRow>
                 <TableCell
                   colSpan={table.getAllColumns().length}
-                  className="h-24 text-center"
+                  className="h-24 text-center" //表格为空时，显示的行高
                 >
                   No results.
                 </TableCell>
