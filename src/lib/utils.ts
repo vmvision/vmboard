@@ -18,10 +18,11 @@ export function formatDate(
 }
 
 export function formatBytes(
-  bytes: number | string,
+  bytes: number | string | undefined,
   decimals = 2,
   short = false,
 ) {
+  if (bytes === undefined) return "-";
   if (typeof bytes === "string") {
     bytes = Number(bytes);
   }
@@ -40,7 +41,7 @@ export function formatBytes(
 }
 
 export function formatKiloBytes(
-  bytes: number | string,
+  bytes: number | string | undefined,
   decimals = 2,
   short = false,
 ) {

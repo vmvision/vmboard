@@ -12,6 +12,7 @@ import { ProfileLogout } from "./profile.client";
 import { Link } from "next-view-transitions";
 import { Button } from "../ui/button";
 import { getTranslations } from "next-intl/server";
+import { BoltIcon, CircleUserRoundIcon } from "lucide-react";
 export default async function Profile() {
   const t = await getTranslations("Public.Auth");
   const tP = await getTranslations("Private.Profile");
@@ -41,12 +42,14 @@ export default async function Profile() {
       </DropdownMenuTrigger>
       <DropdownMenuContent>
         <DropdownMenuItem asChild>
-          <Link href="/dash/setting/account" className="block w-full">
+          <Link href="/dash/setting/personal/account" className="block w-full">
+            <CircleUserRoundIcon />
             {tP("account")}
           </Link>
         </DropdownMenuItem>
         <DropdownMenuItem asChild>
           <Link href="/dash/setting" className="block w-full">
+            <BoltIcon />
             {tP("setting")}
           </Link>
         </DropdownMenuItem>

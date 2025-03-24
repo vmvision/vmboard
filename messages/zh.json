@@ -67,13 +67,14 @@
       "edit": "编辑",
       "delete": "删除",
       "cancel": "取消",
-      "save": "保存"
+      "save": "保存",
+      "submit": "提交"
     },
     "Onboard": {
       "title": "欢迎使用 VMBoard",
       "description": "请按照以下步骤完成您的设置",
       "firstVM": {
-        "title": "添加虚拟机",
+        "title": "添加服务器",
         "description": "请输入您的邮箱地址"
       },
       "customHandle": {
@@ -100,19 +101,20 @@
     "Page": {
       "Management": {
         "title": "页面管理",
-        "description": "管理您的页面设置和虚拟机列表",
+        "description": "管理您的页面设置和服务器列表",
         "subTitle": "您的监控页面",
         "description2": "您可以为不同的用途创建多个监控页面，每个页面可以有自己的 VM 集合和布局",
         "emptyPage": "您还没有创建任何监控页面",
         "addPage": "添加新页面",
         "createFirstPage": "创建第一个页面",
-        "vmCount": "{count} 台虚拟机"
+        "vmCount": "{count} 台服务器",
+        "createdAt": "创建时间: {date}"
       },
       "Detail": {
         "accessLink": "访问链接",
         "customDomain": "自定义域名",
         "createPage": "创建页面",
-        "createPageDescription": "创建一个新页面来展示您的虚拟机。填写以下详细信息。",
+        "createPageDescription": "创建一个新页面来展示您的服务器。填写以下详细信息。",
         "title": "标题",
         "titleDescription": "页面标题",
         "handle": "唯一标识符",
@@ -123,16 +125,23 @@
         "descriptionDescription": "一个简短的描述您的页面。",
         "editPage": "编辑页面",
         "deletePage": "删除页面",
-        "vmList": "虚拟机列表",
-        "emptyVm": "该页面还没有添加任何虚拟机",
-        "addVm": "添加虚拟机",
-        "addFirstVm": "添加第一台虚拟机",
-        "updateVmInPage": "更新虚拟机",
-        "updateVmInPageDescription": "更新虚拟机在当前页面中的相关信息",
-        "updateVmDisplayName": "更新虚拟机昵称",
-        "updateVmDisplayNameDescription": "为该虚拟机设置一个自定义昵称",
+        "vmList": "服务器列表",
+        "vmLabel": "服务器",
+        "vmDescription": "选择要添加到此页面的服务器",
+        "emptyVm": "该页面还没有添加任何服务器",
+        "addVm": "添加服务器",
+        "addVmToPage": "添加服务器到页面",
+        "addVmToPageDescription": "选择一个服务器添加到当前页面",
+        "addFirstVm": "添加第一台服务器",
+        "nicknamePlaceholder": "在此页面上为该服务器设置自定义名称",
+        "nicknameDescription": "您可以为此页面上的服务器设置自定义显示名称",
+        "nicknameLabel": "显示名称（可选）",
+        "updateVmInPage": "更新服务器",
+        "updateVmInPageDescription": "更新服务器在当前页面中的相关信息",
+        "updateVmDisplayName": "更新服务器昵称",
+        "updateVmDisplayNameDescription": "为该服务器设置一个自定义昵称",
         "updateVmNickname": "更新昵称",
-        "updateVmNicknameDescription": "为该虚拟机设置一个自定义昵称"
+        "updateVmNicknameDescription": "为该服务器设置一个自定义昵称"
       }
     },
     "Setting": {

@@ -1,9 +1,6 @@
 import MonitorPageWrapper from "./page.client";
-import { notFound } from "next/navigation";
-import { headers } from "next/headers";
 import rscClient from "@/lib/rsc-client";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { env } from "@/env";
 import { getHostname } from "./data";
 
 type Params = Promise<{ handle: string }>;

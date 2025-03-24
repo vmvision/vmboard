@@ -95,7 +95,10 @@ export default function PageDetail({ params }: { params: Params }) {
                         {pageVm.vm.monitorInfo?.platformVersion || ""}
                       </p>
                       <div className="mt-4 flex gap-2">
-                        <ModifyVmDetailInPageDialog pageId={pageId} vmId={pageVm.vmId}>
+                        <ModifyVmDetailInPageDialog
+                          pageId={pageId}
+                          vmId={pageVm.vmId}
+                        >
                           <Button size="sm" variant="outline">
                             {tAction("edit")}
                           </Button>
@@ -111,10 +114,10 @@ export default function PageDetail({ params }: { params: Params }) {
             </div>
           ) : (
             <div className="rounded-lg border py-6 text-center">
-              <p className="text-muted-foreground">
-                {t("emptyVm")}
-              </p>
-              <Button className="mx-auto mt-4">{t("addFirstVm")}</Button>
+              <p className="text-muted-foreground">{t("emptyVm")}</p>
+              <AddVmDialog pageId={pageId}>
+                <Button className="mx-auto mt-4">{t("addFirstVm")}</Button>
+              </AddVmDialog>
             </div>
           )}
         </div>

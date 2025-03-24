@@ -17,7 +17,12 @@ import {
   GetOsName,
   MageMicrosoftWindows,
 } from "@/lib/logo-class";
-import { cn, formatBytes, calculatePercentage } from "@/lib/utils";
+import {
+  cn,
+  formatBytes,
+  calculatePercentage,
+  formatKiloBytes,
+} from "@/lib/utils";
 import type { ServerWithLiveMetrics } from "@/types/metrics";
 import { useTranslations } from "next-intl";
 import { Link } from "next-view-transitions";
@@ -119,9 +124,9 @@ const ServerCard: React.FC<{
             <div className={"flex w-14 flex-col"}>
               <p className="text-muted-foreground text-xs">{t("disk")}</p>
               <div className="flex items-center font-semibold text-xs">
-                {calculatePercentage(metrics.diskUsed, metrics.diskTotal, 2)}%
+                {Number(metrics.diskUsage).toFixed(2)}%
               </div>
-              <ServerUsageBar value={metrics.diskUsed} />
+              <ServerUsageBar value={metrics.diskUsage} />
             </div>
             <div className={"flex w-14 flex-col"}>
               <p className="text-muted-foreground text-xs">{t("upload")}</p>
@@ -142,13 +147,15 @@ const ServerCard: React.FC<{
                 variant="secondary"
                 className="flex-1 items-center justify-center text-nowrap rounded-[8px] border-muted-50 text-[11px] shadow-md shadow-neutral-200/30 dark:shadow-none"
               >
-                {t("totalUpload")}:{formatBytes(metrics.networkOutSpeed)}
+                {t("totalUpload")}:
+                {formatKiloBytes(metrics.networkOutSpeed, 2, true)}
               </Badge>
               <Badge
                 variant="outline"
                 className="flex-1 items-center justify-center text-nowrap rounded-[8px] text-[11px] shadow-md shadow-neutral-200/30 dark:shadow-none"
               >
-                {t("totalDownload")}:{formatBytes(metrics.networkInSpeed)}
+                {t("totalDownload")}:
+                {formatKiloBytes(metrics.networkInSpeed, 2, true)}
               </Badge>
             </section>
           )}

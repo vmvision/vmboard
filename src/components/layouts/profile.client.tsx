@@ -7,6 +7,7 @@ import { useCallback } from "react";
 import { useTransitionRouter } from "next-view-transitions";
 import { toast } from "sonner";
 import { useTranslations } from "next-intl";
+import { LogOutIcon } from "lucide-react";
 
 export const ProfileLogout: React.FC<{ session: Session }> = ({ session }) => {
   const t = useTranslations("Public.Auth");
@@ -26,7 +27,12 @@ export const ProfileLogout: React.FC<{ session: Session }> = ({ session }) => {
         },
       },
     );
-  }, [t,router, session]);
+  }, [t, router, session]);
 
-  return <DropdownMenuItem onClick={logout}>{t("logout")}</DropdownMenuItem>;
+  return (
+    <DropdownMenuItem onClick={logout}>
+      <LogOutIcon />
+      {t("logout")}
+    </DropdownMenuItem>
+  );
 };

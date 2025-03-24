@@ -6,6 +6,7 @@ import { useForm } from "react-hook-form";
 import { toast } from "sonner";
 import { z } from "zod";
 import { useRouter } from "next/navigation";
+import { useTranslations } from "next-intl";
 
 import { Button } from "@/components/ui/button";
 import {
@@ -55,7 +56,8 @@ export function AddVmDialog({
 }) {
   const router = useRouter();
   const [open, setOpen] = React.useState(false);
-  
+  const t = useTranslations("Private.Page.Management.Detail");
+  const tAction = useTranslations("Private.Action");
   const { data: vms, isLoading } = useSWR(
     "/api/vm",
     fetchWrapper(apiClient.vm.$get)
@@ -103,9 +105,9 @@ export function AddVmDialog({
       {children && <DialogTrigger asChild>{children}</DialogTrigger>}
       <DialogContent className="sm:max-w-[425px]">
         <DialogHeader>
-          <DialogTitle>Add VM to Page</DialogTitle>
+          <DialogTitle>{t("addVmToPage")}</DialogTitle>
           <DialogDescription>
-            Select a virtual machine to add to this page.
+            {t("addVmToPageDescription")}
           </DialogDescription>
         </DialogHeader>
         <Form {...form}>
@@ -115,7 +117,7 @@ export function AddVmDialog({
               name="vmId"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Virtual Machine</FormLabel>
+                  <FormLabel>{t("vmList")}</FormLabel>
                   <Select
                     onValueChange={field.onChange}
                     defaultValue={field.value}
@@ -123,7 +125,7 @@ export function AddVmDialog({
                   >
                     <FormControl>
                       <SelectTrigger>
-                        <SelectValue placeholder="Select a VM" />
+                        <SelectValue placeholder={t("vmLabel")} />
                       </SelectTrigger>
                     </FormControl>
                     <SelectContent>
@@ -135,7 +137,7 @@ export function AddVmDialog({
                     </SelectContent>
                   </Select>
                   <FormDescription>
-                    Choose a VM to add to this page.
+                    {t("vmDescription")}
                   </FormDescription>
                   <FormMessage />
                 </FormItem>
@@ -146,15 +148,15 @@ export function AddVmDialog({
               name="nickname"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Display Name (Optional)</FormLabel>
+                  <FormLabel>{t("nicknameLabel")}</FormLabel>
                   <FormControl>
                     <Input
-                      placeholder="Custom name for this VM on this page"
+                      placeholder={t("nicknamePlaceholder")}
                       {...field}
                     />
                   </FormControl>
                   <FormDescription>
-                    You can give this VM a custom display name for this page.
+                    {t("nicknameDescription")}
                   </FormDescription>
                   <FormMessage />
                 </FormItem>
@@ -167,14 +169,14 @@ export function AddVmDialog({
                 disabled={isMutating}
                 onClick={() => setOpen(false)}
               >
-                Cancel
+                {tAction("cancel")}
               </Button>
               <Button
                 type="submit"
                 disabled={isMutating || isLoading}
                 isLoading={isMutating}
               >
-                Add VM
+                {tAction("submit")}
               </Button>
             </div>
           </form>

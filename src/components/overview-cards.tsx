@@ -1,9 +1,9 @@
 "use client";
 
 import AnimateCount from "@/components/derive-ui/animate-count";
-import { Loader } from "lucide-react";
+import { ArrowDownCircleIcon, ArrowUpCircleIcon, Loader } from "lucide-react";
 import { Card, CardContent } from "@/components/ui/card";
-import { cn, formatBytes } from "@/lib/utils";
+import { cn, formatBytes, formatKiloBytes } from "@/lib/utils";
 // import {
 //   ArrowDownCircleIcon,
 //   ArrowUpCircleIcon,
@@ -12,6 +12,7 @@ import { useTranslations } from "next-intl";
 import type React from "react";
 import useSWR from "swr";
 import apiClient, { fetchWrapper } from "@/lib/api-client";
+import { Skeleton } from "./ui/skeleton";
 
 const ServerOverview: React.FC<{
   type: "vm" | "page";
@@ -29,6 +30,19 @@ const ServerOverview: React.FC<{
         ? apiClient.vm.status.$get
         : apiClient.page[":id"].status.$get,
     ),
+  );
+
+  const network = useSWR(
+    ["/api/page/status/network", { param: { id: pageId } }],
+    fetchWrapper(apiClient.page[":id"].status.network.$get),
+    // type === "vm"
+    //   ? ["/api/vm/status/network"]
+    //   : ["/api/page/status/network", { param: { id: pageId } }],
+    //   fetchWrapper(
+    //     type === "vm"
+    //     ? apiClient.vm.status.network.$get
+    //     : apiClient.page[":id"].status.network.$get,
+    // ),
   );
 
   const status = "online";
@@ -97,30 +111,31 @@ const ServerOverview: React.FC<{
       </OverviewCard>
       <OverviewCard
         label={tVM("network")}
+        count={null}
         className={cn(
           "group cursor-pointer ring-1 ring-transparent transition-all hover:ring-purple-500",
           {
-            "border-transparent ring-2 ring-purple-500": filter === true,
+            // "border-transparent ring-2 ring-purple-500": filter === true,
           },
         )}
       >
         <section className="flex flex-row flex-wrap items-start gap-1 pr-0">
-          {/* <p className="text-nowrap font-medium text-[12px] text-blue-800 dark:text-blue-400">
-              ↑{formatBytes(data?.total_out_bandwidth)}
-            </p>
-            <p className="text-nowrap font-medium text-[12px] text-purple-800 dark:text-purple-400">
-              ↓{formatBytes(data?.total_in_bandwidth)}
-            </p>
-          </section>
-          <section className="-mr-1 flex flex-row flex-wrap items-start gap-1 sm:items-center">
-            <p className="flex items-center text-nowrap font-semibold text-[11px]">
-              <ArrowUpCircleIcon className="mr-0.5 size-3 sm:mb-[1px]" />
-              {formatBytes(data?.total_out_speed)}/s
-            </p>
-            <p className="flex items-center text-nowrap font-semibold text-[11px]">
-              <ArrowDownCircleIcon className="mr-0.5 size-3" />
-              {formatBytes(data?.total_in_speed)}/s
-            </p> */}
+          <p className="text-nowrap font-medium text-[12px] text-blue-800 dark:text-blue-400">
+            ↑{formatBytes(network.data?.totalUpload)}
+          </p>
+          <p className="text-nowrap font-medium text-[12px] text-purple-800 dark:text-purple-400">
+            ↓{formatBytes(network.data?.totalDownload)}
+          </p>
+        </section>
+        <section className="-mr-1 flex flex-row flex-wrap items-start gap-1 sm:items-center">
+          <p className="flex items-center text-nowrap font-semibold text-[11px]">
+            <ArrowUpCircleIcon className="mr-0.5 size-3 sm:mb-[1px]" />
+            {formatBytes(network.data?.uploadSpeed)}/s
+          </p>
+          <p className="flex items-center text-nowrap font-semibold text-[11px]">
+            <ArrowDownCircleIcon className="mr-0.5 size-3" />
+            {formatBytes(network.data?.downloadSpeed)}/s
+          </p>
         </section>
       </OverviewCard>
     </section>
@@ -130,7 +145,7 @@ const ServerOverview: React.FC<{
 const OverviewCard: React.FC<
   {
     label: string;
-    count?: number;
+    count?: number | null;
   } & React.ComponentProps<typeof Card>
 > = ({ label, children, ...props }) => {
   return (
@@ -140,14 +155,17 @@ const OverviewCard: React.FC<
           <p className="font-medium text-sm md:text-base">{label}</p>
           <div className="flex min-h-[28px] items-center gap-2">
             {children}
-            {props?.count !== undefined ? (
-              <div className="font-semibold text-lg">
-                <AnimateCount count={props.count} />
-              </div>
+            {typeof props?.count === "number" ? (
+              <AnimateCount
+                count={props.count}
+                className="font-semibold text-lg"
+              />
             ) : (
-              <div className="flex h-7 items-center">
-                <Loader />
-              </div>
+              props?.count === undefined && (
+                <div className="flex h-7 items-center">
+                  <Skeleton className="h-4 w-16" />
+                </div>
+              )
             )}
           </div>
         </section>

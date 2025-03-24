@@ -13,9 +13,9 @@ import {
   pageVM as pageVMTable,
   hostname as hostnameTable,
 } from "@/db/schema/page";
-import { metrics as metricsTable } from "@/db/schema/metrics";
+import { metrics, metrics as metricsTable } from "@/db/schema/metrics";
 import { pageBind as pageBindTable } from "@/db/schema/page";
-import { and, count, eq, inArray, sql } from "drizzle-orm";
+import { and, count, desc, eq, gt, inArray, sql, sum } from "drizzle-orm";
 import { zValidator } from "@hono/zod-validator";
 import appFactory from "../factory";
 import BizError, { BizCodeEnum } from "../error";
@@ -36,6 +36,7 @@ const app = appFactory
         description: pageTable.description,
         bind: pageBindTable,
         vmCount: count(pageVMTable.vmId),
+        createdAt: pageTable.createdAt,
       })
       .from(pageTable)
       .where(eq(pageTable.userId, user.id))
@@ -50,6 +51,7 @@ const app = appFactory
           Pick<Page, "id" | "title" | "description"> & {
             binds: PageBind[];
             vmCount: number;
+            createdAt: Date;
           }
         >
       >((acc, row) => {
@@ -61,6 +63,7 @@ const app = appFactory
             description: row.description,
             binds: bind ? [bind] : [],
             vmCount: Number(row.vmCount),
+            createdAt: row.createdAt,
           };
         } else if (bind) {
           // biome-ignore lint/style/noNonNullAssertion: <explanation>
@@ -240,49 +243,72 @@ const app = appFactory
         throw new BizError(BizCodeEnum.PageNotFound);
       }
 
-      const status = page.pageVMs.map((vm) => vm.vmId);
+      const vmIds = page.pageVMs.map((vm) => vm.vmId);
 
-      const rankedMetrics = db
-        .select({
-          vmId: metricsTable.vmId,
-          time: metricsTable.time,
-          networkIn: metricsTable.networkIn,
-          networkOut: metricsTable.networkOut,
-          rn: sql`ROW_NUMBER() OVER (PARTITION BY ${metricsTable.vmId} ORDER BY ${metricsTable.time} DESC)`.as(
-            "rn",
-          ),
-        })
-        .from(metricsTable);
-      const result = await db
-        .select({
-          vmId: sql`r1.vm_id`,
-          currentIn: sql`r1.network_in`,
-          currentOut: sql`r1.network_out`,
-          previousIn: sql`r2.network_in`,
-          previousOut: sql`r2.network_out`,
-          timeDiffSeconds: sql`EXTRACT(EPOCH FROM (r1.time - r2.time))`,
-          networkInRate: sql`(r1.network_in - r2.network_in) / 
-        NULLIF(EXTRACT(EPOCH FROM (r1.time - r2.time)), 0)`,
-          networkOutRate: sql`(r1.network_out - r2.network_out) / 
-        NULLIF(EXTRACT(EPOCH FROM (r1.time - r2.time)), 0)`,
-        })
-        .from(rankedMetrics.as("r1"))
-        .leftJoin(
-          rankedMetrics.as("r2"),
-          and(eq(sql`r1.vm_id`, sql`r2.vm_id`), eq(sql`r2.rn`, 2)),
+      const results = await db.execute(sql`
+        WITH time_buckets AS (
+          SELECT 
+            time_bucket('60 seconds', time) as bucket,
+            FIRST_VALUE(SUM(network_in)) OVER w as first_network_in,
+            FIRST_VALUE(SUM(network_out)) OVER w as first_network_out,
+            LAST_VALUE(SUM(network_in)) OVER w as last_network_in,
+            LAST_VALUE(SUM(network_out)) OVER w as last_network_out,
+            FIRST_VALUE(time) OVER w as first_time,
+            LAST_VALUE(time) OVER w as last_time
+          FROM metrics
+          WHERE 
+            ${inArray(metrics.vmId, vmIds)}
+            AND time > NOW() - INTERVAL '60 seconds'
+          GROUP BY time, bucket
+          WINDOW w AS (
+            PARTITION BY time_bucket('60 seconds', time)
+            ORDER BY time
+            RANGE BETWEEN UNBOUNDED PRECEDING AND UNBOUNDED FOLLOWING
+          )
         )
-        .where(eq(sql`r1.rn`, 1));
-      // const metrics = await db.query.metricsTable.findMany({
-      //   where: and(
-      //     inArray(metricsTable.vmId, status),
-      //     eq(metricsTable.createdAt, new Date()),
-      //   ),
-      //   orderBy: desc(metricsTable.createdAt),
-      // });
+        SELECT DISTINCT
+          bucket,
+          last_network_in::numeric as network_in_total,
+          last_network_out::numeric as network_out_total,
+          ((last_network_in - first_network_in) / 
+            EXTRACT(EPOCH FROM (last_time - first_time)))::numeric as network_in_speed,
+          ((last_network_out - first_network_out) / 
+            EXTRACT(EPOCH FROM (last_time - first_time)))::numeric as network_out_speed
+        FROM time_buckets
+        WHERE bucket = (SELECT MAX(bucket) FROM time_buckets)
+        ORDER BY bucket DESC;
+      `);
+
+      if (results.rows.length === 0) {
+        return c.json({
+          uploadSpeed: 0,
+          downloadSpeed: 0,
+          totalUpload: 0,
+          totalDownload: 0,
+        });
+      }
+
+      const result = results.rows[0] as {
+        network_in_speed: number;
+        network_out_speed: number;
+        network_in_total: number;
+        network_out_total: number;
+      };
+
+      return c.json({
+        uploadSpeed: result.network_out_speed,
+        downloadSpeed: result.network_in_speed,
+        totalUpload: result.network_out_total,
+        totalDownload: result.network_in_total,
+      });
+
       // return c.json({
-      //   total: page.pageVMs.length,
-      //   online: status.filter((s) => s.status).length,
-      //   offline: status.filter((s) => !s.status).length,
+      //   uploadSpeed:
+      //     (Number(current.networkOut) - Number(previous.networkOut)) / 30,
+      //   downloadSpeed:
+      //     (Number(current.networkIn) - Number(previous.networkIn)) / 30,
+      //   totalUpload: Number(current.networkOut),
+      //   totalDownload: Number(current.networkIn),
       // });
     },
   )

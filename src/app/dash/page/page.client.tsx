@@ -52,9 +52,12 @@ export function PageManagementData() {
               <p className="mb-2 text-muted-foreground">
                 {tD("accessLink")}: /{page.handle}
               </p>
-              <div className="mt-3">
+              <div className="mt-3 flex flex-row items-center gap-2">
                 <p className="text-muted-foreground text-sm">
                   {t("vmCount", { count: page.vmCount })}
+                </p>
+                <p className="ml-auto text-muted-foreground text-sm">
+                  {t("createdAt", { date: page.createdAt })}
                 </p>
               </div>
             </div>
