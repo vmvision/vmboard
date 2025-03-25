@@ -10,5 +10,8 @@ export const siteConfig = {
     env.NODE_ENV === "development"
       ? "http://localhost:3000"
       : "https://vmboard.app",
-  links: { github: "https://github.com/AprilNEA/vmboard" },
+  links: {
+    github: "https://github.com/AprilNEA/vmboard",
+    docs: "https://vmboard.io",
+  },
 };

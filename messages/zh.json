@@ -13,8 +13,9 @@
       "hour": "小时"
     },
     "Link": {
-      "docs": "文档",
-      "page": "页面"
+      "vm": "服务器",
+      "page": "页面",
+      "rule": "规则"
     },
     "Common": {
       "unknownError": "发生未知错误"

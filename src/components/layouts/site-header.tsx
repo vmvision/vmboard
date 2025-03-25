@@ -1,16 +1,14 @@
-import Link from "next/link";
-
+import { Link } from "next-view-transitions";
 import { Icons } from "@/components/icons";
 import { ModeToggle } from "@/components/layouts/mode-toggle";
 import { Button } from "@/components/ui/button";
 import { siteConfig } from "@/config/site";
 import Logo from "../icons/logo";
 import Profile from "./profile";
-import { getTranslations } from "next-intl/server";
+import { LinkBar } from "./link-bar";
+import { BookOpenTextIcon } from "lucide-react";
 
 export async function SiteHeader() {
-  const t = await getTranslations("Public.Link");
-
   return (
     <header className="sticky top-0 z-50 w-full border-border/40 border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
       <div className="container flex h-14 items-center">
@@ -21,24 +19,9 @@ export async function SiteHeader() {
           </span>
         </Link>
         <nav className="flex w-full items-center gap-6 text-sm">
-          <Link
-            href="https://vmboard.org"
-            target="_blank"
-            rel="noopener noreferrer"
-            className="text-foreground/60 transition-colors hover:text-foreground"
-          >
-            {t("docs")}
-          </Link>
-          <Link
-            href="/dash/page"
-            // target="_blank"
-            // rel="noopener noreferrer"
-            className="text-foreground/60 transition-colors hover:text-foreground"
-          >
-            {t("page")}
-          </Link>
+          <LinkBar />
         </nav>
-        <nav className="flex flex-1 items-center md:justify-end">
+        <nav className="flex flex-1 items-center gap-1 md:justify-end">
           <Button variant="ghost" size="icon" className="size-8" asChild>
             <Link
               aria-label="GitHub repo"
@@ -46,7 +29,20 @@ export async function SiteHeader() {
               target="_blank"
               rel="noopener noreferrer"
             >
-              <Icons.gitHub className="size-5" aria-hidden="true" />
+              <Icons.GitHub className="size-5" aria-hidden="true" />
+            </Link>
+          </Button>
+          <Button variant="ghost" size="icon" className="size-8" asChild>
+            <Link
+              href={siteConfig.links.docs}
+              target="_blank"
+              rel="noopener noreferrer"
+            >
+              <BookOpenTextIcon
+                className="size-5"
+                aria-hidden="true"
+                strokeWidth="1.5"
+              />
             </Link>
           </Button>
           <ModeToggle />

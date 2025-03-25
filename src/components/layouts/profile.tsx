@@ -13,6 +13,7 @@ import { Link } from "next-view-transitions";
 import { Button } from "../ui/button";
 import { getTranslations } from "next-intl/server";
 import { BoltIcon, CircleUserRoundIcon } from "lucide-react";
+
 export default async function Profile() {
   const t = await getTranslations("Public.Auth");
   const tP = await getTranslations("Private.Profile");
