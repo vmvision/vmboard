@@ -23,7 +23,7 @@ void app.prepare().then(async () => {
       handle(req, res);
     });
 
-    (await import("./server/wss/master.js")).setupMasterWebSocketServer(server);
+    (await import("./server/wss/probe.js")).setupProbeWebSocketServer(server);
     console.log("[WSS] Master Setup Complete");
     (await import("./server/wss/monitor.js")).setupMonitorWebSocketServer(
       server,

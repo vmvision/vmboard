@@ -5,7 +5,7 @@ import db from "@/db";
 import { metrics as metricsTable } from "@/db/schema/metrics";
 import { auth } from "@/lib/auth";
 import { pack } from "msgpackr";
-import type { MonitorUserClientEvent, MonitorWebSocket } from "./types";
+import type { MonitorClientEvent, MonitorWebSocket } from "./types";
 import { parseMsgPack } from "./utils";
 import { page as pageTable } from "@/db/schema/page";
 import { socketManager } from "./manager/socket";
@@ -40,10 +40,10 @@ export const setupMonitorWebSocketServer = (
     if (!session) return unauthenticated("No session");
     wssTerm.handleUpgrade(req, socket, head, function done(ws) {
       const monitorWs = ws as MonitorWebSocket;
-      monitorWs.id = uuid();
+      monitorWs.socketId = uuid();
       monitorWs.session = session;
       monitorWs.listenVmIds = [];
-      socketManager.addSocket(monitorWs.id, monitorWs);
+      socketManager.addSocket(monitorWs.socketId, monitorWs);
       wssTerm.emit("connection", monitorWs, req);
     });
   });
@@ -52,7 +52,7 @@ export const setupMonitorWebSocketServer = (
       console.error("WebSocket error:", err);
     });
     userWs.on("message", async (data) => {
-      const message = parseMsgPack(data) as MonitorUserClientEvent;
+      const message = parseMsgPack(data) as MonitorClientEvent;
       switch (message.type) {
         case "startMonitor": {
           const vmIds =
@@ -72,7 +72,7 @@ export const setupMonitorWebSocketServer = (
                     })
                   )?.pageVMs?.map((pageVM) => pageVM.vm.id) ?? [])
                 : [];
-          monitorManager.listen(userWs.id, vmIds);
+          monitorManager.listen(userWs.socketId, vmIds);
           userWs.send(
             pack({
               type: "monitoring",
@@ -101,8 +101,8 @@ export const setupMonitorWebSocketServer = (
       }
     });
     userWs.on("close", () => {
-      socketManager.removeSocket(userWs.id);
-      monitorManager.unlisten(userWs.id, "all");
+      socketManager.removeSocket(userWs.socketId);
+      monitorManager.unlisten(userWs.socketId, "all");
     });
   });
 };

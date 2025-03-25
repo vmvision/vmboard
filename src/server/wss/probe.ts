@@ -5,15 +5,15 @@ import { WebSocketServer } from "ws";
 import db from "@/db";
 import { metrics as metricsTable } from "@/db/schema/metrics";
 import { pack } from "msgpackr";
-import type { MonitorServerClientEvent, VMWebSocket } from "./types";
+import type { ProbeServerEvent, VMWebSocket } from "./types";
 import { parseMsgPack } from "./utils";
 import { v4 as uuid } from "uuid";
 import { socketManager } from "./manager/socket";
 import { vmManager } from "./manager/vm-manager";
 import { monitorManager } from "./manager/monitor-manager";
 
-const WSS_PATHNAME = "/wss/master";
-export function setupMasterWebSocketServer(
+const WSS_PATHNAME = "/wss/probe";
+export function setupProbeWebSocketServer(
   server: http.Server<typeof http.IncomingMessage, typeof http.ServerResponse>,
 ) {
   const wssTerm = new WebSocketServer({
@@ -37,34 +37,43 @@ export function setupMasterWebSocketServer(
       const token = searchParams.get("secret");
       if (!token) return unauthenticated("No token");
       const vm = await db.query.vm.findFirst({
-        where: eq(vmTable.token, token),
+        where: eq(vmTable.probeToken, token),
       });
       if (!vm) return unauthenticated("VM not found");
       wssTerm.handleUpgrade(req, socket, head, function done(ws) {
         const vmWs = ws as unknown as VMWebSocket;
-        vmWs.vmId = vm.id;
-        vmWs.token = vm.token;
-        vmWs.id = uuid();
-        socketManager.addSocket(vmWs.id, vmWs);
-        vmManager.addSocket(vm.id, vmWs.id);
+        const socketId = uuid();
+        vmWs.socketId = socketId;
+        vmWs.vm = vm;
+        socketManager.addSocket(socketId, vmWs);
+        vmManager.addSocket(vm.id, socketId);
         wssTerm.emit("connection", vmWs, req);
       });
     } catch (error) {
+      console.error("[WSS-Probe] Error upgrading:", error);
       unauthenticated(`Error upgrading: ${error}`);
     }
   });
 
-  wssTerm.on("connection", async (vmWs: VMWebSocket) => {
-    vmWs.on("error", (err) => {
+  wssTerm.on("connection", async (ws: VMWebSocket) => {
+    ws.on("error", (err) => {
       console.error("WebSocket error:", err);
     });
-    vmWs.on("close", () => {
-      socketManager.removeSocket(vmWs.id);
-      vmManager.removeSocket(vmWs.vmId);
+    ws.on("close", () => {
+      socketManager.removeSocket(ws.socketId);
+      vmManager.removeSocket(ws.vm.id);
     });
-    vmWs.on("message", async (data) => {
+    ws.send(
+      pack({
+        type: "update_config",
+        data: ws.vm.probeConfig ?? {
+          metrics_interval: 10,
+        },
+      }),
+    );
+    ws.on("message", async (data) => {
       try {
-        const message = parseMsgPack(data) as MonitorServerClientEvent;
+        const message = parseMsgPack(data) as ProbeServerEvent;
         if (typeof message !== "object" || message === null || !message?.type) {
           throw new Error("Invalid message");
         }
@@ -75,7 +84,7 @@ export function setupMasterWebSocketServer(
               await db
                 .insert(metricsTable)
                 .values({
-                  vmId: vmWs.vmId,
+                  vmId: ws.vm.id,
                   uptime: data.uptime,
                   cpuUsage: data.system.cpuUsage,
                   processCount: data.system.processCount,
@@ -97,10 +106,10 @@ export function setupMasterWebSocketServer(
                 })
                 .returning()
             )?.[0];
-            monitorManager.broadcast(vmWs.vmId, {
+            monitorManager.broadcast(ws.vm.id, {
               type: "liveMetrics",
               data: {
-                vmId: vmWs.vmId,
+                vmId: ws.vm.id,
                 metrics,
               },
             });
@@ -113,9 +122,9 @@ export function setupMasterWebSocketServer(
             await db
               .update(vmTable)
               .set({
-                monitorInfo: data,
+                probeInfo: data,
               })
-              .where(eq(vmTable.id, vmWs.vmId));
+              .where(eq(vmTable.id, ws.vm.id));
             break;
           }
           default:
@@ -123,7 +132,7 @@ export function setupMasterWebSocketServer(
         }
       } catch (error) {
         console.error("Error processing message:", error);
-        vmWs.send(
+        ws.send(
           pack({
             type: "error",
             message:

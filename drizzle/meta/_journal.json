@@ -22,6 +22,13 @@
       "when": 1742551334206,
       "tag": "0002_page_handle_hostname",
       "breakpoints": true
+    },
+    {
+      "idx": 3,
+      "version": "7",
+      "when": 1742895215175,
+      "tag": "0003_rename_probe",
+      "breakpoints": true
     }
   ]
 }

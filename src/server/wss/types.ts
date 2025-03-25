@@ -1,4 +1,4 @@
-import type { MonitorVMInfo } from "@/db/schema/vm";
+import type { MonitorVMInfo, VM } from "@/db/schema/vm";
 import type { Session } from "@/lib/auth";
 import type { UUIDTypes } from "uuid";
 import type { WebSocket as _WebSocket } from "ws";
@@ -6,11 +6,10 @@ export type SocketIdentifier = UUIDTypes;
 export type VMIdentifier = number;
 
 export type WebSocket = _WebSocket & {
-  id: SocketIdentifier;
+  socketId: SocketIdentifier;
 };
 export interface VMWebSocket extends WebSocket {
-  vmId: number;
-  token: string;
+  vm: VM;
 }
 export interface MonitorWebSocket extends WebSocket {
   session: Session | null;
@@ -34,7 +33,8 @@ export interface GetMonitorMetricsEvent {
   };
 }
 
-export type MonitorUserClientEvent = StartMonitorEvent | GetMonitorMetricsEvent;
+/* User monitor side event */
+export type MonitorClientEvent = StartMonitorEvent | GetMonitorMetricsEvent;
 
 export interface VMReportEvent {
   type: "metrics";
@@ -79,4 +79,4 @@ export interface VMInfoEvent {
   data: MonitorVMInfo;
 }
 
-export type MonitorServerClientEvent = VMReportEvent | VMInfoEvent;
+export type ProbeServerEvent = VMReportEvent | VMInfoEvent;

@@ -17,6 +17,7 @@ import bigintJsonb from "../bigint-jsonb";
 import { relations } from "drizzle-orm";
 import { pageVM } from "./page";
 import { metrics } from "./metrics";
+import { z } from "zod";
 
 export interface SSHInfo extends ConnectConfig {
   sshKeyId?: number;
@@ -37,6 +38,12 @@ export interface MonitorVMInfo {
   version: string;
 }
 
+export const monitorConfig = z.object({
+  metrics_interval: z.number().min(1).max(60),
+});
+
+export type MonitorConfig = z.infer<typeof monitorConfig>;
+
 export const vm = pgTable("vm", {
   id: serial("id").primaryKey(),
   userId: text("user_id")
@@ -56,11 +63,15 @@ export const vm = pgTable("vm", {
     enum: ["running", "stopped", "expired", "error"],
   }).notNull(),
   ipAddress: inet("ip_address"),
-  token: uuid("token").defaultRandom().notNull(),
-  sshInfo: jsonb("ssh_info").$type<SSHInfo>(),
-
-  monitorInfo: bigintJsonb("monitor_info").$type<MonitorVMInfo>(),
   metadata: jsonb("metadata").$type<VMMetadata>(),
+
+  sshInfo: jsonb("ssh_info").$type<SSHInfo>(),
+  /* Secret token for probe */
+  probeToken: uuid("probe_token").defaultRandom().unique().notNull(),
+  /* Config for probe */
+  probeConfig: jsonb("probe_config").$type<MonitorConfig>(),
+  /* Information harvest from probe */
+  probeInfo: bigintJsonb("probe_info").$type<MonitorVMInfo>(),
 
   createdAt: timestamp("created_at", { withTimezone: true })
     .notNull()
