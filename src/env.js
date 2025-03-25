@@ -16,7 +16,7 @@ export const env = createEnv({
     INTERNAL_URL: z.string().url().default("http://localhost:3000"),
     // Database
     DATABASE_URL: z.string().url(),
-    
+
     // Auth
     ENABLE_EMAIL_VERIFICATION: z.boolean().default(false),
     RESEND_API_KEY: z.string().optional(),
@@ -25,6 +25,10 @@ export const env = createEnv({
     GOOGLE_CLIENT_ID: z.string().optional(),
     GOOGLE_CLIENT_SECRET: z.string().optional(),
     CF_TURNSTILE_SECRET_KEY: z.string().optional(),
+
+    // Cloud
+    DOCS_BASE: z.string().optional(),
+    CLOUD_HOST: z.string().optional(),
   },
 
   /**
@@ -61,6 +65,9 @@ export const env = createEnv({
     NEXT_PUBLIC_CF_TURNSTILE_SITE_KEY:
       process.env.NEXT_PUBLIC_CF_TURNSTILE_SITE_KEY,
     CF_TURNSTILE_SECRET_KEY: process.env.CF_TURNSTILE_SECRET_KEY,
+    
+    DOCS_BASE: process.env.DOCS_BASE,
+    CLOUD_HOST: process.env.CLOUD_HOST,
   },
   /**
    * Run `build` or `dev` with `SKIP_ENV_VALIDATION` to skip env validation. This is especially
