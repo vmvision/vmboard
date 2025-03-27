@@ -1,42 +1,55 @@
 export interface ThemeColors {
-  radius: string;
   background: string;
   foreground: string;
   card: string;
-  cardForeground: string;
+  "card-foreground": string;
   popover: string;
-  popoverForeground: string;
+  "popover-foreground": string;
   primary: string;
-  primaryForeground: string;
+  "primary-foreground": string;
   secondary: string;
-  secondaryForeground: string;
+  "secondary-foreground": string;
   muted: string;
-  mutedForeground: string;
+  "muted-foreground": string;
   accent: string;
-  accentForeground: string;
+  "accent-foreground": string;
   destructive: string;
+  "destructive-foreground": string;
+  
   border: string;
   input: string;
   ring: string;
-  chart1: string;
-  chart2: string;
-  chart3: string;
-  chart4: string;
-  chart5: string;
-  sidebar: string;
-  sidebarForeground: string;
-  sidebarPrimary: string;
-  sidebarPrimaryForeground: string;
-  sidebarAccent: string;
-  sidebarAccentForeground: string;
-  sidebarBorder: string;
-  sidebarRing: string;
+
+  "chart-1": string;
+  "chart-2": string;
+  "chart-3": string;
+  "chart-4": string;
+  "chart-5": string;
+  "chart-6": string;
+  "chart-7": string;
+  "chart-8": string;
+  "chart-9": string;
+  "chart-10": string;
+
+  "sidebar-background": string;
+  "sidebar-foreground": string;
+  "sidebar-primary": string;
+  "sidebar-primary-foreground": string;
+  "sidebar-accent": string;
+  "sidebar-accent-foreground": string;
+  "sidebar-border": string;
+  "sidebar-ring": string;
+}
+
+export interface ThemeVariables extends ThemeColors {
+  radius: string;
+  timing: string;
 }
 
 export interface Theme {
   name: string;
-  light: Partial<ThemeColors>;
-  dark: Partial<ThemeColors>;
+  light: Partial<ThemeVariables>;
+  dark: Partial<ThemeVariables>;
 }
 
 export interface DerivedTheme {

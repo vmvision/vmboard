@@ -1,4 +1,4 @@
-import { Calendar, Home, Inbox, Search, Settings } from "lucide-react";
+import { Bell, Cable, Home, Palette } from "lucide-react";
 
 // Menu items.
 export const userItems = [
@@ -36,10 +36,14 @@ export const siteItems = [
   },
   {
     id: "api",
-    icon: Home,
+    icon: Cable,
   },
   {
     id: "notification",
-    icon: Home,
+    icon: Bell,
+  },
+  {
+    id: "theme",
+    icon: Palette,
   },
 ];
