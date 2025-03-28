@@ -15,6 +15,7 @@ import { getLocale, getMessages } from "next-intl/server";
 import { NextIntlClientProvider } from "next-intl";
 import { pickPublic } from "@/i18n/pick";
 import type { Messages } from "global";
+import { ThemeScript } from "@/providers/color/script";
 
 export const metadata: Metadata = {
   metadataBase: new URL(siteConfig.url),
@@ -70,7 +71,9 @@ export default async function RootLayout({
 
   return (
     <html lang={locale} suppressHydrationWarning>
-      <head />
+      <head>
+        <ThemeScript />
+      </head>
       <body
         className={cn(
           "min-h-screen bg-background font-sans antialiased",
