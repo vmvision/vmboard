@@ -6,12 +6,14 @@ import { DateRangePicker } from "@/components/date-range-picker";
 import { Shell } from "@/components/shell";
 import { Skeleton } from "@/components/ui/skeleton";
 import { getValidFilters } from "@/lib/data-table";
-
+import { CreateVMSheet } from "@/components/vm/create-vm-sheet";
 import { FeatureFlagsProvider } from "../../components/vm/feature-flags-provider";
 import { VMsTable } from "../../components/vm/vms-table";
 import { getMerchants, getVMs, getVMStatusCounts } from "../_lib/queries";
 import { searchParamsCache } from "../_lib/validations";
 import ServerOverview from "@/components/overview-cards";
+import { useState } from "react";
+import { CreateVMDialog } from "@/components/vm/create-vm-dialog";
 
 interface IndexPageProps {
   searchParams: Promise<SearchParams>;
@@ -32,9 +34,12 @@ export default async function IndexPage(props: IndexPageProps) {
     getVMStatusCounts(),
   ]);
 
+  const [vms, merchants, statusCounts] = await promises;
+
   return (
     <Shell className="gap-2">
       <ServerOverview type="vm" />
+      <CreateVMDialog open={vms.data.length === 0} />
       {/* <FeatureFlagsProvider> */}
       {/* <React.Suspense fallback={<Skeleton className="h-7 w-52" />}>
           <DateRangePicker
@@ -55,7 +60,7 @@ export default async function IndexPage(props: IndexPageProps) {
           />
         }
       >
-        <VMsTable promises={promises} />
+        {vms ? <VMsTable promises={promises} /> : <div>promises is null</div>}
       </React.Suspense>
       {/* </FeatureFlagsProvider> */}
     </Shell>
