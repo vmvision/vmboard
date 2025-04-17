@@ -164,7 +164,11 @@
         "description": "管理您的站点设置",
         "General": {
           "title": "通用设置",
-          "description": "管理您的站点设置"
+          "description": "管理您的站点设置",
+          "Detail": {
+            "name": "站点名称",
+            "description": "站点描述"
+          }
         },
         "Api": {
           "title": "API 设置",
