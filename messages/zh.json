@@ -177,6 +177,34 @@
         "Notification": {
           "title": "通知设置",
           "description": "管理您的通知设置"
+        },
+        "Theme": {
+          "title": "主题设置",
+          "description": "自定义浅色和深色模式的主题颜色",
+          "light": "浅色模式",
+          "dark": "深色模式",
+          "system": "系统",
+          "Colors": {
+            "background": "背景色",
+            "foreground": "前景色",
+            "muted": "柔和色",
+            "muted-foreground": "柔和前景色",
+            "popover": "弹出层背景色",
+            "popover-foreground": "弹出层前景色",
+            "card": "卡片背景色",
+            "card-foreground": "卡片前景色",
+            "border": "边框色",
+            "input": "输入框色",
+            "primary": "主色",
+            "primary-foreground": "主色前景色",
+            "secondary": "次色",
+            "secondary-foreground": "次色前景色",
+            "accent": "强调色",
+            "accent-foreground": "强调色前景色",
+            "destructive": "危险色",
+            "destructive-foreground": "危险色前景色",
+            "ring": "环形色"
+          }
         }
       }
     }
